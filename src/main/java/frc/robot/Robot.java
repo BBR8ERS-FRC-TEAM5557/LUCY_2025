@@ -187,6 +187,11 @@ public class Robot extends LoggedRobot {
 		if (m_autoCommand != null) {
 			m_autoCommand.cancel();
 		}
+
+		if (!RobotContainer.m_wrist.isHomed() || !RobotContainer.m_elevator.isHomed()) {
+			RobotContainer.m_wrist.homingSequence().schedule();
+			RobotContainer.m_elevator.homingSequence().schedule();
+		}
 	}
 
 	@Override

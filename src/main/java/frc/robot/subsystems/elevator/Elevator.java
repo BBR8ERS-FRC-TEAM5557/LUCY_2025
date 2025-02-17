@@ -11,13 +11,12 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.util.Util;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -43,8 +42,6 @@ public class Elevator extends SubsystemBase {
                         0.25);
         private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
                         "Elevator/HomingVelocityThresh", 5.0);
-        private static final LoggedTunableNumber staticCharacterizationVelocityThresh = new LoggedTunableNumber(
-                        "Elevator/StaticCharacterizationVelocityThresh", 0.1);
 
         private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
                         "Elevator/setpointTolerance", Units.inchesToMeters(0.5));
@@ -55,19 +52,16 @@ public class Elevator extends SubsystemBase {
         private final Alert motorDisconnectedAlert = new Alert("Elevator motor disconnected!",
                         Alert.AlertType.kWarning);
 
-        private BooleanSupplier coastOverride = () -> false;
-
         @AutoLogOutput(key = "Elevator/isBrakeMode")
         private boolean brakeModeEnabled = true;
-        private DoubleSupplier setpointMeters = () -> 0.0;
-
-        @AutoLogOutput(key = "Elevator/homed")
         private boolean homed = false;
         private Debouncer homingDebouncer = new Debouncer(homingTimeSecs.get());
 
+        private DoubleSupplier setpointMeters = () -> 0.0;
+
         public Elevator(ElevatorIO io) {
-                System.out.println("[Init] Instantiating RobotContainer");
-                
+                System.out.println("[Init] Instantiating Elevator");
+
                 super.setName("Elevator");
                 this.io = io;
                 io.setPID(kP.get(), 0.0, kD.get());
@@ -94,9 +88,6 @@ public class Elevator extends SubsystemBase {
                                 || maxAccelerationMetersPerSec2.hasChanged(hashCode())) {
                         io.setKinematicConstraints(maxVelocityMetersPerSec.get(), maxAccelerationMetersPerSec2.get());
                 }
-
-                // Set coast mode
-                setBrakeMode(!coastOverride.getAsBoolean());
         }
 
         public Command runPositionCommand(DoubleSupplier setpointSupplier) {
@@ -109,8 +100,7 @@ public class Elevator extends SubsystemBase {
 
         public Command waitUntilAtSetpointCommand() {
                 return new WaitUntilCommand(
-                                () -> Util.epsilonEquals(getPositionMeters(), getSetpointMeters(),
-                                                setpointTolerance.get()));
+                                () -> atSetpoint());
         }
 
         public void setBrakeMode(boolean enabled) {
@@ -118,10 +108,6 @@ public class Elevator extends SubsystemBase {
                         return;
                 brakeModeEnabled = enabled;
                 io.setBrakeMode(brakeModeEnabled);
-        }
-
-        public void setOverride(BooleanSupplier coastOverride) {
-                this.coastOverride = coastOverride;
         }
 
         public double getPositionMeters() {
@@ -133,21 +119,37 @@ public class Elevator extends SubsystemBase {
                 return setpointMeters.getAsDouble();
         }
 
+        @AutoLogOutput(key = "Elevator/atSetpoint")
+        public boolean atSetpoint() {
+                return Util.epsilonEquals(getPositionMeters(), getSetpointMeters(),
+                                setpointTolerance.get());
+        }
+
+        @AutoLogOutput(key = "Elevator/homed")
+        public boolean isHomed() {
+                return homed;
+        }
+
         public Command homingSequence() {
-                return Commands.startRun(
+                return startRun(
                                 () -> {
                                         homed = false;
                                         homingDebouncer = new Debouncer(homingTimeSecs.get());
                                         homingDebouncer.calculate(false);
                                 },
                                 () -> {
-                                        if (coastOverride.getAsBoolean())
+                                        if (!brakeModeEnabled) // implies limp mode
                                                 return;
                                         io.runVolts(homingVolts.get());
                                         homed = homingDebouncer.calculate(
                                                         Math.abs(inputs.velocityMetersPerSec) <= homingVelocityThresh
                                                                         .get());
                                 })
-                                .until(() -> homed);
+                                .until(() -> homed)
+                                .andThen(
+                                                () -> {
+                                                        io.setPosition(SuperstructureState.HOME.getElevatorMeters());
+                                                        io.runPosition(SuperstructureState.STOW.getElevatorMeters());
+                                                });
         }
 }

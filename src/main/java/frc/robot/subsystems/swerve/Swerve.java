@@ -2,6 +2,8 @@ package frc.robot.subsystems.swerve;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -17,7 +19,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -59,7 +60,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                 () -> this.getState().Pose, // Supplier of current robot pose
                                 (pose) -> resetPose(pose), // Consumer for seeding pose against auto
                                 () -> getCurrentRobotChassisSpeeds(),
-                                (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)), // Consumer of robot speeds
+                                (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)), // Consumer
+                                                                                                           // of robot
+                                                                                                           // speeds
                                 new PPHolonomicDriveController(
                                                 new PIDConstants(
                                                                 SwerveConstants.PID.kTranslationkP,
@@ -77,37 +80,39 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
         private void configureDashboard() {
                 ShuffleboardTab shuffleboardTab = Shuffleboard
-				.getTab("Swerve");
-		shuffleboardTab.addNumber("Heading", () -> Util.truncate(getState().Pose.getRotation().getDegrees(), 2))
-				.withWidget(BuiltInWidgets.kGyro);
-		shuffleboardTab
-				.addNumber(
-						"Velocity",
-						() -> Util.truncate(Math.hypot(getState().Speeds.vxMetersPerSecond, getState().Speeds.vyMetersPerSecond),
-								2))
-				.withWidget(BuiltInWidgets.kGraph);
-        
+                                .getTab("Swerve");
+                shuffleboardTab.addNumber("Heading", () -> Util.truncate(getState().Pose.getRotation().getDegrees(), 2))
+                                .withWidget(BuiltInWidgets.kGyro);
+                shuffleboardTab
+                                .addNumber(
+                                                "Velocity",
+                                                () -> Util.truncate(
+                                                                Math.hypot(getState().Speeds.vxMetersPerSecond,
+                                                                                getState().Speeds.vyMetersPerSecond),
+                                                                2))
+                                .withWidget(BuiltInWidgets.kGraph);
+
                 ShuffleboardLayout containerFL = shuffleboardTab.getLayout("FL Module", BuiltInLayouts.kList)
-                        .withSize(2, 2)
-                        .withPosition(0, 0);
+                                .withSize(2, 2)
+                                .withPosition(0, 0);
                 containerFL.addNumber("Current Velocity", () -> getModule(0).getCurrentState().speedMetersPerSecond);
                 containerFL.addNumber("Current Angle (Deg)", () -> getModule(0).getCurrentState().angle.getDegrees());
 
                 ShuffleboardLayout containerFR = shuffleboardTab.getLayout("FR Module", BuiltInLayouts.kList)
-                        .withSize(2, 2)
-                        .withPosition(2, 0);
+                                .withSize(2, 2)
+                                .withPosition(2, 0);
                 containerFR.addNumber("Current Velocity", () -> getModule(1).getCurrentState().speedMetersPerSecond);
                 containerFR.addNumber("Current Angle (Deg)", () -> getModule(1).getCurrentState().angle.getDegrees());
 
                 ShuffleboardLayout containerBL = shuffleboardTab.getLayout("BL Module", BuiltInLayouts.kList)
-                        .withSize(2, 2)
-                        .withPosition(2, 0);
+                                .withSize(2, 2)
+                                .withPosition(2, 0);
                 containerBL.addNumber("Current Velocity", () -> getModule(2).getCurrentState().speedMetersPerSecond);
                 containerBL.addNumber("Current Angle (Deg)", () -> getModule(2).getCurrentState().angle.getDegrees());
 
                 ShuffleboardLayout containerBR = shuffleboardTab.getLayout("BR Module", BuiltInLayouts.kList)
-                        .withSize(2, 2)
-                        .withPosition(2, 2);
+                                .withSize(2, 2)
+                                .withPosition(2, 2);
                 containerBR.addNumber("Current Velocity", () -> getModule(3).getCurrentState().speedMetersPerSecond);
                 containerBR.addNumber("Current Angle (Deg)", () -> getModule(3).getCurrentState().angle.getDegrees());
 
@@ -142,17 +147,19 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
          * 
          * @return field oriented chassis speeds
          */
-        public Twist2d getCurrentFieldChassisSpeeds() {
+        @AutoLogOutput(key = "Swerve/FieldVelocity")
+        public ChassisSpeeds getCurrentFieldChassisSpeeds() {
                 var state = getState();
                 if (state == null || state.Pose == null) {
-                        return new Twist2d();
+                        return new ChassisSpeeds();
                 }
                 var robotAngle = state.Pose.getRotation();
                 var chassisSpeeds = state.Speeds;
                 var fieldSpeeds = new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
                                 .rotateBy(robotAngle);
-                return new Twist2d(
+                return new ChassisSpeeds(
                                 // TODO: Change to using pigeon2 omega
-                                fieldSpeeds.getX(), fieldSpeeds.getY(), chassisSpeeds.omegaRadiansPerSecond);
+                                fieldSpeeds.getX(), fieldSpeeds.getY(),
+                                getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
         }
 }

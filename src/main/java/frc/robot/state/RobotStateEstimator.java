@@ -6,8 +6,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -28,7 +28,6 @@ public class RobotStateEstimator extends VirtualSubsystem {
         return mInstance;
     }
 
-    private Twist2d mRobotVelocity = new Twist2d();
     private final Field2d mField2d = new Field2d();
 
     private RobotStateEstimator() {
@@ -52,11 +51,6 @@ public class RobotStateEstimator extends VirtualSubsystem {
         }
     }
 
-    @AutoLogOutput(key = "RobotState/FusedFieldVelocity")
-    public Twist2d getFusedFieldVelocity() {
-        return RobotContainer.m_swerve.getCurrentFieldChassisSpeeds();
-    }
-
     @AutoLogOutput(key = "RobotState/EstimatedPose")
     public Pose2d getEstimatedPose() {
         return RobotContainer.m_swerve.getState().Pose;
@@ -73,12 +67,13 @@ public class RobotStateEstimator extends VirtualSubsystem {
      * @return The predicted pose.
      */
     public Pose2d getPredictedPose(double translationLookaheadS, double rotationLookaheadS) {
+        ChassisSpeeds robotVelocity = RobotContainer.m_swerve.getCurrentFieldChassisSpeeds();
         return getEstimatedPose()
                 .exp(
                         new Twist2d(
-                                mRobotVelocity.dx * translationLookaheadS,
-                                mRobotVelocity.dy * translationLookaheadS,
-                                mRobotVelocity.dtheta * rotationLookaheadS));
+                                robotVelocity.vxMetersPerSecond * translationLookaheadS,
+                                robotVelocity.vyMetersPerSecond * translationLookaheadS,
+                                robotVelocity.omegaRadiansPerSecond * rotationLookaheadS));
     }
 
     public void setPose(Pose2d pose) {

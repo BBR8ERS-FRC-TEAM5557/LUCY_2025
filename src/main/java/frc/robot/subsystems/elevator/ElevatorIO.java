@@ -41,6 +41,9 @@ public interface ElevatorIO {
         default void runPosition(double positionMeters) {
         }
 
+        default void setPosition(double positionMeters) {
+        }
+
         default void setPID(double kP, double kI, double kD) {
         }
 

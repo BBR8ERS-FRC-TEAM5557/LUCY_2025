@@ -17,8 +17,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.team6328.VirtualSubsystem;
+import frc.robot.RobotContainer;
 import frc.robot.state.RobotStateEstimator;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
@@ -65,8 +67,8 @@ public class Vision extends VirtualSubsystem {
 
             // Exit if no new data
             if (!hasUpdate) {
-                Logger.recordOutput("AprilTagVision/Inst" + instanceNames[instanceIndex] + "/RobotPose", new Pose2d());
-                Logger.recordOutput("AprilTagVision/Inst" + instanceNames[instanceIndex] + "/RobotPose3d",
+                Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/RobotPose", new Pose2d());
+                Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/RobotPose3d",
                         new Pose3d());
 
                 // If no recent frames from instance, clear tag poses
@@ -90,6 +92,11 @@ public class Vision extends VirtualSubsystem {
                     || robotPose3d.getY() > FieldConstants.fieldWidth + fieldBorderMargin
                     || robotPose3d.getZ() < -zMargin
                     || robotPose3d.getZ() > zMargin) {
+                continue;
+            }
+
+            if (Math.abs(RobotContainer.m_swerve.getCurrentFieldChassisSpeeds().omegaRadiansPerSecond) > Units
+                    .degreesToRadians(720)) {
                 continue;
             }
 
