@@ -46,7 +46,8 @@ public class Constants {
     public static final double kKrakenFreeSpeedFOC = 5800;
 
     public static final double kMass = Units.lbsToKilograms(120.0);
-    public static final double kMOI = (kMass / 12.0) * Math.hypot(kChassisLength, kChassisWidth); // estimate using formula for a slab
+    public static final double kMOI = (kMass / 12.0) * Math.hypot(kChassisLength, kChassisWidth); // estimate using
+                                                                                                  // formula for a slab
   }
 
   public class Joystick {

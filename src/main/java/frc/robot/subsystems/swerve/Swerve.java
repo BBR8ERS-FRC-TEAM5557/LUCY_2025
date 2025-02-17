@@ -14,12 +14,14 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -33,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.Util;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.Constants.Physical.*;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements
@@ -55,7 +59,20 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
         }
 
         private void configurePathPlanner() {
-                RobotConfig config = SwerveConstants.PPConfig.kRobotConfig;
+                ModuleConfig kModuleConfig = new ModuleConfig(
+                                kWheelRadiusMeters,
+                                kTrueMaxSpeed,
+                                kWheelCOF,
+                                DCMotor.getKrakenX60(1),
+                                kDriveGearRatio,
+                                80,
+                                1);
+                RobotConfig kRobotConfig = new RobotConfig(
+                                kMass,
+                                kMOI,
+                                kModuleConfig,
+                                getModuleLocations());
+
                 AutoBuilder.configure(
                                 () -> this.getState().Pose, // Supplier of current robot pose
                                 (pose) -> resetPose(pose), // Consumer for seeding pose against auto
@@ -73,7 +90,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                                                 SwerveConstants.PID.kRotationkI,
                                                                 SwerveConstants.PID.kRotationkD),
                                                 0.004),
-                                config,
+                                kRobotConfig,
                                 () -> AllianceFlipUtil.shouldFlip(),
                                 this); // Subsystem for requirements
         }

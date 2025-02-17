@@ -9,24 +9,19 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
-
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 import static frc.robot.Constants.RobotMap.*;
 import static frc.robot.Constants.Physical.*;
 
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 
 public class SwerveConstants {
         public static final String kSubsystemName = "Swerve";
 
-        private static final double kDriveGearRatio = (50.0 / 16.0) * (19.0 / 25.0) * (45.0 / 15.0);
-        private static final double kSteerGearRatio = 150.0 / 7.0;
-        private static final double kWheelRadiusMeters = Units.inchesToMeters(2.00);
+        public static final double kDriveGearRatio = (50.0 / 16.0) * (19.0 / 25.0) * (45.0 / 15.0);
+        public static final double kSteerGearRatio = 150.0 / 7.0;
+        public static final double kWheelRadiusMeters = Units.inchesToMeters(2.00);
         private static final boolean kInvertSteer = true;
         private static final boolean kInvertDrive = true;
         private static final boolean kInvertEncoder = true;
@@ -35,7 +30,7 @@ public class SwerveConstants {
         // This may need to be tuned to your individual robot
         private static final double kCoupleRatio = (50.0 / 16.0);
 
-        private static final double kWheelCOF = 1.5;
+        public static final double kWheelCOF = 1.5;
 
         // These are only used for simulation
         private static final double kSteerInertia = 0.00001;
@@ -44,28 +39,11 @@ public class SwerveConstants {
         /* Swerve Profiling Values */
         public static final double kTheoreticalMaxSpeed = kWheelRadiusMeters * 2 * Math.PI
                         * ((Constants.Physical.kKrakenFreeSpeed / 60.0) / kDriveGearRatio); // meters per second
-        public static final double kTrueMaxSpeed = kTheoreticalMaxSpeed * 0.9; // Max out at 90% to estimate true max speed
+        public static final double kTrueMaxSpeed = kTheoreticalMaxSpeed * 0.9; // Max out at 90% to estimate true max
+                                                                               // speed
 
         public static final double kTheoreticalMaxOmega = kTheoreticalMaxSpeed / kModuleRadius; // radians per second
         public static final double kTrueMaxOmega = kTrueMaxSpeed / kModuleRadius;
-
-        public class PPConfig {
-                private static final ModuleConfig kModuleConfig = new ModuleConfig(
-                                kWheelRadiusMeters,
-                                kTrueMaxSpeed,
-                                kWheelCOF,
-                                DCMotor.getKrakenX60(1),
-                                kDriveGearRatio,
-                                80,
-                                1
-                                );
-                public static final RobotConfig kRobotConfig = new RobotConfig(
-                        kMass,
-                        kMOI,
-                        kModuleConfig,
-                        RobotContainer.m_swerve.getModuleLocations()
-                        );
-        }
 
         /* MOTION PLANNER PID */
         public class PID {
@@ -87,25 +65,22 @@ public class SwerveConstants {
         // KINEMATIC LIMITS
         public class Kinematics {
                 public static final KinematicLimits kUncappedLimits = new KinematicLimits(
-                        kTheoreticalMaxSpeed,
-                        Double.MAX_VALUE,
-                        kTheoreticalMaxOmega, 
-                        Double.MAX_VALUE
-                        );
+                                kTheoreticalMaxSpeed,
+                                Double.MAX_VALUE,
+                                kTheoreticalMaxOmega,
+                                Double.MAX_VALUE);
 
                 public static final KinematicLimits kTeleopLimits = new KinematicLimits(
-                        kTrueMaxSpeed,
-                        kTrueMaxSpeed / 0.2,
-                        kTrueMaxOmega * 0.5, 
-                        Double.MAX_VALUE
-                        );
+                                kTrueMaxSpeed,
+                                kTrueMaxSpeed / 0.2,
+                                kTrueMaxOmega * 0.5,
+                                Double.MAX_VALUE);
 
                 public static final KinematicLimits kAutoLimits = new KinematicLimits(
-                        kTheoreticalMaxSpeed,
-                        kTheoreticalMaxSpeed / 0.2,
-                        kTrueMaxOmega * 0.5, 
-                        Double.MAX_VALUE
-                        );
+                                kTheoreticalMaxSpeed,
+                                kTheoreticalMaxSpeed / 0.2,
+                                kTrueMaxOmega * 0.5,
+                                Double.MAX_VALUE);
         }
 
         public class TunerConstants {
@@ -150,7 +125,8 @@ public class SwerveConstants {
                                 .withKI(0)
                                 .withKD(0)
                                 .withKS(0)
-                                .withKV((12.0 - kDriveFrictionVoltage) / (kSpeedAt12VoltsMps * (kDriveGearRatio / (2 * Math.PI * kWheelRadiusMeters))))
+                                .withKV((12.0 - kDriveFrictionVoltage) / (kSpeedAt12VoltsMps
+                                                * (kDriveGearRatio / (2 * Math.PI * kWheelRadiusMeters))))
                                 .withKA(0);
 
                 private static final Pigeon2Configuration Pigeon2 = new Pigeon2Configuration();
