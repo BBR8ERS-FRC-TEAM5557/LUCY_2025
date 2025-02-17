@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -16,13 +15,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.team6328.VirtualSubsystem;
 import frc.robot.RobotContainer;
-import frc.robot.state.quest.Quest;
 import frc.robot.state.vision.Vision.VisionObservation;
 
 public class RobotStateEstimator extends VirtualSubsystem {
-    public record QuestObservation(Pose3d questPose) {
-    }
-
     private static RobotStateEstimator mInstance = null;
 
     public static RobotStateEstimator getInstance() {
@@ -57,16 +52,6 @@ public class RobotStateEstimator extends VirtualSubsystem {
         }
     }
 
-    public void addQuestObservation(QuestObservation update) {
-
-    }
-
-    public void addQuestObservation(List<QuestObservation> questData) {
-        for (var update : questData) {
-            addQuestObservation(update);
-        }
-    }
-
     @AutoLogOutput(key = "RobotState/FusedFieldVelocity")
     public Twist2d getFusedFieldVelocity() {
         return RobotContainer.m_swerve.getCurrentFieldChassisSpeeds();
@@ -97,7 +82,7 @@ public class RobotStateEstimator extends VirtualSubsystem {
     }
 
     public void setPose(Pose2d pose) {
-        RobotContainer.m_swerve.seedFieldRelative(pose);
+        RobotContainer.m_swerve.resetPose(pose);
     }
 
     private void clampPoseToField() {

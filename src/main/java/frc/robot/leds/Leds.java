@@ -77,8 +77,6 @@ public class Leds extends VirtualSubsystem {
 	private static final double waveExponent = 0.4;
 	private static final double waveFastCycleLength = 25.0;
 	private static final double waveFastDuration = 0.25;
-	private static final double waveSlowCycleLength = 25.0;
-	private static final double waveSlowDuration = 3.0;
 	private static final double waveAllianceCycleLength = 10.0;
 	private static final double waveAllianceDuration = 1.0;
 	private static final double autoFadeTime = 2.5; // 3s nominal

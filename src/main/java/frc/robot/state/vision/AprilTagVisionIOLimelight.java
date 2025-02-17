@@ -4,8 +4,9 @@ import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.lib.team6328.Alert;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.state.RobotStateEstimator;
 import limelight.Limelight;
 import limelight.estimator.LimelightPoseEstimator.BotPose;
@@ -29,7 +30,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         System.out.println("[Init] Creating Limelight(" + cameraName + ")");
 
         this.camera = new Limelight(cameraName);
-        this.disconnectedAlert = new Alert("No data from \"" + cameraName + "\"", Alert.AlertType.INFO);
+        this.disconnectedAlert = new Alert("No data from \"" + cameraName + "\"", Alert.AlertType.kInfo);
 
         camera.getSettings()
                 .withLimelightLEDMode(LEDMode.PipelineControl)
@@ -49,8 +50,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         Rotation3d rotation = new Rotation3d(
                 0.0, 0.0, RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getRadians());
         Orientation3d orientation = new Orientation3d(rotation, null);
-        camera.getSettings()
-                .withRobotOrientation(orientation);
+        camera.getSettings().withRobotOrientation(orientation);
 
         Optional<PoseEstimate> result = DriverStation.isEnabled() ? BotPose.BLUE_MEGATAG2.get(camera)
                 : BotPose.BLUE.get(camera);
@@ -75,6 +75,13 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
             inputs.isMegatagTwo = result.get().isMegaTag2;
 
             poseCacheTimestampSeconds = result.get().timestampSeconds;
+
+        }
+
+        if (Timer.getFPGATimestamp() - poseCacheTimestampSeconds > 2.0) {
+            disconnectedAlert.set(true);
+        } else {
+            disconnectedAlert.set(false);
         }
     }
 }

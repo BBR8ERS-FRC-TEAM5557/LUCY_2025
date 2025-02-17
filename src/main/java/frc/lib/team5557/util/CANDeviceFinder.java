@@ -5,8 +5,8 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 import edu.wpi.first.hal.can.CANJNI;
-import frc.lib.team6328.Alert;
-import frc.lib.team6328.Alert.AlertType;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 /**
  * Class to find out which goodies are on the CAN bus. The important guts of
@@ -68,12 +68,12 @@ public class CANDeviceFinder {
 			if (whatItIs == null) {
 				Alert motor = new Alert(
 						" " + deviceType + "(" + id + ")" + " is missing From the CAN bus",
-						AlertType.WARNING);
+						AlertType.kWarning);
 				motor.set(true);
 			} else {
 				Alert motor = new Alert(
 						" " + deviceType + "(" + id + ")" + whatItIs + " is missing From the CAN bus",
-						AlertType.WARNING);
+						AlertType.kWarning);
 				motor.set(true);
 			}
 		}

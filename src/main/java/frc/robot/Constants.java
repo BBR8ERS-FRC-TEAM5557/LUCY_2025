@@ -1,13 +1,12 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
   public static boolean kIsReal = Robot.isReal();
-  public static boolean kTuningMode = false;
+  public static boolean kTuningMode = true;
 
   public class RobotMap {
     public static final int kPigeon = 5;
@@ -35,15 +34,19 @@ public class Constants {
 
   public class Physical {
     // Physical Constants
-    public static final double kChassisLength = Units.inchesToMeters(22.0);
-    public static final double kChassisWidth = Units.inchesToMeters(22.0);
+    public static final double kChassisLength = Units.inchesToMeters(26.0);
+    public static final double kChassisWidth = Units.inchesToMeters(26.0);
     public static final double kModuleInset = Units.inchesToMeters(2.625);
 
-    public static final double kWheelBase = kChassisLength - 2 * kModuleInset;
-    public static final double kTrackWidth = kChassisWidth - 2 * kModuleInset;
+    public static final double kWheelBase = kChassisLength - (2 * kModuleInset);
+    public static final double kTrackWidth = kChassisWidth - (2 * kModuleInset);
+    public static final double kModuleRadius = Math.hypot(kWheelBase / 2.0, kTrackWidth / 2.0);
 
     public static final double kKrakenFreeSpeed = 6000;
     public static final double kKrakenFreeSpeedFOC = 5800;
+
+    public static final double kMass = Units.lbsToKilograms(120.0);
+    public static final double kMOI = (kMass / 12.0) * Math.hypot(kChassisLength, kChassisWidth); // estimate using formula for a slab
   }
 
   public class Joystick {

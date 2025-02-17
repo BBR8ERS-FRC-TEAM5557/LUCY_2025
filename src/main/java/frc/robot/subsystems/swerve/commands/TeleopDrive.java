@@ -5,8 +5,8 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
@@ -35,10 +35,6 @@ public class TeleopDrive extends Command {
                 SwerveConstants.PID.kRotationkD);
         driveWithHeading.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
-        // uncomment for easy PID tuning
-        // SmartDashboard.putData("Heading Controller PID",
-        // driveWithHeading.HeadingController);
-
         addRequirements(mDrivetrain);
         setName("Teleop Drive Maintain Heading");
 
@@ -60,7 +56,7 @@ public class TeleopDrive extends Command {
 
     @Override
     public void initialize() {
-        mHeadingSetpoint = Optional.empty();
+        mHeadingSetpoint = Optional.of(RobotStateEstimator.getInstance().getEstimatedPose().getRotation());
     }
 
     @Override
@@ -79,7 +75,7 @@ public class TeleopDrive extends Command {
                 || (Util.epsilonEquals(mJoystickLastTouched, Timer.getFPGATimestamp(), 0.25)
                         && Math.abs(mDrivetrain.getCurrentRobotChassisSpeeds().omegaRadiansPerSecond) > Math
                                 .toRadians(10))) {
-            turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxAlpha();
+            turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
             mDrivetrain.setControl(driveNoHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
                     .withRotationalRate(turnFieldFrame));
             mHeadingSetpoint = Optional.empty();

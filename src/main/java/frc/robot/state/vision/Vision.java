@@ -20,7 +20,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.team6328.VirtualSubsystem;
 import frc.robot.state.RobotStateEstimator;
-import frc.robot.state.vision.AprilTagVisionIO.AprilTagVisionIOInputs;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
 
@@ -29,7 +28,7 @@ public class Vision extends VirtualSubsystem {
     }
 
     private final AprilTagVisionIO[] io;
-    private final AprilTagVisionIOInputs[] inputs;
+    private final AprilTagVisionIOInputsAutoLogged[] inputs;
 
     private final Map<Integer, Double> lastFrameTimes = new HashMap<>();
     private final Map<Integer, Double> lastTagDetectionTimes = new HashMap<>();
@@ -38,9 +37,9 @@ public class Vision extends VirtualSubsystem {
         System.out.println("[Init] Creating Vision");
 
         this.io = io;
-        inputs = new AprilTagVisionIOInputs[io.length];
+        inputs = new AprilTagVisionIOInputsAutoLogged[io.length];
         for (int i = 0; i < io.length; i++) {
-            inputs[i] = new AprilTagVisionIOInputs();
+            inputs[i] = new AprilTagVisionIOInputsAutoLogged();
         }
 
         // Create map of last frame times for instances

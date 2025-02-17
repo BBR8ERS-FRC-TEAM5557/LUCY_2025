@@ -8,6 +8,7 @@ public class CANDeviceId implements Comparable<CANDeviceId> {
 
     private CANDeviceType deviceType;
     private int deviceNumber;
+    private String busName;
 
     public CANDeviceType getDeviceType() {
         return deviceType;
@@ -17,11 +18,23 @@ public class CANDeviceId implements Comparable<CANDeviceId> {
         return deviceNumber;
     }
 
+    public String getBusName() {
+        return busName;
+    }
+
     private String toString;
+
+    public CANDeviceId (CANDeviceType deviceType, int deviceNumber, String busName) {
+        this.deviceType = deviceType;
+        this.deviceNumber = deviceNumber;
+        this.busName = busName;
+        this.toString = deviceType.toString() + " " + Integer.toString(deviceNumber);
+    }
 
     public CANDeviceId (CANDeviceType deviceType, int deviceNumber) {
         this.deviceType = deviceType;
         this.deviceNumber = deviceNumber;
+        this.busName = "";
         this.toString = deviceType.toString() + " " + Integer.toString(deviceNumber);
     }
 

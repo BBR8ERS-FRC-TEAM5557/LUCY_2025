@@ -6,233 +6,238 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.team5557.factory.BurnManager;
-import frc.lib.team5557.factory.SparkMaxFactory;
-import frc.lib.team6328.Alert;
-import frc.lib.team6328.Alert.AlertType;
 import frc.robot.leds.Leds;
 import frc.robot.state.vision.AprilTagVisionIO;
 import frc.robot.state.vision.AprilTagVisionIOLimelight;
 import frc.robot.state.vision.Vision;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.util.AllianceFlipUtil;
-//import frc.robot.util.FeedForwardCharacterization;
-import frc.robot.util.FieldConstants;
-import frc.robot.util.GeometryUtil;
 import frc.robot.state.*;
 
-import static frc.robot.Constants.*;
-import static frc.robot.Constants.RobotMap.*;
 import static frc.robot.state.vision.VisionConstants.*;
 
-import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
-import org.littletonrobotics.junction.networktables.LoggedDashboardBoolean;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 public class RobotContainer {
-  // create controller instances
-  public static final CommandXboxController m_driver = new CommandXboxController(0);
-  public static final CommandXboxController m_operator = new CommandXboxController(1);
+        // create controller instances
+        public static final CommandXboxController m_driver = new CommandXboxController(0);
+        public static final CommandXboxController m_operator = new CommandXboxController(1);
 
-  // create variables for physical subsystems
-  public static Swerve m_swerve;
-  public static Leds m_leds;
+        // create variables for physical subsystems
+        public static Swerve m_swerve;
+        public static Elevator m_elevator;
+        public static Leds m_leds;
 
-  // create variables for virtual subsystems
-  public static Vision m_vision;
-  public static RobotStateEstimator m_stateEstimator;
+        // create variables for virtual subsystems
+        public static Vision m_vision;
+        public static RobotStateEstimator m_stateEstimator;
 
-  // instantiate dashboard choosers / switches
-  public static LoggedDashboardChooser<Command> m_autoChooser;
+        // instantiate dashboard choosers / switches
+        public static LoggedDashboardChooser<Command> m_autoChooser;
 
-  // controller alerts
-  private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).",
-      AlertType.WARNING);
-  private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
-      AlertType.WARNING);
+        // controller alerts
+        private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).",
+                        AlertType.kWarning);
+        private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
+                        AlertType.kWarning);
 
-  public RobotContainer() {
-    // instantiate subsystems normally if the code is running irl (on a rio),
-    // otherwise create simulation subsystems or blank subsystems (useful for taking
-    // out entire subsystems in code without having to rewrite much)
+        public RobotContainer() {
+                System.out.println("[Init] Instantiating RobotContainer");
+                // instantiate subsystems normally if the code is running irl (on a rio),
+                // otherwise create simulation subsystems or blank subsystems (useful for taking
+                // out entire subsystems in code without having to rewrite much)
 
-    if (Constants.kIsReal) {
-      m_swerve = new Swerve(
-          SwerveConstants.TunerConstants.DrivetrainConstants,
-          SwerveConstants.TunerConstants.FrontLeft,
-          SwerveConstants.TunerConstants.FrontRight,
-          SwerveConstants.TunerConstants.BackLeft,
-          SwerveConstants.TunerConstants.BackRight);
-      m_vision = new Vision(
-          new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
-          new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
+                m_swerve = new Swerve(
+                                SwerveConstants.TunerConstants.DrivetrainConstants,
+                                SwerveConstants.TunerConstants.FrontLeft,
+                                SwerveConstants.TunerConstants.FrontRight,
+                                SwerveConstants.TunerConstants.BackLeft,
+                                SwerveConstants.TunerConstants.BackRight);
 
-    } else {
-    }
+                m_vision = new Vision(
+                                new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
+                                new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
 
-    // Instantiate missing subsystems
-    if (m_swerve == null) {
-    }
-    if (m_vision == null) {
-      m_vision = new Vision(
-          new AprilTagVisionIO() {
-          },
-          new AprilTagVisionIO() {
-          });
-    }
+                m_elevator = new Elevator(
+                                new ElevatorIOTalonFX());
 
-    m_stateEstimator = RobotStateEstimator.getInstance(); // get singleton
-    m_leds = Leds.getInstance(); // get leds singleton
-    m_autoChooser = new LoggedDashboardChooser<Command>("Driver/AutonomousChooser");
+                // Instantiate missing subsystems
+                if (m_vision == null) {
+                        m_vision = new Vision(
+                                        new AprilTagVisionIO() {},
+                                        new AprilTagVisionIO() {}
+                                        );
+                }
+                if (m_elevator == null) {
+                        m_elevator = new Elevator(new ElevatorIO(){});
+                }
 
-    // Alerts for constants
-    if (Constants.kTuningMode) {
-      SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
-      new Alert("Tuning mode enabled, expect slower network", AlertType.INFO).set(true);
-    }
-    if (BurnManager.shouldBurn()) {
-      new Alert("Burning flash enabled, consider disabling before competeing", AlertType.INFO).set(true);
-    }
+                m_stateEstimator = RobotStateEstimator.getInstance(); // get state estimator singleton
+                m_leds = Leds.getInstance(); // get leds singleton
+                m_autoChooser = new LoggedDashboardChooser<Command>("Driver/AutonomousChooser");
 
-    configureBindings();
-    generateEventMap();
-    generateAutoChoices();
-  }
+                // Alerts for constants
+                if (Constants.kTuningMode) {
+                        SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
+                        new Alert("Tuning mode enabled, expect slower network", AlertType.kInfo).set(true);
+                }
 
-  private void configureBindings() {
-    // Bind driver and operator controls
-    System.out.println("[Init] Binding controls");
-    DriverStation.silenceJoystickConnectionWarning(true);
+                configureBindings();
+                generateEventMap();
+                generateAutoChoices();
+        }
 
-    /* SWERVING */
-    TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput, this::getRotationInput);
-    m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
+        private void configureBindings() {
+                // Bind driver and operator controls
+                System.out.println("[Init] Binding controls");
+                DriverStation.silenceJoystickConnectionWarning(true);
 
-    m_driver.start()
-        .onTrue(Commands.runOnce(
-            () -> m_stateEstimator.setPose(
-                new Pose2d(
-                    m_stateEstimator.getEstimatedPose()
-                        .getTranslation(),
-                    AllianceFlipUtil.apply(
-                        new Rotation2d()))))
-            .ignoringDisable(true).withName("ResetHeading"));
+                /* SWERVING */
+                TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
+                                this::getRotationInput);
+                m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
-    PathPlannerPath path = PathPlannerPath.fromPathFile("alignAmp");
-    PathConstraints constraints = new PathConstraints(
-        4.0, 4.5,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
-    Command pathfindToAmp = AutoBuilder.pathfindThenFollowPath(
-        path,
-        constraints,
-        0.0);
-    // mDriver.rightBumper().and(mDriver.x()).whileTrue(pathfindToAmp);
+                m_driver.start()
+                        .onTrue(
+                                Commands.runOnce(
+                                        () -> m_stateEstimator.setPose(
+                                                new Pose2d(
+                                                        m_stateEstimator.getEstimatedPose().getTranslation(),
+                                                        AllianceFlipUtil.apply(new Rotation2d())
+                                                )
+                                        )
+                                ).ignoringDisable(true).withName("ResetHeading")
+                                .alongWith(m_elevator.homingSequence()));
 
-    Command pulseControllers = Commands.sequence(Commands.runOnce(() -> {
-      m_driver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-      m_operator.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-    }).andThen(Commands.waitSeconds(0.25)), Commands.runOnce(() -> {
-      m_driver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-      m_operator.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-    }).andThen(Commands.waitSeconds(0.25)), Commands.runOnce(() -> {
-      m_driver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-      m_operator.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-    }).andThen(Commands.waitSeconds(0.25)), Commands.runOnce(() -> {
-      m_driver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-      m_operator.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-    })).withName("PulseControllers").ignoringDisable(true);
+                m_driver.back()
+                        .whileTrue(
+                                Commands.startEnd(
+                                        () ->{
+                                                m_swerve.setBrakeMode(false);
+                                                m_elevator.setBrakeMode(false);
+                                        }, 
+                                        () -> {
+                                                m_swerve.setBrakeMode(true);
+                                                m_elevator.setBrakeMode(true);
+                                        }, 
+                                        m_swerve, m_elevator
+                                ).ignoringDisable(true).withName("Robot Go Limp"));
 
-  }
+                // Endgame Alerts
+                new Trigger(
+                        () ->
+                                DriverStation.isTeleopEnabled()
+                                && DriverStation.getMatchTime() > 0
+                                && DriverStation.getMatchTime() <= Math.round(30.0))
+                        .onTrue(
+                        controllerRumbleCommand()
+                                .withTimeout(0.5)
+                                .beforeStarting(() -> m_leds.endgameAlert = true)
+                                .finallyDo(() -> m_leds.endgameAlert = false));
+                new Trigger(
+                        () ->
+                                DriverStation.isTeleopEnabled()
+                                && DriverStation.getMatchTime() > 0
+                                && DriverStation.getMatchTime() <= Math.round(15.0))
+                        .onTrue(
+                        controllerRumbleCommand()
+                                .withTimeout(0.2)
+                                .andThen(Commands.waitSeconds(0.1))
+                                .repeatedly()
+                                .withTimeout(0.9)
+                                .beforeStarting(() -> m_leds.endgameAlert = true)
+                                .finallyDo(() -> m_leds.endgameAlert = false)); // Rumble three times
+        }
 
-  /** Updates the alerts for disconnected controllers. */
-  public void checkControllers() {
-    driverDisconnected.set(
-        !DriverStation.isJoystickConnected(m_driver.getHID().getPort())
-            || !DriverStation.getJoystickIsXbox(m_driver.getHID().getPort()));
-    operatorDisconnected.set(
-        !DriverStation.isJoystickConnected(m_operator.getHID().getPort())
-            || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
-  }
+        /** Updates the alerts for disconnected controllers. */
+        public void checkControllers() {
+                driverDisconnected.set(
+                                !DriverStation.isJoystickConnected(m_driver.getHID().getPort())
+                                                || !DriverStation.getJoystickIsXbox(m_driver.getHID().getPort()));
+                operatorDisconnected.set(
+                                !DriverStation.isJoystickConnected(m_operator.getHID().getPort())
+                                                || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
+        }
 
-  private void generateAutoChoices() {
-    System.out.println("[Init] Auto Routines");
+        private void generateAutoChoices() {
+                System.out.println("[Init] Auto Routines");
 
-    m_autoChooser.addDefaultOption("Do Nothing", null);
-    m_autoChooser.addDefaultOption("Drive Out", AutoBuilder.buildAuto("DriveBack"));
+                m_autoChooser.addDefaultOption("Do Nothing", null);
+                m_autoChooser.addDefaultOption("Drive Out", AutoBuilder.buildAuto("DriveBack"));
 
-    m_autoChooser.addDefaultOption("N3_S_C01", AutoBuilder.buildAuto("N3_S_C01"));
+                m_autoChooser.addDefaultOption("N3_S_C01", AutoBuilder.buildAuto("N3_S_C01"));
 
-    // // Set up feedforward characterization
-    // m_autoChooser.addOption(
-    // "Drive FF Characterization",
-    // new FeedForwardCharacterization(
-    // m_swerve, m_swerve::runCharacterizationVolts,
-    // m_swerve::getCharacterizationVelocity)
-    // .finallyDo(m_swerve::stop));
+                // // Set up feedforward characterization
+                // m_autoChooser.addOption(
+                // "Drive FF Characterization",
+                // new FeedForwardCharacterization(
+                // m_swerve, m_swerve::runCharacterizationVolts,
+                // m_swerve::getCharacterizationVelocity)
+                // .finallyDo(m_swerve::stop));
+        }
 
-    // m_autoChooser.addOption(
-    // "Flywheels FF Characterization",
-    // new FeedForwardCharacterization(
-    // mFlywheels, mFlywheels::runCharacterizationVolts,
-    // mFlywheels::getCharacterizationVelocity)
-    // .finallyDo(mFlywheels::stop));
-  }
+        private void generateEventMap() {
+        }
 
-  private void generateEventMap() {
-  }
+          // Creates controller rumble command
+        private Command controllerRumbleCommand() {
+                return Commands.startEnd(
+                        () -> {
+                                m_driver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+                                m_operator.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+                        },
+                        () -> {
+                                m_driver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                                m_operator.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                        }
+                        );
+        }
 
-  public double getForwardInput() {
-    return -square(deadband(m_driver.getLeftY(), 0.05));
-  }
+        public double getForwardInput() {
+                return -square(deadband(m_driver.getLeftY(), 0.05));
+        }
 
-  public double getStrafeInput() {
-    return -square(deadband(m_driver.getLeftX(), 0.05));
-  }
+        public double getStrafeInput() {
+                return -square(deadband(m_driver.getLeftX(), 0.05));
+        }
 
-  public double getRotationInput() {
-    double leftTrigger = square(deadband(m_driver.getLeftTriggerAxis(), 0.05));
-    double rightTrigger = square(deadband(m_driver.getRightTriggerAxis(), 0.05));
+        public double getRotationInput() {
+                double leftTrigger = square(deadband(m_driver.getLeftTriggerAxis(), 0.05));
+                double rightTrigger = square(deadband(m_driver.getRightTriggerAxis(), 0.05));
+                // return leftTrigger > rightTrigger ? leftTrigger : -rightTrigger;
 
-    // return -square(deadband(mDriver.getRightX(), 0.05));
+                return -square(deadband(m_driver.getRightX(), 0.05));
+        }
 
-    return leftTrigger > rightTrigger ? leftTrigger : -rightTrigger;
-  }
+        private static double deadband(double value, double tolerance) {
+                if (Math.abs(value) < tolerance)
+                        return 0.0;
+                return Math.copySign(value, (value - tolerance) / (1.0 - tolerance));
+        }
 
-  private static double deadband(double value, double tolerance) {
-    if (Math.abs(value) < tolerance)
-      return 0.0;
-    return Math.copySign(value, (value - tolerance) / (1.0 - tolerance));
-  }
+        public static double square(double value) {
+                return Math.copySign(value * value, value);
+        }
 
-  public static double square(double value) {
-    return Math.copySign(value * value, value);
-  }
-
-  public static double cube(double value) {
-    return Math.copySign(value * value * value, value);
-  }
+        public static double cube(double value) {
+                return Math.copySign(value * value * value, value);
+        }
 }

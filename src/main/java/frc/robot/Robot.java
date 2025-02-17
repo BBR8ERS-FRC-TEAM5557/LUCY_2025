@@ -14,6 +14,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -22,8 +24,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.lib.team6328.Alert;
-import frc.lib.team6328.Alert.AlertType;
 import frc.robot.leds.Leds;
 import frc.lib.team6328.VirtualSubsystem;
 
@@ -38,15 +38,17 @@ public class Robot extends LoggedRobot {
 	private final Timer m_disabledTimer = new Timer();
 
 	private final Alert m_logReceiverQueueAlert = new Alert("Logging queue exceeded capacity, data will NOT be logged.",
-			AlertType.ERROR);
+			AlertType.kError);
 	private final Alert m_canErrorAlert = new Alert("CAN errors detected, robot may not be controllable.",
-			AlertType.ERROR);
+			AlertType.kError);
 	private final Alert m_lowBatteryAlert = new Alert(
 			"Battery voltage is very low, consider turning off the robot or replacing the battery.",
-			AlertType.WARNING);
+			AlertType.kWarning);
 
 	@Override
 	public void robotInit() {
+		Logger.recordMetadata("ProjectName", "TBD-C2025"); // Set a metadata value
+
 		if (Constants.kIsReal) {
 			Logger.addDataReceiver(new WPILOGWriter()); // gotta plug a usb stick into rio 2 to have logging
 			Logger.addDataReceiver(new NT4Publisher());
@@ -94,7 +96,6 @@ public class Robot extends LoggedRobot {
 		m_disabledTimer.start();
 
 		// Instantiate RobotContainer
-		System.out.println("[Init] Instantiating RobotContainer");
 		m_robotContainer = new RobotContainer();
 	}
 
