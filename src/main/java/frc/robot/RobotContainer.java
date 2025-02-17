@@ -77,11 +77,11 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
 
-                m_elevator = new Elevator(
-                                new ElevatorIOTalonFX());
+                // m_elevator = new Elevator(
+                // new ElevatorIOTalonFX());
 
-                m_wrist = new Wrist(
-                                new WristIOTalonFX());
+                // m_wrist = new Wrist(
+                // new WristIOTalonFX());
 
                 // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
