@@ -11,25 +11,25 @@ public class Constants {
   public class RobotMap {
     public static final int kPigeon = 5;
 
-    public static final int kFLDriveMotor = 12;
+    public static final int kFLDriveMotor = 22;
     public static final int kFLTurnMotor = 21;
-    public static final int kFLEncoder = 22;
-    public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(0.0);
+    public static final int kFLEncoder = 11;
+    public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-68.90625);
 
-    public static final int kFRDriveMotor = 14;
+    public static final int kFRDriveMotor = 24;
     public static final int kFRTurnMotor = 22;
-    public static final int kFREncoder = 22;
-    public static final Rotation2d kFROffset = Rotation2d.fromDegrees(0.0);
+    public static final int kFREncoder = 12;
+    public static final Rotation2d kFROffset = Rotation2d.fromDegrees(-48.076171875);
 
-    public static final int kBLDriveMotor = 13;
-    public static final int kBLTurnMotor = 23;
-    public static final int kBLEncoder = 22;
-    public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(0.0);
+    public static final int kBLDriveMotor = 28;
+    public static final int kBLTurnMotor = 27;
+    public static final int kBLEncoder = 14;
+    public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(560.654296875);
 
-    public static final int kBRDriveMotor = 15;
-    public static final int kBRTurnMotor = 24;
-    public static final int kBREncoder = 22;
-    public static final Rotation2d kBROffset = Rotation2d.fromDegrees(0.0);
+    public static final int kBRDriveMotor = 26;
+    public static final int kBRTurnMotor = 25;
+    public static final int kBREncoder = 13;
+    public static final Rotation2d kBROffset = Rotation2d.fromDegrees(356.044921875);
   }
 
   public class Physical {
@@ -45,13 +45,20 @@ public class Constants {
     public static final double kKrakenFreeSpeed = 6000;
     public static final double kKrakenFreeSpeedFOC = 5800;
 
-    public static final double kMass = Units.lbsToKilograms(120.0);
+    public static final double kMass = Units.lbsToKilograms(101.0);
     public static final double kMOI = (kMass / 12.0) * Math.hypot(kChassisLength, kChassisWidth); // estimate using
                                                                                                   // formula for a slab
   }
 
   public class Joystick {
     public static double kSteerJoystickDeadband = 0.05;
+  }
+
+
+  public static boolean disableHAL = false;
+
+  public static void disableHAL() {
+    disableHAL = true;
   }
 
 }

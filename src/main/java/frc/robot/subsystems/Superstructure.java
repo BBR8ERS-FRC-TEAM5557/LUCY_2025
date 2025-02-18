@@ -38,6 +38,19 @@ public class Superstructure {
             "Superstructure/L2CoralWrist",
             -45.0);
 
+    private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
+                "Superstructure/L3CoralElevator",
+                0.5);
+    private static final LoggedTunableNumber l3_coral_wrist = new LoggedTunableNumber(
+                "Superstructure/L3CoralWrist",
+                -45.0);
+    private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
+                        "Superstructure/L4CoralElevator",
+                        0.5);
+    private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
+                        "Superstructure/L4CoralWrist",
+                        -45.0);
+
     public enum SuperstructureState {
         HOME(() -> home_elevator.get(), () -> home_wrist.get()),
         STOW(() -> stow_elevator.get(), () -> stow_wrist.get()),
@@ -45,7 +58,10 @@ public class Superstructure {
         INTAKE_CORAL(() -> intake_coral_elevator.get(), () -> intake_coral_wrist.get()),
 
         L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get()),
-        L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get());
+        L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get()),
+        L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get()),
+        L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get());
+
 
         // TODO: Add the remaining states plz
 

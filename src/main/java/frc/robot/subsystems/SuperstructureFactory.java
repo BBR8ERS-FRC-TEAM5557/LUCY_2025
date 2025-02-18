@@ -23,8 +23,8 @@ public class SuperstructureFactory {
     static {
         levelMap.put(1, SuperstructureState.L1_CORAL);
         levelMap.put(2, SuperstructureState.L2_CORAL);
-        levelMap.put(3, SuperstructureState.L1_CORAL); // TODO: Fix THISSS
-        levelMap.put(4, SuperstructureState.L2_CORAL); // TODO: FIX THISSS
+        levelMap.put(3, SuperstructureState.L3_CORAL); 
+        levelMap.put(4, SuperstructureState.L4_CORAL); 
     }
 
     public static Command runSuperstructureState(SuperstructureState state) {

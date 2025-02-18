@@ -24,7 +24,7 @@ public class SwerveConstants {
         public static final double kWheelRadiusMeters = Units.inchesToMeters(2.00);
         private static final boolean kInvertSteer = true;
         private static final boolean kInvertDrive = true;
-        private static final boolean kInvertEncoder = true;
+        private static final boolean kInvertEncoder = false;
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot

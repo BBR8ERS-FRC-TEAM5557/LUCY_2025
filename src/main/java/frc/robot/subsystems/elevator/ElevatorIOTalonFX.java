@@ -61,8 +61,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
         public ElevatorIOTalonFX() {
-                talon = new TalonFX(13, "canivore"); // TODO: Fix this CAN ID
-                followerTalon = new TalonFX(14, "canivore"); // TODO: Fix this CAN ID
+                talon = new TalonFX(33, "canivore"); // TODO: Fix this CAN ID
+                followerTalon = new TalonFX(34, "canivore"); // TODO: Fix this CAN ID
                 followerTalon.setControl(new Follower(talon.getDeviceID(), true));
 
                 // Configure motor
@@ -79,6 +79,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
                 config.Audio.BeepOnBoot = false;
+                config.Audio.AllowMusicDurDisable = true;
                 config.Audio.BeepOnConfig = false;
 
                 config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: Fix this based on thing
