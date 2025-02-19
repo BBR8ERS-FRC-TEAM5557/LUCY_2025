@@ -113,25 +113,25 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                 .withSize(2, 2)
                                 .withPosition(0, 0);
                 containerFL.addNumber("Current Velocity", () -> getModule(0).getCurrentState().speedMetersPerSecond);
-                containerFL.addNumber("Current Angle (Deg)", () -> getModule(0).getCurrentState().angle.getDegrees());
+                containerFL.addNumber("Current Angle (Deg)", () -> getModule(0).getCurrentState().angle.getDegrees() % 360.0);
 
                 ShuffleboardLayout containerFR = shuffleboardTab.getLayout("FR Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 0);
                 containerFR.addNumber("Current Velocity", () -> getModule(1).getCurrentState().speedMetersPerSecond);
-                containerFR.addNumber("Current Angle (Deg)", () -> getModule(1).getCurrentState().angle.getDegrees());
+                containerFR.addNumber("Current Angle (Deg)", () -> getModule(1).getCurrentState().angle.getDegrees() % 360.0);
 
                 ShuffleboardLayout containerBL = shuffleboardTab.getLayout("BL Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 0);
                 containerBL.addNumber("Current Velocity", () -> getModule(2).getCurrentState().speedMetersPerSecond);
-                containerBL.addNumber("Current Angle (Deg)", () -> getModule(2).getCurrentState().angle.getDegrees());
+                containerBL.addNumber("Current Angle (Deg)", () -> getModule(2).getCurrentState().angle.getDegrees() % 360.0);
 
                 ShuffleboardLayout containerBR = shuffleboardTab.getLayout("BR Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 2);
                 containerBR.addNumber("Current Velocity", () -> getModule(3).getCurrentState().speedMetersPerSecond);
-                containerBR.addNumber("Current Angle (Deg)", () -> getModule(3).getCurrentState().angle.getDegrees());
+                containerBR.addNumber("Current Angle (Deg)", () -> getModule(3).getCurrentState().angle.getDegrees() % 360.0);
 
         }
 
