@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,8 +22,8 @@ public class SuperstructureFactory {
     static {
         levelMap.put(1, SuperstructureState.L1_CORAL);
         levelMap.put(2, SuperstructureState.L2_CORAL);
-        levelMap.put(3, SuperstructureState.L3_CORAL); 
-        levelMap.put(4, SuperstructureState.L4_CORAL); 
+        levelMap.put(3, SuperstructureState.L3_CORAL);
+        levelMap.put(4, SuperstructureState.L4_CORAL);
     }
 
     public static Command runSuperstructureState(SuperstructureState state) {

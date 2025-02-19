@@ -105,15 +105,15 @@ public class SwerveConstants {
                 private static final double kSpeedAt12VoltsMps = kTrueMaxSpeed;
 
                 // Simulated voltage necessary to overcome friction
-                private static final double kSteerFrictionVoltage = 0.25;
-                private static final double kDriveFrictionVoltage = 0.25;
+                private static final double kSteerFrictionVoltage = 0.0;
+                private static final double kDriveFrictionVoltage = 0.0;
 
                 // The steer motor uses any SwerveModule.SteerRequestType control request with
                 // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
                 private static final Slot0Configs steerGains = new Slot0Configs()
                                 .withKP(50)
                                 .withKI(0)
-                                .withKD(0) //.2
+                                .withKD(0) // .2
                                 .withKS(0)
                                 .withKV(0)
                                 .withKA(0);
@@ -126,7 +126,7 @@ public class SwerveConstants {
                                 .withKD(0)
                                 .withKS(0)
                                 .withKV((12.0 - kDriveFrictionVoltage) / (kSpeedAt12VoltsMps
-                                                * (kDriveGearRatio / (2 * Math.PI * kWheelRadiusMeters)))) 
+                                                * (kDriveGearRatio / (2 * Math.PI * kWheelRadiusMeters))))
                                 .withKA(0);
 
                 private static final Pigeon2Configuration Pigeon2 = new Pigeon2Configuration();
@@ -169,7 +169,9 @@ public class SwerveConstants {
                                 .withSteerInertia(kSteerInertia)
                                 .withDriveInertia(kDriveInertia)
                                 .withFeedbackSource(feedbackSource)
-                                .withCouplingGearRatio(kCoupleRatio);
+                                .withCouplingGearRatio(kCoupleRatio)
+                                .withDriveMotorInitialConfigs(initialDriveConfigs)
+                                .withSteerMotorInitialConfigs(initialSteerConfigs);
 
                 public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft = ConstantCreator
                                 .createModuleConstants(

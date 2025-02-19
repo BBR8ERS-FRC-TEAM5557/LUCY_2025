@@ -76,8 +76,8 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
 
-                // m_elevator = new Elevator(
-                // new ElevatorIOTalonFX());
+                m_elevator = new Elevator(
+                                new ElevatorIOTalonFX());
 
                 // m_wrist = new Wrist(
                 // new WristIOTalonFX());
