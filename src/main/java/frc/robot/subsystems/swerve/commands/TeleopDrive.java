@@ -40,12 +40,7 @@ public class TeleopDrive extends Command {
         driveWithHeading.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
         addRequirements(mDrivetrain);
-        setName("Teleop Drive Maintain Heading");
-
-        if (Robot.isSimulation()) {
-            driveNoHeading.DriveRequestType = SwerveModule.DriveRequestType.OpenLoopVoltage;
-            driveWithHeading.DriveRequestType = SwerveModule.DriveRequestType.OpenLoopVoltage;
-        }
+        setName("Teleop Drive");
     }
 
     private Swerve mDrivetrain;
