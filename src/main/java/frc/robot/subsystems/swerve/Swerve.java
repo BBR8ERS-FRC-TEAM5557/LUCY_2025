@@ -19,6 +19,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -113,25 +114,29 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                 .withSize(2, 2)
                                 .withPosition(0, 0);
                 containerFL.addNumber("Current Velocity", () -> getModule(0).getCurrentState().speedMetersPerSecond);
-                containerFL.addNumber("Current Angle (Deg)", () -> getModule(0).getCurrentState().angle.getDegrees() % 360.0);
+                containerFL.addNumber("Current Angle (Deg)",
+                                () -> placeRotationIn360Scope(getModule(0).getCurrentState().angle));
 
                 ShuffleboardLayout containerFR = shuffleboardTab.getLayout("FR Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 0);
                 containerFR.addNumber("Current Velocity", () -> getModule(1).getCurrentState().speedMetersPerSecond);
-                containerFR.addNumber("Current Angle (Deg)", () -> getModule(1).getCurrentState().angle.getDegrees() % 360.0);
+                containerFR.addNumber("Current Angle (Deg)",
+                                () -> placeRotationIn360Scope(getModule(1).getCurrentState().angle));
 
                 ShuffleboardLayout containerBL = shuffleboardTab.getLayout("BL Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 0);
                 containerBL.addNumber("Current Velocity", () -> getModule(2).getCurrentState().speedMetersPerSecond);
-                containerBL.addNumber("Current Angle (Deg)", () -> getModule(2).getCurrentState().angle.getDegrees() % 360.0);
+                containerBL.addNumber("Current Angle (Deg)",
+                                () -> placeRotationIn360Scope(getModule(2).getCurrentState().angle));
 
                 ShuffleboardLayout containerBR = shuffleboardTab.getLayout("BR Module", BuiltInLayouts.kList)
                                 .withSize(2, 2)
                                 .withPosition(2, 2);
                 containerBR.addNumber("Current Velocity", () -> getModule(3).getCurrentState().speedMetersPerSecond);
-                containerBR.addNumber("Current Angle (Deg)", () -> getModule(3).getCurrentState().angle.getDegrees() % 360.0);
+                containerBR.addNumber("Current Angle (Deg)",
+                                () -> placeRotationIn360Scope(getModule(3).getCurrentState().angle));
 
         }
 
@@ -178,5 +183,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                 // TODO: Change to using pigeon2 omega
                                 fieldSpeeds.getX(), fieldSpeeds.getY(),
                                 getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
+        }
+
+        private double placeRotationIn360Scope(Rotation2d rot) {
+                double result = rot.getDegrees() % 360.0;
+                if (result < 0) {
+                        return result + 360.0;
+                }
+                return result;
         }
 }

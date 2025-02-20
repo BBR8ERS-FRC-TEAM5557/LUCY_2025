@@ -61,8 +61,13 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
         public ElevatorIOTalonFX() {
+
                 talon = new TalonFX(31, "canivore"); 
                 followerTalon = new TalonFX(32, "canivore"); 
+
+                //talon = new TalonFX(33); // TODO: Fix this CAN ID
+                //followerTalon = new TalonFX(34); // TODO: Fix this CAN ID
+
                 followerTalon.setControl(new Follower(talon.getDeviceID(), true));
 
                 // Configure motor
