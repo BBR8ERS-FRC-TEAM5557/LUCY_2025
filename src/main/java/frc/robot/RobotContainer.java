@@ -128,7 +128,7 @@ public class RobotContainer {
 
                 /* SWERVING */
                 TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
-                                this::getRotationInput);
+                                this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput);
                 m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
                 m_driver.start()
@@ -253,6 +253,14 @@ public class RobotContainer {
                 // return leftTrigger > rightTrigger ? leftTrigger : -rightTrigger;
 
                 return -square(deadband(m_driver.getRightX(), 0.05));
+        }
+
+        public boolean getLeftIntakeInput() {
+                return m_driver.leftBumper().getAsBoolean();
+        }
+
+        public boolean getRightIntakeInput() {
+                return m_driver.rightBumper().getAsBoolean();
         }
 
         private static double deadband(double value, double tolerance) {

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve.commands;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -17,17 +18,20 @@ import frc.robot.state.RobotStateEstimator;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.Util;
 
 /**
  * Heading controller drive command.
  */
 public class TeleopDrive extends Command {
-    public TeleopDrive(DoubleSupplier throttle, DoubleSupplier strafe, DoubleSupplier turn) {
+    public TeleopDrive(DoubleSupplier throttle, DoubleSupplier strafe, DoubleSupplier turn, BooleanSupplier intakeLeft,
+            BooleanSupplier intakeRight) {
         mDrivetrain = RobotContainer.m_swerve;
         mThrottleSupplier = throttle;
         mStrafeSupplier = strafe;
         mTurnSupplier = turn;
+
+        mLeftIntakeSupplier = intakeLeft;
+        mRightIntakeSupplier = intakeRight;
 
         driveWithHeading.HeadingController.setPID(
                 SwerveConstants.PID.kRotationkP,
@@ -46,6 +50,7 @@ public class TeleopDrive extends Command {
 
     private Swerve mDrivetrain;
     private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
+    private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier;
     private Optional<Rotation2d> mHeadingSetpoint = Optional.empty();
     private double mJoystickLastTouched = -1;
 
@@ -71,23 +76,42 @@ public class TeleopDrive extends Command {
             mJoystickLastTouched = Timer.getFPGATimestamp();
         }
 
-        if (Math.abs(turnFieldFrame) > 0.0
-                || (Util.epsilonEquals(mJoystickLastTouched, Timer.getFPGATimestamp(), 0.25)
-                        && Math.abs(mDrivetrain.getCurrentRobotChassisSpeeds().omegaRadiansPerSecond) > Math
-                                .toRadians(10))) {
-            turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
-            mDrivetrain.setControl(driveNoHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
-                    .withRotationalRate(turnFieldFrame));
-            mHeadingSetpoint = Optional.empty();
-            Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
-        } else {
-            if (mHeadingSetpoint.isEmpty()) {
-                mHeadingSetpoint = Optional.of(RobotStateEstimator.getInstance().getEstimatedPose().getRotation());
+        boolean wantsLeftIntake = mLeftIntakeSupplier.getAsBoolean();
+        boolean wantsRightIntake = mRightIntakeSupplier.getAsBoolean();
+
+        if (wantsLeftIntake || wantsRightIntake) {
+            double setpointDegrees = 0.0;
+            if (wantsLeftIntake) {
+                setpointDegrees = -54.0;
+            } else if (wantsRightIntake) {
+                setpointDegrees = 54.0;
             }
-            mDrivetrain.setControl(driveWithHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
-                    .withTargetDirection(mHeadingSetpoint.get()));
+            mHeadingSetpoint = Optional.of(AllianceFlipUtil.apply(Rotation2d.fromDegrees(setpointDegrees)));
+            mDrivetrain
+                    .setControl(driveWithHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
+                            .withTargetDirection(mHeadingSetpoint.get()));
             Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
             Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", mHeadingSetpoint.get().getDegrees());
+        } else {
+            if (Math.abs(turnFieldFrame) > 0.0
+                    || ((Timer.getFPGATimestamp() - mJoystickLastTouched < 0.25)
+                            && Math.abs(mDrivetrain.getCurrentRobotChassisSpeeds().omegaRadiansPerSecond) > Math
+                                    .toRadians(10))) {
+                turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
+                mDrivetrain.setControl(driveNoHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
+                        .withRotationalRate(turnFieldFrame));
+                mHeadingSetpoint = Optional.empty();
+                Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
+            } else {
+                if (mHeadingSetpoint.isEmpty()) {
+                    mHeadingSetpoint = Optional.of(RobotStateEstimator.getInstance().getEstimatedPose().getRotation());
+                }
+                mDrivetrain
+                        .setControl(driveWithHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
+                                .withTargetDirection(mHeadingSetpoint.get()));
+                Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
+                Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", mHeadingSetpoint.get().getDegrees());
+            }
         }
     }
 
