@@ -84,8 +84,8 @@ public class RobotContainer {
                  m_elevator = new Elevator(
                  new ElevatorIOTalonFX());
 
-                 m_wrist = new Wrist(
-                 new WristIOTalonFX());
+                // m_wrist = new Wrist(
+                 //new WristIOTalonFX());
 
                 m_flywheels = new Flywheels(
                         new FlywheelsIOTalonFX());

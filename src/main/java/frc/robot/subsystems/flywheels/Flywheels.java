@@ -17,7 +17,6 @@ import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.subsystems.flywheels.FlywheelsIO;
-import frc.robot.subsystems.flywheels.FlywheelsIOInputsAutoLogged;
 import frc.robot.util.Util;
 
 import java.util.function.DoubleSupplier;
@@ -69,7 +68,7 @@ public class Flywheels extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs(this.getName(), inputs);
+       Logger.processInputs(this.getName(), inputs);
 
         motorDisconnectedAlert.set(!inputs.motorConnected);
 

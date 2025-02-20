@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class FlywheelsIOTalonFX implements FlywheelsIO {
-    public static final double reduction = (1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
+    public static final double reduction =  28.0 / 44.0 / 36.0 ;   //(1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
 
     // Hardware
     private final TalonFX talon;
