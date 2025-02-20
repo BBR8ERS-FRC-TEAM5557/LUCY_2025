@@ -1,4 +1,4 @@
-package frc.robot.subsystems.wrist;
+package frc.robot.subsystems.flywheels;
 
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
@@ -20,7 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
-public class WristIOTalonFX implements WristIO {
+public class FlywheelsIOTalonFX implements FlywheelsIO {
     public static final double reduction = (1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
 
     // Hardware
@@ -32,7 +32,6 @@ public class WristIOTalonFX implements WristIO {
     // Status Signals
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
-    private final StatusSignal<Double> positionError;
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Current> supplyCurrent;
@@ -47,8 +46,8 @@ public class WristIOTalonFX implements WristIO {
 
     private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-    public WristIOTalonFX() {
-        talon = new TalonFX(33); // TODO: Fix this CAN ID
+    public  FlywheelsIOTalonFX() {
+        talon = new TalonFX(30); 
 
         // Configure motor
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -68,33 +67,31 @@ public class WristIOTalonFX implements WristIO {
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: Fix this based on thing
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
-        tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getWristDegrees(), 0.25));
-
+        //tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getWristDegrees(), 0.25));
+        
         position = talon.getPosition();
         velocity = talon.getVelocity();
-        positionError = talon.getClosedLoopError();
         appliedVolts = talon.getMotorVoltage();
         torqueCurrent = talon.getTorqueCurrent();
         supplyCurrent = talon.getSupplyCurrent();
         temp = talon.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-                50.0, position, velocity,
-                positionError, appliedVolts, torqueCurrent, supplyCurrent, temp);
+                50.0, velocity, position,
+                 appliedVolts, torqueCurrent, supplyCurrent, temp);
         ParentDevice.optimizeBusUtilizationForAll(talon);
     }
 
     @Override
     public void updateInputs(WristIOInputs inputs) {
         boolean connected = BaseStatusSignal.refreshAll(
-                position, velocity,
-                positionError, appliedVolts, torqueCurrent, supplyCurrent, temp)
+                velocity, position, 
+                 appliedVolts, torqueCurrent, supplyCurrent, temp)
                 .isOK();
 
         inputs.motorConnected = connectedDebouncer.calculate(connected);
         inputs.positionDegrees = position.getValueAsDouble();
         inputs.velocityDegreesPerSec = velocity.getValueAsDouble();
-        inputs.positionError = positionError.getValueAsDouble();
         inputs.appliedVolts = new double[] { appliedVolts.getValueAsDouble() };
         inputs.torqueCurrentAmps = new double[] { torqueCurrent.getValueAsDouble() };
         inputs.supplyCurrentAmps = new double[] { supplyCurrent.getValueAsDouble() };
@@ -116,15 +113,7 @@ public class WristIOTalonFX implements WristIO {
         talon.setControl(voltageRequest.withOutput(volts));
     }
 
-    @Override
-    public void runPosition(double positionDegrees) {
-        talon.setControl(motionMagicVoltageRequest.withPosition(positionDegrees));
-    }
-
-    @Override
-    public void setPosition(double positionDegrees) {
-        talon.setPosition(positionDegrees);
-    }
+    
 
     @Override
     public void setPID(double kP, double kI, double kD) {

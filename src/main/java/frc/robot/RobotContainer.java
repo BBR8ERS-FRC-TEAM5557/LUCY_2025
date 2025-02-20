@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +25,9 @@ import frc.robot.subsystems.SuperstructureFactory;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
+import frc.robot.subsystems.flywheels.Flywheels;
+import frc.robot.subsystems.flywheels.FlywheelsIO;
+import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
@@ -48,6 +52,7 @@ public class RobotContainer {
         public static Elevator m_elevator;
         public static Wrist m_wrist;
         public static Leds m_leds;
+        public static Flywheels m_flywheels;
 
         // create variables for virtual subsystems
         public static Vision m_vision;
@@ -76,17 +81,25 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
 
-                // m_elevator = new Elevator(
-                // new ElevatorIOTalonFX());
+                 m_elevator = new Elevator(
+                 new ElevatorIOTalonFX());
 
-                // m_wrist = new Wrist(
-                // new WristIOTalonFX());
+                 m_wrist = new Wrist(
+                 new WristIOTalonFX());
+
+                m_flywheels = new Flywheels(
+                        new FlywheelsIOTalonFX());
 
                 // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
                 // new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
 
                 // Instantiate missing subsystems
+                if (m_swerve == null){
+                        m_swerve = new Swerve(null, null);
+                }
+
+                
                 if (m_elevator == null) {
                         m_elevator = new Elevator(new ElevatorIO() {
                         });
@@ -94,6 +107,11 @@ public class RobotContainer {
 
                 if (m_wrist == null) {
                         m_wrist = new Wrist(new WristIO() {
+                        });
+                }
+
+                if (m_flywheels == null) {
+                        m_flywheels = new Flywheels(new FlywheelsIO() {
                         });
                 }
 
@@ -150,13 +168,15 @@ public class RobotContainer {
                                                                         m_swerve.setBrakeMode(false);
                                                                         m_elevator.setBrakeMode(false);
                                                                         m_wrist.setBrakeMode(false);
+                                                                        m_flywheels.setBrakeMode(false);
                                                                 },
                                                                 () -> {
                                                                         m_swerve.setBrakeMode(true);
                                                                         m_elevator.setBrakeMode(true);
                                                                         m_wrist.setBrakeMode(true);
+                                                                        m_flywheels.setBrakeMode(true);
                                                                 },
-                                                                m_swerve, m_elevator, m_wrist).ignoringDisable(true)
+                                                                m_swerve, m_elevator, m_wrist, m_flywheels).ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
                 m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());

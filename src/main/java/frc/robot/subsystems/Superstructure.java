@@ -30,47 +30,56 @@ public class Superstructure {
             0.0);
     private static final LoggedTunableNumber l1_coral_wrist = new LoggedTunableNumber(
             "Superstructure/L1CoralWrist",
-            -45.0);
+            128.0);
     private static final LoggedTunableNumber l2_coral_elevator = new LoggedTunableNumber(
             "Superstructure/L2CoralElevator",
-            0.5);
+            0.0);
     private static final LoggedTunableNumber l2_coral_wrist = new LoggedTunableNumber(
             "Superstructure/L2CoralWrist",
             -45.0);
 
     private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
                 "Superstructure/L3CoralElevator",
-                0.5);
+                0.0);
     private static final LoggedTunableNumber l3_coral_wrist = new LoggedTunableNumber(
                 "Superstructure/L3CoralWrist",
-                -45.0);
+                175.0);
     private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L4CoralElevator",
-                        0.5);
+                        3.0);
     private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
                         -45.0);
 
+    private static final LoggedTunableNumber intake_coral_flywheels = new LoggedTunableNumber(
+        "Superstructure/IntakeFlywheels", 8.0);
+    private static final LoggedTunableNumber eject_coral_flywheels = new LoggedTunableNumber(
+        "Superstructure/EjectFlywheels", -8.0);
+    private static final LoggedTunableNumber idle_coral_flywheels = new LoggedTunableNumber(
+        "Superstructure/IdleFlywheels", 2.0);
+
     public enum SuperstructureState {
-        HOME(() -> home_elevator.get(), () -> home_wrist.get()),
-        STOW(() -> stow_elevator.get(), () -> stow_wrist.get()),
+        HOME(() -> home_elevator.get(), () -> home_wrist.get(), () -> idle_coral_flywheels.get()),
+        STOW(() -> stow_elevator.get(), () -> stow_wrist.get(), () -> idle_coral_flywheels.get()),
 
-        INTAKE_CORAL(() -> intake_coral_elevator.get(), () -> intake_coral_wrist.get()),
+        INTAKE_CORAL(() -> intake_coral_elevator.get(), () -> intake_coral_wrist.get(), () -> intake_coral_flywheels.get()),
 
-        L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get()),
-        L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get()),
-        L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get()),
-        L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get());
+        L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get(), () -> idle_coral_flywheels.get()), 
+        L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get(), () -> idle_coral_flywheels.get()),
+        L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get(), () -> idle_coral_flywheels.get()),
+        L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get(), () -> idle_coral_flywheels.get());
 
 
         // TODO: Add the remaining states plz
 
         private final DoubleSupplier elevatorSetpoint;
         private final DoubleSupplier wristSetpoint;
-
-        private SuperstructureState(DoubleSupplier elevatorSetpoint, DoubleSupplier wristSetpoint) {
-            this.elevatorSetpoint = elevatorSetpoint;
-            this.wristSetpoint = wristSetpoint;
+        private DoubleSupplier flywheelSetpoint;
+        
+                private SuperstructureState(DoubleSupplier elevatorSetpoint, DoubleSupplier wristSetpoint, DoubleSupplier flywheelSetpoint) {
+                    this.elevatorSetpoint = elevatorSetpoint;
+                    this.wristSetpoint = wristSetpoint;
+                    this.flywheelSetpoint = flywheelSetpoint;
         }
 
         public double getElevatorMeters() {
@@ -87,6 +96,14 @@ public class Superstructure {
 
         public DoubleSupplier getWristDegreesSupplier() {
             return wristSetpoint;
+        }
+
+        public double getFlywheelVolts() {
+            return flywheelSetpoint.getAsDouble();
+        }
+
+        public DoubleSupplier getFlywheelVoltsSupplier() {
+            return flywheelSetpoint;
         }
     }
 }

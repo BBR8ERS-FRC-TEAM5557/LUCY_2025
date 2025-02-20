@@ -10,12 +10,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.flywheels.Flywheels;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.util.Util;
 
 public class SuperstructureFactory {
     private static final Elevator elevator = RobotContainer.m_elevator;
     private static final Wrist wrist = RobotContainer.m_wrist;
+    private static final Flywheels flywheels = RobotContainer.m_flywheels;
 
     private static Timer levelAdjustmentTimer;
     private static int level = 1;

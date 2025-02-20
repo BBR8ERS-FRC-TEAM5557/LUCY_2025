@@ -52,7 +52,7 @@ public class Elevator extends SubsystemBase {
         private final Alert motorDisconnectedAlert = new Alert("Elevator motor disconnected!",
                         Alert.AlertType.kWarning);
 
-        @AutoLogOutput(key = "Elevator/isBrakeMode")
+        @AutoLogOutput(key = "Elevator/isBrakeMode")         
         private boolean brakeModeEnabled = true;
         private boolean homed = false;
         private Debouncer homingDebouncer = new Debouncer(homingTimeSecs.get());
