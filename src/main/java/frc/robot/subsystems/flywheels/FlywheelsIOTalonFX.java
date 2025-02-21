@@ -53,11 +53,11 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
         config.Feedback.SensorToMechanismRatio = reduction;
-        config.Voltage.PeakForwardVoltage = 10.0;
-        config.Voltage.PeakReverseVoltage = -10.0;
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 50.0;
-        config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
-        config.CurrentLimits.StatorCurrentLimit = 50.0;
+        config.Voltage.PeakForwardVoltage = 12.0;  //
+        config.Voltage.PeakReverseVoltage = -12.0;   //
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;   //
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -70.0;  //
+        config.CurrentLimits.StatorCurrentLimit = 60.0;   //
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
         config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
