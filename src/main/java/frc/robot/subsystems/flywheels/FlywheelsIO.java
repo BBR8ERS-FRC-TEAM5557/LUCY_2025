@@ -2,11 +2,12 @@ package frc.robot.subsystems.flywheels;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import frc.robot.subsystems.wrist.WristIOInputsAutoLogged;
+
 public interface FlywheelsIO {
     @AutoLog
-    class WristIOInputs {
+    class FlywheelsIOInputs {
         public boolean motorConnected = true;
-        public double positionDegrees = 0.0;
         public double velocityDegreesPerSec = 0.0;
         public double[] appliedVolts = new double[] {};
         public double[] torqueCurrentAmps = new double[] {};
@@ -14,7 +15,7 @@ public interface FlywheelsIO {
         public double[] tempCelsius = new double[] {};
     }
 
-    default void updateInputs(WristIOInputs inputs) {
+    default void updateInputs(WristIOInputsAutoLogged inputs) {
     }
 
     default void runOpenLoop(double output) {

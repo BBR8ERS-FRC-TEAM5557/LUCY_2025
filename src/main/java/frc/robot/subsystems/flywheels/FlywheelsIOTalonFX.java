@@ -81,16 +81,14 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
                  appliedVolts, torqueCurrent, supplyCurrent, temp);
         ParentDevice.optimizeBusUtilizationForAll(talon);
     }
-
-    @Override
-    public void updateInputs(WristIOInputs inputs) {
+    //@Override
+    public void updateInputs(FlywheelsIOInputs inputs) {
         boolean connected = BaseStatusSignal.refreshAll(
                 velocity, position, 
                  appliedVolts, torqueCurrent, supplyCurrent, temp)
                 .isOK();
 
         inputs.motorConnected = connectedDebouncer.calculate(connected);
-        inputs.positionDegrees = position.getValueAsDouble();
         inputs.velocityDegreesPerSec = velocity.getValueAsDouble();
         inputs.appliedVolts = new double[] { appliedVolts.getValueAsDouble() };
         inputs.torqueCurrentAmps = new double[] { torqueCurrent.getValueAsDouble() };

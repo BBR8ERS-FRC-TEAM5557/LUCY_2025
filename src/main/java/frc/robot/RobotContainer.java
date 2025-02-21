@@ -84,8 +84,8 @@ public class RobotContainer {
                  m_elevator = new Elevator(
                  new ElevatorIOTalonFX());
 
-                // m_wrist = new Wrist(
-                 //new WristIOTalonFX());
+                 m_wrist = new Wrist(
+                 new WristIOTalonFX());
 
                 m_flywheels = new Flywheels(
                         new FlywheelsIOTalonFX());
@@ -179,8 +179,30 @@ public class RobotContainer {
                                                                 m_swerve, m_elevator, m_wrist, m_flywheels).ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
+                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral()
+                        .alongWith(m_flywheels.scoreCoral()));
+
                 m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+
+
+                //intake coral
+                m_operator.leftTrigger().whileTrue(SuperstructureFactory.intakeCoral()
+                        .alongWith(m_flywheels.intakeCoralSubstation()));
+
+                //eject coral
+                m_operator.rightTrigger().whileTrue(m_flywheels.ejectCoral());
+
+                        /**
+                Operator.rightBumper().whileTrue(
+				mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
+						.andThen(Commands.parallel(mIntake.intake(), mFeeder.intake())
+								.until(mFeeder::hasGamepiece)))
+						.withName("Teleop Intaking"));
+
+		mOperator.leftBumper().whileTrue(
+				mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
+						.andThen(Commands.parallel(mIntake.eject(), mFeeder.ejectFloor())))
+						.withName("Teleop Ejecting")); */
 
                 m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
                 m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());

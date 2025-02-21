@@ -65,9 +65,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 talon = new TalonFX(31, "canivore"); 
                 followerTalon = new TalonFX(32, "canivore"); 
 
-                //talon = new TalonFX(33); // TODO: Fix this CAN ID
-                //followerTalon = new TalonFX(34); // TODO: Fix this CAN ID
-
                 followerTalon.setControl(new Follower(talon.getDeviceID(), true));
 
                 // Configure motor
@@ -87,7 +84,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.Audio.AllowMusicDurDisable = true;
                 config.Audio.BeepOnConfig = false;
 
-                config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: Fix this based on thing
+                config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO: Fix this based on thing
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
                 tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getElevatorMeters(), 0.25));
 
