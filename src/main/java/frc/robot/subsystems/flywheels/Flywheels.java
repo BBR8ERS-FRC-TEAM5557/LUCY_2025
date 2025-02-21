@@ -31,7 +31,6 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber kD = new LoggedTunableNumber("Flywheel/kD", 0.0);
 
     private static final LoggedTunableNumber kS = new LoggedTunableNumber("Flywheel/kS", 0.0);
-    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Flywheel/kG", 0.0);
     private static final LoggedTunableNumber kV = new LoggedTunableNumber("Flywheel/kV", 0.0);
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Flywheel/kA", 0.0);
 
@@ -83,7 +82,7 @@ public class Flywheels extends SubsystemBase {
         super.setName("Flywheels");
         this.io = io;
         io.setPID(kP.get(), 0.0, kD.get());
-        io.setSGVA(kS.get(), kG.get(), kV.get(), kA.get());
+        io.setSGVA(kS.get(), kV.get(), kA.get());
 
         setDefaultCommand(runOnce(() -> setState(State.IDLE)).withName("Flywheels Idle"));
     }
@@ -99,9 +98,9 @@ public class Flywheels extends SubsystemBase {
         if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
             io.setPID(kP.get(), 0.0, kD.get());
         }
-        if (kS.hasChanged(hashCode()) || kG.hasChanged(hashCode()) || kV.hasChanged(hashCode())
+        if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())
                 || kA.hasChanged(hashCode())) {
-            io.setSGVA(kS.get(), kG.get(), kV.get(), kA.get());
+            io.setSGVA(kS.get(), kV.get(), kA.get());
         }
        
         Logger.recordOutput("Flywheels/State", mState);

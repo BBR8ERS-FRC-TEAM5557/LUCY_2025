@@ -32,7 +32,7 @@ public interface FlywheelsIO {
     default void setPID(double kP, double kI, double kD) {
     }
 
-    default void setSGVA(double kS, double kG, double kV, double kA) {
+    default void setSGVA(double kS, double kV, double kA) {
     }
 
     default void setKinematicConstraints(double maxVelocityDegreesPerSec, double maxAccelerationDegreesPerSec2) {

@@ -24,11 +24,11 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
         // Tunable numbers
-        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.0);
+        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 100);
         private static final LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0);
 
-        private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
-        private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0);
+        private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.45);
+        private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.25);
         private static final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
         private static final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.0);
 

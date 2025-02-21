@@ -81,7 +81,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
                 config.Audio.BeepOnBoot = false;
-                config.Audio.AllowMusicDurDisable = true;
+                config.Audio.AllowMusicDurDisable = false;
                 config.Audio.BeepOnConfig = false;
 
                 config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO: Fix this based on thing

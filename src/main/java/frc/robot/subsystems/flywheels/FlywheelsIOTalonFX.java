@@ -123,9 +123,8 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     }
 
     @Override
-    public void setSGVA(double kS, double kG, double kV, double kA) {
+    public void setSGVA(double kS,double kV, double kA) {
         config.Slot0.kS = kS;
-        config.Slot0.kG = kG;
         config.Slot0.kV = kV;
         config.Slot0.kA = kA;
 

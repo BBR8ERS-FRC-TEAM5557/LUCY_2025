@@ -82,7 +82,7 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackRight);
 
                  m_elevator = new Elevator(
-                 new ElevatorIOTalonFX());
+                new ElevatorIOTalonFX());
 
                  m_wrist = new Wrist(
                  new WristIOTalonFX());
@@ -186,11 +186,13 @@ public class RobotContainer {
 
 
                 //intake coral
-                m_operator.leftTrigger().whileTrue(SuperstructureFactory.intakeCoral()
-                        .alongWith(m_flywheels.intakeCoralSubstation()));
+                //m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
+                  //      .alongWith(m_flywheels.intakeCoralSubstation()));
+
+                        m_driver.x().whileTrue((m_flywheels.intakeCoralSubstation()));
 
                 //eject coral
-                m_operator.rightTrigger().whileTrue(m_flywheels.ejectCoral());
+                m_driver.b().whileTrue(m_flywheels.ejectCoral());
 
                         /**
                 Operator.rightBumper().whileTrue(
