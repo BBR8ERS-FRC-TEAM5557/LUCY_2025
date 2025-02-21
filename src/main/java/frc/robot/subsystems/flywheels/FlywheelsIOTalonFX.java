@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class FlywheelsIOTalonFX implements FlywheelsIO {
-    public static final double reduction =  28.0 / 44.0 / 36.0 ;   //(1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
+    public static final double reduction = 1.0; // (1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
 
     // Hardware
     private final TalonFX talon;
@@ -46,18 +46,18 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
 
     private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-    public  FlywheelsIOTalonFX() {
-        talon = new TalonFX(30); 
+    public FlywheelsIOTalonFX() {
+        talon = new TalonFX(30);
 
         // Configure motor
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
         config.Feedback.SensorToMechanismRatio = reduction;
-        config.Voltage.PeakForwardVoltage = 12.0;  //
-        config.Voltage.PeakReverseVoltage = -12.0;   //
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;   //
-        config.TorqueCurrent.PeakReverseTorqueCurrent = -70.0;  //
-        config.CurrentLimits.StatorCurrentLimit = 60.0;   //
+        config.Voltage.PeakForwardVoltage = 12.0; //
+        config.Voltage.PeakReverseVoltage = -12.0; //
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0; //
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -70.0; //
+        config.CurrentLimits.StatorCurrentLimit = 60.0; //
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
         config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
@@ -67,8 +67,9 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive; // TODO: Fix this based on thing
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
-        //tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getWristDegrees(), 0.25));
-        
+        // tryUntilOk(5, () ->
+        // talon.setPosition(SuperstructureState.HOME.getWristDegrees(), 0.25));
+
         position = talon.getPosition();
         velocity = talon.getVelocity();
         appliedVolts = talon.getMotorVoltage();
@@ -78,14 +79,15 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
 
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50.0, velocity, position,
-                 appliedVolts, torqueCurrent, supplyCurrent, temp);
+                appliedVolts, torqueCurrent, supplyCurrent, temp);
         ParentDevice.optimizeBusUtilizationForAll(talon);
     }
-    //@Override
+
+    // @Override
     public void updateInputs(FlywheelsIOInputs inputs) {
         boolean connected = BaseStatusSignal.refreshAll(
-                velocity, position, 
-                 appliedVolts, torqueCurrent, supplyCurrent, temp)
+                velocity, position,
+                appliedVolts, torqueCurrent, supplyCurrent, temp)
                 .isOK();
 
         inputs.motorConnected = connectedDebouncer.calculate(connected);
@@ -111,8 +113,6 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         talon.setControl(voltageRequest.withOutput(volts));
     }
 
-    
-
     @Override
     public void setPID(double kP, double kI, double kD) {
         config.Slot0.kP = kP;
@@ -123,7 +123,7 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     }
 
     @Override
-    public void setSGVA(double kS,double kV, double kA) {
+    public void setSGVA(double kS, double kV, double kA) {
         config.Slot0.kS = kS;
         config.Slot0.kV = kV;
         config.Slot0.kA = kA;

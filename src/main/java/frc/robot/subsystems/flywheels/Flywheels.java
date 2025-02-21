@@ -17,11 +17,9 @@ import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.wrist.WristIOInputsAutoLogged;
 import frc.robot.util.Util;
-import lombok.RequiredArgsConstructor;
 
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,23 +32,19 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber kV = new LoggedTunableNumber("Flywheel/kV", 0.0);
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Flywheel/kA", 0.0);
 
-    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleRpm", 2500.0);
-    private static final LoggedTunableNumber mIntakingRpm = new LoggedTunableNumber("Flywheels/IntakingRpm", -2000.0);
-    private static final LoggedTunableNumber mEjectingRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", 2500.0);
-    private static final LoggedTunableNumber mScoringRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", 2500.0);
-
+    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleRpm", 3.0);
+    private static final LoggedTunableNumber mIntakingRpm = new LoggedTunableNumber("Flywheels/IntakingRpm", 12.0);
+    private static final LoggedTunableNumber mEjectingRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", -5.0);
+    private static final LoggedTunableNumber mScoringRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", -5.0);
 
     private final FlywheelsIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-
     private State mState = State.IDLE;
-    private IdleMode mIdleMode = IdleMode.TELEOP;
 
     private final Alert motorDisconnectedAlert = new Alert("Flywheels motor disconnected!",
             Alert.AlertType.kWarning);
 
-    @RequiredArgsConstructor
     public enum State {
         STOP(() -> 0.0),
         IDLE(mIdleRpm),
@@ -60,21 +54,19 @@ public class Flywheels extends SubsystemBase {
 
         CHARACTERIZING(() -> 0.0);
 
-        private final DoubleSupplier rpm;
-
-        private double getRPM() {
-            return rpm.getAsDouble();
+        private State(DoubleSupplier voltageSupplier) {
+            volts = voltageSupplier;
         }
-    }
 
-    public enum IdleMode {
-        TELEOP,
-        AUTO
+        private final DoubleSupplier volts;
+
+        private double getVolts() {
+            return volts.getAsDouble();
+        }
     }
 
     @AutoLogOutput(key = "Flywheels/isBrakeMode")
     private boolean brakeModeEnabled = true;
-
 
     public Flywheels(FlywheelsIO io) {
         System.out.println("[Init] Instantiating Flywheels");
@@ -90,7 +82,7 @@ public class Flywheels extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-       Logger.processInputs(this.getName(), inputs);
+        Logger.processInputs(this.getName(), inputs);
 
         motorDisconnectedAlert.set(!inputs.motorConnected);
 
@@ -102,37 +94,15 @@ public class Flywheels extends SubsystemBase {
                 || kA.hasChanged(hashCode())) {
             io.setSGVA(kS.get(), kV.get(), kA.get());
         }
-       
+
+        io.runVolts(mState.getVolts());
+
         Logger.recordOutput("Flywheels/State", mState);
-        Logger.recordOutput("Flywheels/SetpointRpm", mState.getRPM());
+        Logger.recordOutput("Flywheels/SetpointRpm", mState.getVolts());
     }
 
-   
     private void setState(State state) {
         this.mState = state;
-    }
-/**
-    public Command waitUntilAtSetpointCommand() {
-        return new WaitUntilCommand(() -> atSetpoint());
-    } */
-
-    public void setIdleMode(IdleMode idleMode) {
-        if (this.mIdleMode != idleMode) {
-            // Idle after switching IdleMode
-            this.mIdleMode = idleMode;
-            idle();
-        }
-    }
-
-    //TODO: Change auto scoring idle mode
-    private void idle() {
-        // Change based on current idle mode
-        if (mIdleMode == IdleMode.TELEOP) {
-            setState(State.IDLE);
-        } else if (mIdleMode == IdleMode.AUTO) {
-            setState(State.SCORE);
-        }
-
     }
 
     public void setBrakeMode(boolean enabled) {
@@ -142,26 +112,23 @@ public class Flywheels extends SubsystemBase {
         io.setBrakeMode(brakeModeEnabled);
     }
 
-
-
-public Command intakeCoralSubstation() {
-    return startEnd(() -> setState(State.INTAKE), () -> setState(State.IDLE))
+    public Command intakeCoralSubstation() {
+        return startEnd(() -> setState(State.INTAKE), () -> setState(State.IDLE))
                 .withName("FlywheelsIntake");
-}
+    }
 
-public Command scoreCoral() {
-    return startEnd(() -> setState(State.SCORE), () -> setState(State.IDLE))
-        .withName("FlywheelsScoreCoral");
-}
+    public Command scoreCoral() {
+        return startEnd(() -> setState(State.SCORE), () -> setState(State.IDLE))
+                .withName("FlywheelsScoreCoral");
+    }
 
-public Command ejectCoral() {
-    return startEnd(() -> setState(State.EJECT), () -> setState(State.IDLE))
-        .withName("FlywheelsEject");
-}
+    public Command ejectCoral() {
+        return startEnd(() -> setState(State.EJECT), () -> setState(State.IDLE))
+                .withName("FlywheelsEject");
+    }
 
-public Command stop() {
-    return runOnce(() -> setState(State.STOP));
-}
-
+    public Command stop() {
+        return runOnce(() -> setState(State.STOP));
+    }
 
 }
