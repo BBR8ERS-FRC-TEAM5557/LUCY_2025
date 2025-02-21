@@ -81,25 +81,24 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
 
-                 m_elevator = new Elevator(
-                new ElevatorIOTalonFX());
+                m_elevator = new Elevator(
+                                new ElevatorIOTalonFX());
 
-                 m_wrist = new Wrist(
-                 new WristIOTalonFX());
+                m_wrist = new Wrist(
+                                new WristIOTalonFX());
 
                 m_flywheels = new Flywheels(
-                        new FlywheelsIOTalonFX());
+                                new FlywheelsIOTalonFX());
 
                 // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
                 // new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
 
                 // Instantiate missing subsystems
-                if (m_swerve == null){
+                if (m_swerve == null) {
                         m_swerve = new Swerve(null, null);
                 }
 
-                
                 if (m_elevator == null) {
                         m_elevator = new Elevator(new ElevatorIO() {
                         });
@@ -176,35 +175,36 @@ public class RobotContainer {
                                                                         m_wrist.setBrakeMode(true);
                                                                         m_flywheels.setBrakeMode(true);
                                                                 },
-                                                                m_swerve, m_elevator, m_wrist, m_flywheels).ignoringDisable(true)
+                                                                m_swerve, m_elevator, m_wrist, m_flywheels)
+                                                                .ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral()
-                        .alongWith(m_flywheels.scoreCoral()));
-
+                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
                 m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
 
+                m_driver.rightTrigger().onTrue(m_flywheels.scoreCoral());
 
-                //intake coral
-                //m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
-                  //      .alongWith(m_flywheels.intakeCoralSubstation()));
+                // intake coral
+                // m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
+                // .alongWith(m_flywheels.intakeCoralSubstation()));
 
-                        m_driver.x().whileTrue((m_flywheels.intakeCoralSubstation()));
+                m_driver.x().whileTrue((m_flywheels.intakeCoralSubstation()));
 
-                //eject coral
+                // eject coral
                 m_driver.b().whileTrue(m_flywheels.ejectCoral());
 
-                        /**
-                Operator.rightBumper().whileTrue(
-				mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
-						.andThen(Commands.parallel(mIntake.intake(), mFeeder.intake())
-								.until(mFeeder::hasGamepiece)))
-						.withName("Teleop Intaking"));
-
-		mOperator.leftBumper().whileTrue(
-				mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
-						.andThen(Commands.parallel(mIntake.eject(), mFeeder.ejectFloor())))
-						.withName("Teleop Ejecting")); */
+                /**
+                 * Operator.rightBumper().whileTrue(
+                 * mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
+                 * .andThen(Commands.parallel(mIntake.intake(), mFeeder.intake())
+                 * .until(mFeeder::hasGamepiece)))
+                 * .withName("Teleop Intaking"));
+                 * 
+                 * mOperator.leftBumper().whileTrue(
+                 * mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
+                 * .andThen(Commands.parallel(mIntake.eject(), mFeeder.ejectFloor())))
+                 * .withName("Teleop Ejecting"));
+                 */
 
                 m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
                 m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
