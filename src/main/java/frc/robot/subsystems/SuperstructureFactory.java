@@ -37,6 +37,22 @@ public class SuperstructureFactory {
         return runSuperstructureState(levelMap.get(level));
     }
 
+    public static Command scoreL1Coral() {
+        return runSuperstructureState(SuperstructureState.L1_CORAL);
+    }
+
+    public static Command scoreL2Coral() {
+        return runSuperstructureState(SuperstructureState.L2_CORAL);
+    }
+
+    public static Command scoreL3Coral() {
+        return runSuperstructureState(SuperstructureState.L3_CORAL);
+    }
+
+    public static Command scoreL4Coral() {
+        return runSuperstructureState(SuperstructureState.L4_CORAL);
+    }
+
     public static Command intakeCoral() {
         return runSuperstructureState(SuperstructureState.INTAKE_CORAL);
     }
