@@ -30,7 +30,7 @@ public interface WristIO {
     /**
      * Run wrist output shaft to positionDegrees
      */
-    default void runPosition(double positionDegrees) {
+    default void runPosition(double positionDegrees, double feedforward) {
     }
 
     default void setPosition(double positionDegrees) {

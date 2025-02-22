@@ -115,8 +115,8 @@ public class WristIOTalonFX implements WristIO {
     }
 
     @Override
-    public void runPosition(double positionDegrees) {
-        talon.setControl(motionMagicVoltageRequest.withPosition(positionDegrees));
+    public void runPosition(double positionDegrees, double feedforward) {
+        talon.setControl(motionMagicVoltageRequest.withPosition(positionDegrees).withFeedForward(feedforward));
     }
 
     @Override

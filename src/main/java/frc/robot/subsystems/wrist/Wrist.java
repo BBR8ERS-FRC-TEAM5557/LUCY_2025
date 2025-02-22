@@ -64,7 +64,7 @@ public class Wrist extends SubsystemBase {
         super.setName("Wrist");
         this.io = io;
         io.setPID(kP.get(), 0.0, kD.get());
-        io.setSGVA(kS.get(), kG.get(), kV.get(), kA.get());
+        io.setSGVA(kS.get(), 0.0, kV.get(), kA.get());
         io.setKinematicConstraints(maxVelocityDegreesPerSec.get(), maxAccelerationDegreesPerSec2.get());
     }
 
@@ -92,7 +92,8 @@ public class Wrist extends SubsystemBase {
     public Command runPositionCommand(DoubleSupplier setpointSupplierDegrees) {
         setpointDegrees = setpointSupplierDegrees;
         return runEnd(() -> {
-            io.runPosition(setpointSupplierDegrees.getAsDouble());
+            io.runPosition(setpointSupplierDegrees.getAsDouble(),
+                    kG.get() * Math.cos(Math.toRadians(getPositionDegrees())));
         }, () -> {
         }).withName(getName() + " runPositionCommand");
     }
@@ -147,7 +148,7 @@ public class Wrist extends SubsystemBase {
                 .andThen(
                         () -> {
                             io.setPosition(SuperstructureState.HOME.getWristDegrees());
-                            io.runPosition(SuperstructureState.STOW.getWristDegrees());
+                            runPositionCommand(() -> SuperstructureState.STOW.getWristDegrees()).schedule();
                         });
     }
 }
