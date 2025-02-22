@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ import static frc.robot.state.vision.VisionConstants.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 public class RobotContainer {
         // create controller instances
@@ -143,6 +145,7 @@ public class RobotContainer {
                                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput);
                 m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
+                //HOMING
                 m_driver.start()
                                 .onTrue(
                                                 Commands.runOnce(
@@ -155,6 +158,7 @@ public class RobotContainer {
                                                                 .ignoringDisable(true).withName("ResetHeading"));
                 m_driver.start().whileTrue(m_elevator.homingSequence().alongWith(m_wrist.homingSequence()));
 
+                //COAST MODE
                 m_driver.back()
                                 .whileTrue(
                                                 Commands.startEnd(
@@ -174,28 +178,40 @@ public class RobotContainer {
                                                                 .ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-                // SCORING CORAL
-                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
-                        SuperstructureFactory.stow();
-                }));
-                // m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
-                m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
+         //DRIVER CONTROLS                                                       
+         m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+                SuperstructureFactory.stow();
+        }));
+        //m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+        m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
+        m_operator.x().whileTrue((m_flywheels.intakeCoral()));
+        
+        m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
+        Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
+        intakeTrigger.whileTrue(
+                        SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
+                                        .finallyDo(() -> {
+                                                SuperstructureFactory.stow().schedule();
+                                        })
 
-                // INTAKING CORAL
-                m_driver.x().whileTrue((m_flywheels.intakeCoral()));
-
-                Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
-                intakeTrigger.whileTrue(
-                                SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
-                                                .finallyDo(() -> {
-                                                        SuperstructureFactory.stow().schedule();
-                                                })
-
-                );
-                // intakeTrigger.onFalse(SuperstructureFactory.stow());
+        );        
+         //m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
 
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
+
+                //intake coral
+                //m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
+                  //      .alongWith(m_flywheels.intakeCoralSubstation()));
+
+
+        //OPERATOR CONTROLS
+               
+                
+                m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
+                m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
+                m_operator.povDown().onTrue(SuperstructureFactory.scoreL3Coral());
+                m_operator.povLeft().onTrue(SuperstructureFactory.scoreL4Coral());
 
                 // Endgame Alerts
                 new Trigger(
@@ -233,16 +249,14 @@ public class RobotContainer {
                                                 || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
         }
 
-        private void generateEventMap() {
-        }
-
         private void generateAutoChoices() {
                 System.out.println("[Init] Auto Routines");
 
                 m_autoChooser.addDefaultOption("Do Nothing", null);
-                m_autoChooser.addDefaultOption("Drive Out", AutoBuilder.buildAuto("DriveBack"));
+                
+                m_autoChooser.addDefaultOption("Drive_Back", AutoBuilder.buildAuto("Drive_Back"));
 
-                m_autoChooser.addDefaultOption("N3_S_C01", AutoBuilder.buildAuto("N3_S_C01"));
+
 
                 // // Set up feedforward characterization
                 // m_autoChooser.addOption(
@@ -251,6 +265,15 @@ public class RobotContainer {
                 // m_swerve, m_swerve::runCharacterizationVolts,
                 // m_swerve::getCharacterizationVelocity)
                 // .finallyDo(m_swerve::stop));
+        }
+
+        private void generateEventMap() {
+
+                NamedCommands.registerCommand("scoreL4", Commands.print("setting up to score L4")
+                        .alongWith(SuperstructureFactory.scoreL4Coral()
+                        .andThen(m_flywheels.scoreCoral())));
+                
+
         }
 
         // Creates controller rumble command

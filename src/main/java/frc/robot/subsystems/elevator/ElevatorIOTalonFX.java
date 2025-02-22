@@ -28,8 +28,9 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-        public static final double drumPitchDiameter = Units.inchesToMeters(2.4); // TODO: Fix this number
-        public static final double reduction = 5.0 / (drumPitchDiameter * Math.PI);
+        //public static final double drumPitchDiameter = Units.inchesToMeters(2.4); 
+        public static final double reduction = 5.0 / (.005 * 24.0);
+
 
         // Hardware
         private final TalonFX talon;
