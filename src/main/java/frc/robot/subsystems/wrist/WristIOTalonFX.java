@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class WristIOTalonFX implements WristIO {
-    public static final double reduction = (1.0 / 1.0) * (48.0 / 16.0) / 360.0; // TODO: Fix this crap
+    public static final double reduction = (1.0 / 1.0) * (1.0 / 1.0) / 360.0; // TODO: Fix this crap
 
     // Hardware
     private final TalonFX talon;
@@ -46,7 +46,7 @@ public class WristIOTalonFX implements WristIO {
     private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
     public WristIOTalonFX() {
-        talon = new TalonFX(33); // TODO: Fix this CAN ID
+        talon = new TalonFX(33);
 
         // Configure motor
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

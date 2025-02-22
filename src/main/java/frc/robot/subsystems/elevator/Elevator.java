@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.robot.Constants;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.util.Util;
 
@@ -33,18 +34,19 @@ public class Elevator extends SubsystemBase {
         private static final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.0);
 
         private static final LoggedTunableNumber maxVelocityMetersPerSec = new LoggedTunableNumber(
-                        "Elevator/MaxVelocityMetersPerSec", 2.0);
+                        "Elevator/MaxVelocityMetersPerSec",
+                        Constants.Physical.kKrakenFreeSpeed / ElevatorIOTalonFX.reduction);
         private static final LoggedTunableNumber maxAccelerationMetersPerSec2 = new LoggedTunableNumber(
-                        "Elevator/MaxAccelerationMetersPerSec2", 10);
+                        "Elevator/MaxAccelerationMetersPerSec2", 10.0);
 
         private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", -2.0);
         private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Elevator/HomingTimeSecs",
                         0.25);
         private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
-                        "Elevator/HomingVelocityThresh", 5.0);
+                        "Elevator/HomingVelocityThresh", 0.01);
 
         private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-                        "Elevator/setpointTolerance", Units.inchesToMeters(0.5));
+                        "Elevator/setpointTolerance", Units.inchesToMeters(1.0));
 
         private final ElevatorIO io;
         private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -52,7 +54,7 @@ public class Elevator extends SubsystemBase {
         private final Alert motorDisconnectedAlert = new Alert("Elevator motor disconnected!",
                         Alert.AlertType.kWarning);
 
-        @AutoLogOutput(key = "Elevator/isBrakeMode")         
+        @AutoLogOutput(key = "Elevator/isBrakeMode")
         private boolean brakeModeEnabled = true;
         private boolean homed = false;
         private Debouncer homingDebouncer = new Debouncer(homingTimeSecs.get());

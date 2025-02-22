@@ -8,7 +8,6 @@
 package frc.robot.subsystems.wrist;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,18 +32,18 @@ public class Wrist extends SubsystemBase {
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Wrist/kA", 0.0);
 
     private static final LoggedTunableNumber maxVelocityDegreesPerSec = new LoggedTunableNumber(
-            "Wrist/MaxVelocityDegreesPerSec", 360.0);
+            "Wrist/MaxVelocityDegreesPerSec", 720.0);
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
             "Wrist/MaxAccelerationDegreesPerSec2", 1080.0);
 
-    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Wrist/HomingVolts", -3.0);
+    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Wrist/HomingVolts", -2.0);
     private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Wrist/HomingTimeSecs",
             0.25);
     private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
-            "Wrist/HomingVelocityThresh", 5.0);
+            "Wrist/HomingVelocityThresh", 0.1);
 
     private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-            "Wrist/setpointTolerance", Units.inchesToMeters(0.5));
+            "Wrist/setpointTolerance", 1.0);
 
     private final WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();

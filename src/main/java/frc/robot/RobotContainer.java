@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -95,10 +94,6 @@ public class RobotContainer {
                 // new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
 
                 // Instantiate missing subsystems
-                if (m_swerve == null) {
-                        m_swerve = new Swerve(null, null);
-                }
-
                 if (m_elevator == null) {
                         m_elevator = new Elevator(new ElevatorIO() {
                         });
@@ -179,35 +174,25 @@ public class RobotContainer {
                                                                 .ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
-                m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+                // SCORING CORAL
+                m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+                        SuperstructureFactory.stow();
+                }));
+                // m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+                m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
-                m_driver.rightTrigger().onTrue(m_flywheels.scoreCoral());
+                // INTAKING CORAL
+                m_driver.x().whileTrue((m_flywheels.intakeCoral()));
 
-                // intake coral
-                // m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
-                // .alongWith(m_flywheels.intakeCoralSubstation()));
+                Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
+                intakeTrigger.whileTrue(
+                                SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                })
 
-                m_driver.x().whileTrue((m_flywheels.intakeCoralSubstation()));
-
-                // eject coral
-                m_driver.b().whileTrue(m_flywheels.ejectCoral());
-
-                /**
-                 * Operator.rightBumper().whileTrue(
-                 * mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
-                 * .andThen(Commands.parallel(mIntake.intake(), mFeeder.intake())
-                 * .until(mFeeder::hasGamepiece)))
-                 * .withName("Teleop Intaking"));
-                 * 
-                 * mOperator.leftBumper().whileTrue(
-                 * mArm.intake().alongWith(Commands.waitUntil(mArm::atGoal)
-                 * .andThen(Commands.parallel(mIntake.eject(), mFeeder.ejectFloor())))
-                 * .withName("Teleop Ejecting"));
-                 */
-
-                m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
-                m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
+                );
+                // intakeTrigger.onFalse(SuperstructureFactory.stow());
 
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
@@ -248,6 +233,9 @@ public class RobotContainer {
                                                 || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
         }
 
+        private void generateEventMap() {
+        }
+
         private void generateAutoChoices() {
                 System.out.println("[Init] Auto Routines");
 
@@ -263,9 +251,6 @@ public class RobotContainer {
                 // m_swerve, m_swerve::runCharacterizationVolts,
                 // m_swerve::getCharacterizationVelocity)
                 // .finallyDo(m_swerve::stop));
-        }
-
-        private void generateEventMap() {
         }
 
         // Creates controller rumble command
@@ -290,12 +275,6 @@ public class RobotContainer {
         }
 
         public double getRotationInput() {
-                // TODO: change to determine control scheme
-
-                // double leftTrigger = square(deadband(m_driver.getLeftTriggerAxis(), 0.05));
-                // double rightTrigger = square(deadband(m_driver.getRightTriggerAxis(), 0.05));
-                // return leftTrigger > rightTrigger ? leftTrigger : -rightTrigger;
-
                 return -square(deadband(m_driver.getRightX(), 0.05));
         }
 

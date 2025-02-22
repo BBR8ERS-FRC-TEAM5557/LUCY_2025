@@ -8,16 +8,10 @@
 package frc.robot.subsystems.flywheels;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.team6328.LoggedTunableNumber;
-import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.wrist.WristIOInputsAutoLogged;
-import frc.robot.util.Util;
-
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -25,22 +19,36 @@ import org.littletonrobotics.junction.Logger;
 
 public class Flywheels extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Flywheel/kP", 0.0);
-    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Flywheel/kD", 0.0);
+    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleVolts", 1.0);
 
-    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Flywheel/kS", 0.0);
-    private static final LoggedTunableNumber kV = new LoggedTunableNumber("Flywheel/kV", 0.0);
-    private static final LoggedTunableNumber kA = new LoggedTunableNumber("Flywheel/kA", 0.0);
+    private static final LoggedTunableNumber mIntakingCoralRpm = new LoggedTunableNumber("Flywheels/IntakingCoralVolts",
+            12.0);
+    private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Flywheels/HoldingCoralVolts",
+            2.0);
+    private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
+            -5.0);
 
-    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleRpm", 3.0);
-    private static final LoggedTunableNumber mIntakingRpm = new LoggedTunableNumber("Flywheels/IntakingRpm", 12.0);
-    private static final LoggedTunableNumber mEjectingRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", -5.0);
-    private static final LoggedTunableNumber mScoringRpm = new LoggedTunableNumber("Flywheels/EjectingRpm", -5.0);
+    private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
+            "Flywheels/StallVelocityThresholdRPM",
+            50);
+    private static final LoggedTunableNumber mStallCurrentThreshold = new LoggedTunableNumber(
+            "Flywheels/StallCurrentThresholdAmps",
+            30.0);
+    private static final LoggedTunableNumber mStallTime = new LoggedTunableNumber(
+            "Flywheels/StallTimeSecs",
+            0.25);
 
     private final FlywheelsIO io;
-    private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+    private final FlywheelsIOInputsAutoLogged inputs = new FlywheelsIOInputsAutoLogged();
 
     private State mState = State.IDLE;
+    private Debouncer stallDebouncer = new Debouncer(mStallTime.get());
+
+    @AutoLogOutput(key = "Flywheels/stalled")
+    private boolean stalled = false;
+
+    @AutoLogOutput(key = "Flywheels/isBrakeMode")
+    private boolean brakeModeEnabled = true;
 
     private final Alert motorDisconnectedAlert = new Alert("Flywheels motor disconnected!",
             Alert.AlertType.kWarning);
@@ -48,11 +56,10 @@ public class Flywheels extends SubsystemBase {
     public enum State {
         STOP(() -> 0.0),
         IDLE(mIdleRpm),
-        INTAKE(mIntakingRpm),
-        EJECT(mEjectingRpm),
-        SCORE(mScoringRpm),
 
-        CHARACTERIZING(() -> 0.0);
+        INTAKE_CORAL(mIntakingCoralRpm),
+        HOLD_CORAL(mHoldingCoralRpm),
+        SCORE_CORAL(mScoringCoralRpm);
 
         private State(DoubleSupplier voltageSupplier) {
             volts = voltageSupplier;
@@ -65,18 +72,11 @@ public class Flywheels extends SubsystemBase {
         }
     }
 
-    @AutoLogOutput(key = "Flywheels/isBrakeMode")
-    private boolean brakeModeEnabled = true;
-
     public Flywheels(FlywheelsIO io) {
         System.out.println("[Init] Instantiating Flywheels");
 
         super.setName("Flywheels");
         this.io = io;
-        io.setPID(kP.get(), 0.0, kD.get());
-        io.setSGVA(kS.get(), kV.get(), kA.get());
-
-        setDefaultCommand(runOnce(() -> setState(State.IDLE)).withName("Flywheels Idle"));
     }
 
     @Override
@@ -86,19 +86,10 @@ public class Flywheels extends SubsystemBase {
 
         motorDisconnectedAlert.set(!inputs.motorConnected);
 
-        // Update tunable numbers
-        if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
-            io.setPID(kP.get(), 0.0, kD.get());
-        }
-        if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())
-                || kA.hasChanged(hashCode())) {
-            io.setSGVA(kS.get(), kV.get(), kA.get());
-        }
-
         io.runVolts(mState.getVolts());
 
         Logger.recordOutput("Flywheels/State", mState);
-        Logger.recordOutput("Flywheels/SetpointRpm", mState.getVolts());
+        Logger.recordOutput("Flywheels/SetpointVolts", mState.getVolts());
     }
 
     private void setState(State state) {
@@ -112,19 +103,32 @@ public class Flywheels extends SubsystemBase {
         io.setBrakeMode(brakeModeEnabled);
     }
 
-    public Command intakeCoralSubstation() {
-        return startEnd(() -> setState(State.INTAKE), () -> setState(State.IDLE))
-                .withName("FlywheelsIntake");
+    public Command intakeCoral() {
+        return startRun(
+                () -> {
+                    setState(State.INTAKE_CORAL);
+                    stallDebouncer = new Debouncer(mStallTime.get());
+                    stallDebouncer.calculate(false);
+                    stalled = false;
+                },
+                () -> {
+                    stalled = stallDebouncer.calculate(inputs.velocityRPM < mStallVelocityThreshold.get()
+                            && inputs.torqueCurrentAmps[0] > mStallCurrentThreshold.get());
+                })
+                .until(() -> stalled)
+                .finallyDo(() -> {
+                    if (stalled) {
+                        setState(State.HOLD_CORAL);
+                    } else {
+                        setState(State.IDLE);
+                    }
+                })
+                .withName("FlywheelsIntakeCoral");
     }
 
     public Command scoreCoral() {
-        return startEnd(() -> setState(State.SCORE), () -> setState(State.IDLE))
+        return startEnd(() -> setState(State.SCORE_CORAL), () -> setState(State.IDLE))
                 .withName("FlywheelsScoreCoral");
-    }
-
-    public Command ejectCoral() {
-        return startEnd(() -> setState(State.EJECT), () -> setState(State.IDLE))
-                .withName("FlywheelsEject");
     }
 
     public Command stop() {
