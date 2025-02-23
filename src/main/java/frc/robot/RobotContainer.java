@@ -88,8 +88,8 @@ public class RobotContainer {
                 m_wrist = new Wrist(
                                 new WristIOTalonFX());
 
-                m_flywheels = new Flywheels(
-                                new FlywheelsIOTalonFX());
+               // m_flywheels = new Flywheels(
+                 //               new FlywheelsIOTalonFX());
 
                 // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
@@ -145,7 +145,7 @@ public class RobotContainer {
                                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput);
                 m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
-                //HOMING
+                //HOMING + ZEROING
                 m_driver.start()
                                 .onTrue(
                                                 Commands.runOnce(
@@ -181,12 +181,16 @@ public class RobotContainer {
          //DRIVER CONTROLS                                                       
          m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
                 SuperstructureFactory.stow();
-        }));
-        //m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+                }));
+
+        //m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
+        m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+
+
         m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
-        m_operator.x().whileTrue((m_flywheels.intakeCoral()));
-        
+
         m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
+
         Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
         intakeTrigger.whileTrue(
                         SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
@@ -194,7 +198,12 @@ public class RobotContainer {
                                                 SuperstructureFactory.stow().schedule();
                                         })
 
-        );        
+        );  
+//run once
+
+        m_operator.x().whileTrue((m_flywheels.intakeCoral()));
+        
+              
          //m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
 
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
@@ -206,12 +215,28 @@ public class RobotContainer {
 
 
         //OPERATOR CONTROLS
-               
+       // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+       //         SuperstructureFactory.stow();
+        //        }));
                 
                 m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
-                m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
-                m_operator.povDown().onTrue(SuperstructureFactory.scoreL3Coral());
-                m_operator.povLeft().onTrue(SuperstructureFactory.scoreL4Coral());
+
+               // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+               //                  SuperstructureFactory.stow();
+                //                 }));
+
+                //m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
+
+                m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral().finallyDo(() -> {
+                        SuperstructureFactory.stow();
+                        }));
+
+                m_operator.povDown().whileTrue(SuperstructureFactory.scoreL3Coral());
+                        m_operator.povDown().onFalse(SuperstructureFactory.stow());
+                m_operator.povLeft().whileTrue(SuperstructureFactory.scoreL4Coral());
+                        m_operator.povLeft().onFalse(SuperstructureFactory.stow());
+                
+                m_operator.leftBumper().onTrue(SuperstructureFactory.stow());
 
                 // Endgame Alerts
                 new Trigger(
@@ -255,7 +280,7 @@ public class RobotContainer {
                 m_autoChooser.addDefaultOption("Do Nothing", null);
                 
                 m_autoChooser.addDefaultOption("Drive_Back", AutoBuilder.buildAuto("Drive_Back"));
-
+                
 
 
                 // // Set up feedforward characterization

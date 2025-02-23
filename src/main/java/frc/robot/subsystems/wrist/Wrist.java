@@ -27,7 +27,7 @@ public class Wrist extends SubsystemBase {
     private static final LoggedTunableNumber kD = new LoggedTunableNumber("Wrist/kD", 0.0);
 
     private static final LoggedTunableNumber kS = new LoggedTunableNumber("Wrist/kS", 0.0);
-    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Wrist/kG", 0.0);
+    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Wrist/kG", 0.2);
     private static final LoggedTunableNumber kV = new LoggedTunableNumber("Wrist/kV", 0.0);
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Wrist/kA", 0.0);
 

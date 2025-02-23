@@ -19,12 +19,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Flywheels extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleVolts", 1.0);
+    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleVolts", 0.0);
 
     private static final LoggedTunableNumber mIntakingCoralRpm = new LoggedTunableNumber("Flywheels/IntakingCoralVolts",
             12.0);
     private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Flywheels/HoldingCoralVolts",
-            2.0);
+            0.0);
     private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
             -5.0);
 
