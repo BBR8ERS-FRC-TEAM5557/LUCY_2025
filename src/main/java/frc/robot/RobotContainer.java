@@ -144,10 +144,11 @@ public class RobotContainer {
 
                 /* SWERVING */
                 TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
-                                this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput);
+                                this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput,
+                                this::getSnapInput);
                 m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
-                //HOMING + ZEROING
+                // HOMING + ZEROING
                 m_driver.start()
                                 .onTrue(
                                                 Commands.runOnce(
@@ -160,7 +161,7 @@ public class RobotContainer {
                                                                 .ignoringDisable(true).withName("ResetHeading"));
                 m_driver.start().whileTrue(m_elevator.homingSequence().alongWith(m_wrist.homingSequence()));
 
-                //COAST MODE
+                // COAST MODE
                 m_driver.back()
                                 .whileTrue(
                                                 Commands.startEnd(
@@ -180,64 +181,63 @@ public class RobotContainer {
                                                                 .ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-         //DRIVER CONTROLS                                                       
-         m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
-                SuperstructureFactory.stow();
+                // DRIVER CONTROLS
+                m_driver.leftTrigger().whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+                        SuperstructureFactory.stow().schedule();
                 }));
 
-        //m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
-        m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+                // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
+                m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
 
+                m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
-        m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
+                m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
 
-        m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
+                Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
+                intakeTrigger.whileTrue(
+                                SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                })
 
-        Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
-        intakeTrigger.whileTrue(
-                        SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
-                                        .finallyDo(() -> {
-                                                SuperstructureFactory.stow().schedule();
-                                        })
+                );
+                // run once
 
-        );  
-//run once
+                m_operator.x().whileTrue((m_flywheels.intakeCoral()));
 
-        m_operator.x().whileTrue((m_flywheels.intakeCoral()));
-        
-              
-         //m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
+                // m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
 
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
 
-                //intake coral
-                //m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
-                  //      .alongWith(m_flywheels.intakeCoralSubstation()));
+                // intake coral
+                // m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
+                // .alongWith(m_flywheels.intakeCoralSubstation()));
 
+                // OPERATOR CONTROLS
+                // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(()
+                // -> {
+                // SuperstructureFactory.stow();
+                // }));
 
-        //OPERATOR CONTROLS
-       // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
-       //         SuperstructureFactory.stow();
-        //        }));
-                
                 m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
 
-               // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
-               //                  SuperstructureFactory.stow();
-                //                 }));
+                // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() ->
+                // {
+                // SuperstructureFactory.stow();
+                // }));
 
-                //m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
+                // m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
 
                 m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral().finallyDo(() -> {
                         SuperstructureFactory.stow();
-                        }));
+                }));
 
                 m_operator.povDown().whileTrue(SuperstructureFactory.scoreL3Coral());
-                        m_operator.povDown().onFalse(SuperstructureFactory.stow());
+                m_operator.povDown().onFalse(SuperstructureFactory.stow());
                 m_operator.povLeft().whileTrue(SuperstructureFactory.scoreL4Coral());
-                        m_operator.povLeft().onFalse(SuperstructureFactory.stow());
-                
+                m_operator.povLeft().onFalse(SuperstructureFactory.stow());
+
                 m_operator.leftBumper().onTrue(SuperstructureFactory.stow());
 
                 // Endgame Alerts
@@ -280,10 +280,8 @@ public class RobotContainer {
                 System.out.println("[Init] Auto Routines");
 
                 m_autoChooser.addDefaultOption("Do Nothing", null);
-                
-                m_autoChooser.addDefaultOption("Drive_Back", AutoBuilder.buildAuto("Drive_Back"));
-                
 
+                m_autoChooser.addDefaultOption("Drive_Back", AutoBuilder.buildAuto("Drive_Back"));
 
                 // // Set up feedforward characterization
                 // m_autoChooser.addOption(
@@ -297,33 +295,30 @@ public class RobotContainer {
         private void generateEventMap() {
 
                 NamedCommands.registerCommand("scoreL4", Commands.print("scoring L4")
-                        .alongWith(SuperstructureFactory.scoreL4Coral())
+                                .alongWith(SuperstructureFactory.scoreL4Coral())
                                 .alongWith(Commands.waitSeconds(3.0)
-                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
-                        .andThen(SuperstructureFactory.stow())); 
+                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
+                                .andThen(SuperstructureFactory.stow()));
 
                 NamedCommands.registerCommand("scoreL3", Commands.print("scoring L3")
-                        .alongWith(SuperstructureFactory.scoreL3Coral())
+                                .alongWith(SuperstructureFactory.scoreL3Coral())
                                 .alongWith(Commands.waitSeconds(3.0)
-                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
-                        .andThen(SuperstructureFactory.stow()));        
-                
+                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
+                                .andThen(SuperstructureFactory.stow()));
+
                 NamedCommands.registerCommand("scoreL2", Commands.print("scoring L2")
-                        .alongWith(SuperstructureFactory.scoreL2Coral())
+                                .alongWith(SuperstructureFactory.scoreL2Coral())
                                 .alongWith(Commands.waitSeconds(3.0)
-                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
-                        .andThen(SuperstructureFactory.stow()));
-                        
+                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
+                                .andThen(SuperstructureFactory.stow()));
+
                 NamedCommands.registerCommand("scoreL1", Commands.print("scoring L1")
-                        .alongWith(SuperstructureFactory.scoreL1Coral())
+                                .alongWith(SuperstructureFactory.scoreL1Coral())
                                 .alongWith(Commands.waitSeconds(3.0)
-                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
-                        .andThen(SuperstructureFactory.stow()));       
+                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
+                                .andThen(SuperstructureFactory.stow()));
 
                 NamedCommands.registerCommand("intakeCoral", Commands.print("Intaking coral"));
-
-
-                
 
         }
 
@@ -358,6 +353,10 @@ public class RobotContainer {
 
         public boolean getRightIntakeInput() {
                 return m_driver.rightBumper().getAsBoolean();
+        }
+
+        public boolean getSnapInput() {
+                return m_driver.a().getAsBoolean();
         }
 
         private static double deadband(double value, double tolerance) {

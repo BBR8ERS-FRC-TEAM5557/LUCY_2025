@@ -30,7 +30,7 @@ public class SuperstructureFactory {
         return Commands.parallel(
                 elevator.runPositionCommand(state.getElevatorMetersSupplier()),
                 wrist.runPositionCommand(state.getWristDegreesSupplier()));
-                
+
     }
 
     public static Command scoreCoral() {
@@ -77,7 +77,8 @@ public class SuperstructureFactory {
                                 .withTimeout(0.2)
                                 .andThen(Commands.waitSeconds(0.1))
                                 .repeatedly()
-                                .withTimeout(0.3 * level));
+                                .withTimeout(0.3 * level))
+                .ignoringDisable(true);
 
     }
 

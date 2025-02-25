@@ -24,7 +24,7 @@ import frc.robot.util.AllianceFlipUtil;
  */
 public class TeleopDrive extends Command {
     public TeleopDrive(DoubleSupplier throttle, DoubleSupplier strafe, DoubleSupplier turn, BooleanSupplier intakeLeft,
-            BooleanSupplier intakeRight) {
+            BooleanSupplier intakeRight, BooleanSupplier snap) {
         mDrivetrain = RobotContainer.m_swerve;
         mThrottleSupplier = throttle;
         mStrafeSupplier = strafe;
@@ -32,6 +32,7 @@ public class TeleopDrive extends Command {
 
         mLeftIntakeSupplier = intakeLeft;
         mRightIntakeSupplier = intakeRight;
+        mSnapSupplier = snap;
 
         driveWithHeading.HeadingController.setPID(
                 SwerveConstants.PID.kRotationkP,
@@ -45,7 +46,7 @@ public class TeleopDrive extends Command {
 
     private Swerve mDrivetrain;
     private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
-    private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier;
+    private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier;
     private Optional<Rotation2d> mHeadingSetpoint = Optional.empty();
     private double mJoystickLastTouched = -1;
 
@@ -73,13 +74,17 @@ public class TeleopDrive extends Command {
 
         boolean wantsLeftIntake = mLeftIntakeSupplier.getAsBoolean();
         boolean wantsRightIntake = mRightIntakeSupplier.getAsBoolean();
+        boolean wantsSnap = mSnapSupplier.getAsBoolean();
 
-        if (wantsLeftIntake || wantsRightIntake) {
+        if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
             double setpointDegrees = 0.0;
             if (wantsLeftIntake) {
                 setpointDegrees = -54.0;
             } else if (wantsRightIntake) {
                 setpointDegrees = 54.0;
+            } else if (wantsSnap) {
+                setpointDegrees = 45.0 * Math
+                        .round(RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getDegrees() / 45.0);
             }
             mHeadingSetpoint = Optional.of(AllianceFlipUtil.apply(Rotation2d.fromDegrees(setpointDegrees)));
             mDrivetrain
