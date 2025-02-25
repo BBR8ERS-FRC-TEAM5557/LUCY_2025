@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -62,26 +64,25 @@ public class SuperstructureFactory {
     }
 
     public static Command adjustLevel(int amount) {
-        return Commands.startRun(
-                () -> {
-                    levelAdjustmentTimer = new Timer();
-                    levelAdjustmentTimer.reset();
-                    levelAdjustmentTimer.start();
-                    level = (int) Util.clamp(level + amount, 1, 4);
-                },
-                () -> {
-                })
-                .until(() -> levelAdjustmentTimer.hasElapsed(0.75))
+        level = (int) Util.clamp(level + amount, 1, 4);
+        levelAdjustmentTimer = new Timer();
+        levelAdjustmentTimer.reset();
+        levelAdjustmentTimer.start();
+        int hash = levelAdjustmentTimer.hashCode();
+
+        return Commands.waitUntil(() -> levelAdjustmentTimer.hasElapsed(0.75))
                 .andThen(
                         RobotContainer.controllerRumbleCommand()
                                 .withTimeout(0.2)
                                 .andThen(Commands.waitSeconds(0.1))
                                 .repeatedly()
-                                .withTimeout(0.3 * level))
+                                .withTimeout(0.3 * level).unless(() -> hash != levelAdjustmentTimer.hashCode()))
                 .ignoringDisable(true);
-
+        // TODO: I'm not sure that this will buzz the correct number of times because of
+        // how the command is created
     }
 
+    @AutoLogOutput(key = "Superstrucutre/selectedScoringLevel")
     public static int getLevel() {
         return level;
     }

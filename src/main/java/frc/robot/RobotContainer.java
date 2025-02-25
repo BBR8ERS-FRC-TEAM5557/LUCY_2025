@@ -181,18 +181,23 @@ public class RobotContainer {
                                                                 .ignoringDisable(true)
                                                                 .withName("Robot Go Limp"));
 
-                // DRIVER CONTROLS
+                /* DRVIER CONTROLS */
+
+                // SUPERSTRUCTURE SCORE
                 m_driver.leftTrigger().whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
                         SuperstructureFactory.stow().schedule();
                 }));
+                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
+                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
 
+                // the other versions of superstructure score
                 // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
-                m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
+                // m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
 
+                // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
-                m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
-
+                // INTAKE
                 Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
                 intakeTrigger.whileTrue(
                                 SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
@@ -201,20 +206,15 @@ public class RobotContainer {
                                                 })
 
                 );
-                // run once
 
-                m_operator.x().whileTrue((m_flywheels.intakeCoral()));
-
+                // other versions of intake
+                // m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
+                // m_operator.x().whileTrue((m_flywheels.intakeCoral()));
                 // m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
-
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
-                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
-
-                // intake coral
                 // m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
                 // .alongWith(m_flywheels.intakeCoralSubstation()));
 
-                // OPERATOR CONTROLS
+                /* OPERATOR CONTROLS */
                 // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(()
                 // -> {
                 // SuperstructureFactory.stow();
