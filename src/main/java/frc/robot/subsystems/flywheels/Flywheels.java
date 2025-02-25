@@ -26,7 +26,7 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Flywheels/HoldingCoralVolts",
             0.0);
     private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
-            -5.0);
+            -12.0);
 
     private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
             "Flywheels/StallVelocityThresholdRPM",
@@ -124,6 +124,11 @@ public class Flywheels extends SubsystemBase {
                     }
                 })
                 .withName("FlywheelsIntakeCoral");
+    }
+
+    public Command intakeCoralManual() {
+        return startEnd(() -> setState(State.INTAKE_CORAL), () -> setState(State.IDLE))
+                .withName("FlywheelsIntakeCoralManually");
     }
 
     public Command scoreCoral() {

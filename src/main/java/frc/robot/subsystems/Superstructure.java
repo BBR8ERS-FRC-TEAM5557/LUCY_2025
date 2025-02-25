@@ -10,27 +10,27 @@ public class Superstructure {
                         0.0);
         private static final LoggedTunableNumber home_wrist = new LoggedTunableNumber(
                         "Superstructure/HomeWrist",
-                        -72.0);
+                        -55.0);
         private static final LoggedTunableNumber stow_elevator = new LoggedTunableNumber(
                         "Superstructure/StartElevator",
                         0.0);
         private static final LoggedTunableNumber stow_wrist = new LoggedTunableNumber(
                         "Superstructure/StartWrist",
-                        -69.0);
+                        -55.0);
 
         private static final LoggedTunableNumber intake_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralElevator",
                         0.228);
         private static final LoggedTunableNumber intake_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralWrist",
-                        -63.0);
+                        -50.0);
 
         private static final LoggedTunableNumber l1_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L1CoralElevator",
                         0.0);
         private static final LoggedTunableNumber l1_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L1CoralWrist",
-                        138.0);
+                        -50.0);
         private static final LoggedTunableNumber l2_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L2CoralElevator",
                         0.0);

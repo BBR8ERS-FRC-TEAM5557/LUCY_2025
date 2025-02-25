@@ -42,13 +42,14 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.Voltage.PeakForwardVoltage = 12.0; //
         config.Voltage.PeakReverseVoltage = -12.0; //
-        config.CurrentLimits.StatorCurrentLimit = 60.0; //
+        config.CurrentLimits.StatorCurrentLimit = 40.0; //
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
-        config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
+        config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.04;
         config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
+        
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));

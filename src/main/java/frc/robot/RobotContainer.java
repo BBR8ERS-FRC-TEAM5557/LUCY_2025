@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.leds.Leds;
@@ -88,8 +90,8 @@ public class RobotContainer {
                 m_wrist = new Wrist(
                                 new WristIOTalonFX());
 
-               // m_flywheels = new Flywheels(
-                 //               new FlywheelsIOTalonFX());
+                m_flywheels = new Flywheels(
+                                new FlywheelsIOTalonFX());
 
                 // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
@@ -193,7 +195,7 @@ public class RobotContainer {
 
         Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
         intakeTrigger.whileTrue(
-                        SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
+                        SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
                                         .finallyDo(() -> {
                                                 SuperstructureFactory.stow().schedule();
                                         })
@@ -294,9 +296,33 @@ public class RobotContainer {
 
         private void generateEventMap() {
 
-                NamedCommands.registerCommand("scoreL4", Commands.print("setting up to score L4")
-                        .alongWith(SuperstructureFactory.scoreL4Coral()
-                        .andThen(m_flywheels.scoreCoral())));
+                NamedCommands.registerCommand("scoreL4", Commands.print("scoring L4")
+                        .alongWith(SuperstructureFactory.scoreL4Coral())
+                                .alongWith(Commands.waitSeconds(3.0)
+                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
+                        .andThen(SuperstructureFactory.stow())); 
+
+                NamedCommands.registerCommand("scoreL3", Commands.print("scoring L3")
+                        .alongWith(SuperstructureFactory.scoreL3Coral())
+                                .alongWith(Commands.waitSeconds(3.0)
+                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
+                        .andThen(SuperstructureFactory.stow()));        
+                
+                NamedCommands.registerCommand("scoreL2", Commands.print("scoring L2")
+                        .alongWith(SuperstructureFactory.scoreL2Coral())
+                                .alongWith(Commands.waitSeconds(3.0)
+                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
+                        .andThen(SuperstructureFactory.stow()));
+                        
+                NamedCommands.registerCommand("scoreL1", Commands.print("scoring L1")
+                        .alongWith(SuperstructureFactory.scoreL1Coral())
+                                .alongWith(Commands.waitSeconds(3.0)
+                                        .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))   
+                        .andThen(SuperstructureFactory.stow()));       
+
+                NamedCommands.registerCommand("intakeCoral", Commands.print("Intaking coral"));
+
+
                 
 
         }

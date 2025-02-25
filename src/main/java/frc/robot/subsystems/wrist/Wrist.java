@@ -23,18 +23,18 @@ import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Wrist/kP", 0.0);
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Wrist/kP", 1);
     private static final LoggedTunableNumber kD = new LoggedTunableNumber("Wrist/kD", 0.0);
 
-    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Wrist/kS", 0.0);
-    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Wrist/kG", 0.2);
+    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Wrist/kS", 0.2);
+    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Wrist/kG", 0.4);
     private static final LoggedTunableNumber kV = new LoggedTunableNumber("Wrist/kV", 0.0);
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Wrist/kA", 0.0);
 
     private static final LoggedTunableNumber maxVelocityDegreesPerSec = new LoggedTunableNumber(
             "Wrist/MaxVelocityDegreesPerSec", 720.0);
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
-            "Wrist/MaxAccelerationDegreesPerSec2", 1080.0);
+            "Wrist/MaxAccelerationDegreesPerSec2", 4000.0);
 
     private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Wrist/HomingVolts", -2.0);
     private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Wrist/HomingTimeSecs",
