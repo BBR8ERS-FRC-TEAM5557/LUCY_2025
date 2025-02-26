@@ -100,7 +100,7 @@ public class Vision extends VirtualSubsystem {
             for (int i = 0; i < inputs[instanceIndex].tagsSeen.length; i++) {
                 int tagId = inputs[instanceIndex].tagsSeen[i];
                 lastTagDetectionTimes.put(tagId, Timer.getFPGATimestamp());
-                Optional<Pose3d> tagPose = FieldConstants.aprilTags.getTagPose(tagId);
+                Optional<Pose3d> tagPose = FieldConstants.aprilTagLayout.getTagPose(tagId);
                 tagPose.ifPresent(tagPoses::add);
             }
 

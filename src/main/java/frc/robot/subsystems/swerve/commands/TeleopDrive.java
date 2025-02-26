@@ -87,8 +87,8 @@ public class TeleopDrive extends Command {
             } else if (wantsSnap) {
                 throttleFieldFrame *= 0.5; // slow down by 50% when snapping
                 strafeFieldFrame *= 0.5;
-                setpointDegrees = 45.0 * Math
-                        .round(RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getDegrees() / 45.0);
+                setpointDegrees = 60.0 * Math
+                        .round(RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getDegrees() / 60.0);
                 mHeadingSetpoint = Optional.of(Rotation2d.fromDegrees(setpointDegrees));
             }
 
