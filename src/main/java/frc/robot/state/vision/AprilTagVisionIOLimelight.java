@@ -4,19 +4,21 @@ import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotContainer;
 import frc.robot.state.RobotStateEstimator;
-import limelight.estimator.LimelightPoseEstimator.BotPose;
-import limelight.estimator.PoseEstimate;
-import limelight.structures.LimelightSettings.LEDMode;
-import limelight.structures.Orientation3d;
+import limelight.Limelight;
+import limelight.networktables.LimelightPoseEstimator.BotPose;
+import limelight.networktables.LimelightSettings.LEDMode;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     private final Limelight camera;
-    private double poseCacheTimestampSeconds = -1;
 
+    private double poseCacheTimestampSeconds = -1;
     private final Alert disconnectedAlert;
 
     /**
@@ -49,32 +51,40 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         Rotation3d rotation = new Rotation3d(
                 0.0, 0.0, RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getRadians());
         Orientation3d orientation = new Orientation3d(rotation, null);
-        camera.getSettings().withRobotOrientation(orientation);
+        camera.getSettings().withRobotOrientation(orientation).save();;
 
-        Optional<PoseEstimate> result = DriverStation.isEnabled() ? BotPose.BLUE_MEGATAG2.get(camera)
-                : BotPose.BLUE.get(camera);
+        Optional<PoseEstimate> megaTag1 = BotPose.BLUE.get(camera);
+        Optional<PoseEstimate> megaTag2 = BotPose.BLUE_MEGATAG2.get(camera);
+
+        double avgDistance = Double.MAX_VALUE;
+        if(megaTag2.isPresent()) {
+            avgDistance = megaTag2.get().avgTagDist;
+        } else if(megaTag1.isPresent()) {
+            avgDistance = megaTag1.get().avgTagDist;
+        }
+
+        Optional<PoseEstimate> result = Optional.empty();
+        double rotationalSpeed = Math.abs(RobotContainer.m_swerve.getCurrentFieldChassisSpeeds().omegaRadiansPerSecond);
+
+        if(avgDistance > 1.5 && rotationalSpeed < Units.degreesToRadians(180) && megaTag2.isPresent()) {
+            result = megaTag2;
+        } else {
+            result = megaTag1;
+        }
 
         if (result.isPresent()) {
-            // If the pose cache timestamp was set, and the result is from the same
-            // timestamp, give up
-            if (poseCacheTimestampSeconds > 0
-                    && Math.abs(poseCacheTimestampSeconds - result.get().timestampSeconds) < 1e-6) {
-                inputs.tagsSeen = new int[] {};
-                return;
-            }
-
             inputs.estimatedRobotPose = result.get().pose;
             inputs.estimatedRobotPoseTimestamp = result.get().timestampSeconds;
-            inputs.latency = result.get().latency;
-
+            inputs.latencyMS = result.get().latency * 1000.0;
             inputs.tagsSeen = new int[result.get().rawFiducials.length];
             for (int i = 0; i < inputs.tagsSeen.length; i++) {
                 inputs.tagsSeen[i] = result.get().rawFiducials[i].id;
             }
             inputs.isMegatagTwo = result.get().isMegaTag2;
 
-            poseCacheTimestampSeconds = result.get().timestampSeconds;
-
+            poseCacheTimestampSeconds = inputs.estimatedRobotPoseTimestamp;
+        } else {
+            inputs.tagsSeen = new int[] {};
         }
 
         if (Timer.getFPGATimestamp() - poseCacheTimestampSeconds > 2.0) {

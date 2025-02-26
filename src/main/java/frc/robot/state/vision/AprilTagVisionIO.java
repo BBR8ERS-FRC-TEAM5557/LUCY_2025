@@ -9,7 +9,7 @@ public interface AprilTagVisionIO {
     public static class AprilTagVisionIOInputs {
         Pose3d estimatedRobotPose = new Pose3d();
         double estimatedRobotPoseTimestamp = 0.0;
-        double latency = 0.0;
+        double latencyMS = 0.0;
         int[] tagsSeen = new int[] {};
         boolean isMegatagTwo = true;
     }

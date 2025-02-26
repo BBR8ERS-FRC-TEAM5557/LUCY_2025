@@ -62,25 +62,19 @@ public class Vision extends VirtualSubsystem {
         List<VisionObservation> allVisionObservations = new ArrayList<>();
 
         for (int instanceIndex = 0; instanceIndex < io.length; instanceIndex++) {
-            boolean hasUpdate = inputs[instanceIndex].estimatedRobotPoseTimestamp
-                    - lastFrameTimes.get(instanceIndex) > 1e-5;
+            var timestamp = inputs[instanceIndex].estimatedRobotPoseTimestamp;
+            boolean hasUpdate = timestamp - lastFrameTimes.get(instanceIndex) > 1e-5;
 
             // Exit if no new data
             if (!hasUpdate) {
-                Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/RobotPose", new Pose2d());
                 Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/RobotPose3d",
                         new Pose3d());
-
-                // If no recent frames from instance, clear tag poses
-                if (Timer.getFPGATimestamp() - lastFrameTimes.get(instanceIndex) > targetLogTimeSecs) {
-                    Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/TagPoses",
-                            new Pose3d[] {});
-                }
+                Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/TagPoses",
+                        new Pose3d[] {});
                 continue;
             }
+            lastFrameTimes.put(instanceIndex, timestamp);
 
-            lastFrameTimes.put(instanceIndex, Timer.getFPGATimestamp());
-            var timestamp = inputs[instanceIndex].estimatedRobotPoseTimestamp;
             Pose3d robotPose3d = inputs[instanceIndex].estimatedRobotPose;
             Pose3d cameraPose3d = robotPose3d
                     .transformBy(GeometryUtil.pose3dToTransform3d(robotToCameraPoses[instanceIndex]));
@@ -95,8 +89,9 @@ public class Vision extends VirtualSubsystem {
                 continue;
             }
 
-            if (Math.abs(RobotContainer.m_swerve.getCurrentFieldChassisSpeeds().omegaRadiansPerSecond) > Units
-                    .degreesToRadians(720)) {
+            // Exit if rotational velocity too fast
+            double rotationalSpeed = Math.abs(RobotContainer.m_swerve.getCurrentFieldChassisSpeeds().omegaRadiansPerSecond);
+            if (rotationalSpeed > Units.degreesToRadians(720)) {
                 continue;
             }
 
@@ -108,6 +103,8 @@ public class Vision extends VirtualSubsystem {
                 Optional<Pose3d> tagPose = FieldConstants.aprilTags.getTagPose(tagId);
                 tagPose.ifPresent(tagPoses::add);
             }
+
+            // Exit if no tags
             if (tagPoses.size() == 0) {
                 continue;
             }
@@ -143,8 +140,8 @@ public class Vision extends VirtualSubsystem {
 
             // Log data from instance
             Logger.recordOutput(
-                    "AprilTagVision/" + instanceNames[instanceIndex] + "/LatencySecs",
-                    Timer.getFPGATimestamp() - timestamp);
+                    "AprilTagVision/" + instanceNames[instanceIndex] + "/LatencyMS",
+                    inputs[instanceIndex].latencyMS);
             Logger.recordOutput("AprilTagVision/" + instanceNames[instanceIndex] + "/RobotPose3d", robotPose3d);
             Logger.recordOutput(
                     "AprilTagVision/" + instanceNames[instanceIndex] + "/TagPoses", tagPoses.toArray(Pose3d[]::new));
