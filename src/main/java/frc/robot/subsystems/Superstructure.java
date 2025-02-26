@@ -40,10 +40,10 @@ public class Superstructure {
 
         private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L3CoralElevator",
-                        0.0);
+                        0.5);
         private static final LoggedTunableNumber l3_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L3CoralWrist",
-                        74.0);
+                        138.0);
         private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L4CoralElevator",
                         1.180);

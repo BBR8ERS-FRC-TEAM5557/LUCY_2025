@@ -8,15 +8,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.leds.Leds;
@@ -148,7 +145,7 @@ public class RobotContainer {
                                 this::getSnapInput);
                 m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
 
-                // HOMING + ZEROING
+                // ZERO SWERVE
                 m_driver.start()
                                 .onTrue(
                                                 Commands.runOnce(
@@ -158,8 +155,12 @@ public class RobotContainer {
                                                                                                                 .getTranslation(),
                                                                                                 AllianceFlipUtil.apply(
                                                                                                                 new Rotation2d()))))
-                                                                .ignoringDisable(true).withName("ResetHeading"));
-                m_driver.start().whileTrue(m_elevator.homingSequence().alongWith(m_wrist.homingSequence()));
+                                                                .ignoringDisable(true)
+                                                                .withName("ResetHeading"));
+
+                // HOME SUPERSTRUCTURE
+                m_driver.back().whileTrue(Commands.parallel(m_elevator.homingSequence(), m_wrist.homingSequence())
+                                .withName("HomeSuperstructure"));
 
                 // COAST MODE
                 m_driver.back()
@@ -178,8 +179,9 @@ public class RobotContainer {
                                                                         m_flywheels.setBrakeMode(true);
                                                                 },
                                                                 m_swerve, m_elevator, m_wrist, m_flywheels)
+                                                                .unless(() -> DriverStation.isEnabled())
                                                                 .ignoringDisable(true)
-                                                                .withName("Robot Go Limp"));
+                                                                .withName("RobotGoLimp"));
 
                 /* DRVIER CONTROLS */
 
@@ -190,10 +192,6 @@ public class RobotContainer {
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
 
-                // the other versions of superstructure score
-                // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral());
-                // m_driver.leftTrigger().onFalse(SuperstructureFactory.stow());
-
                 // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
@@ -203,32 +201,12 @@ public class RobotContainer {
                                 SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
-                                                })
-
-                );
-
-                // other versions of intake
-                // m_driver.leftBumper().or(m_driver.rightBumper()).onTrue(SuperstructureFactory.intakeCoral());
-                // m_operator.x().whileTrue((m_flywheels.intakeCoral()));
-                // m_driver.leftBumper().or(m_driver.rightBumper()).onFalse(SuperstructureFactory.stow());
-                // m_driver.x().whileTrue(SuperstructureFactory.intakeCoral()
-                // .alongWith(m_flywheels.intakeCoralSubstation()));
+                                                }));
+                m_driver.x().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
+                                SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
                 /* OPERATOR CONTROLS */
-                // m_driver.leftTrigger().onTrue(SuperstructureFactory.scoreCoral().finallyDo(()
-                // -> {
-                // SuperstructureFactory.stow();
-                // }));
-
                 m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
-
-                // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() ->
-                // {
-                // SuperstructureFactory.stow();
-                // }));
-
-                // m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
-
                 m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral().finallyDo(() -> {
                         SuperstructureFactory.stow();
                 }));
@@ -239,6 +217,13 @@ public class RobotContainer {
                 m_operator.povLeft().onFalse(SuperstructureFactory.stow());
 
                 m_operator.leftBumper().onTrue(SuperstructureFactory.stow());
+
+                // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() ->
+                // {
+                // SuperstructureFactory.stow();
+                // }));
+
+                // m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
 
                 // Endgame Alerts
                 new Trigger(
@@ -294,31 +279,43 @@ public class RobotContainer {
 
         private void generateEventMap() {
 
-                NamedCommands.registerCommand("scoreL4", Commands.print("scoring L4")
-                                .alongWith(SuperstructureFactory.scoreL4Coral())
-                                .alongWith(Commands.waitSeconds(3.0)
-                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
-                                .andThen(SuperstructureFactory.stow()));
+                NamedCommands.registerCommand("scoreL4",
+                                Commands.print("scoring L4")
+                                                .alongWith(SuperstructureFactory.scoreL4Coral())
+                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
+                                                                .andThen(Commands.waitSeconds(0.25))
+                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                                .andThen(SuperstructureFactory.stow()));
 
-                NamedCommands.registerCommand("scoreL3", Commands.print("scoring L3")
-                                .alongWith(SuperstructureFactory.scoreL3Coral())
-                                .alongWith(Commands.waitSeconds(3.0)
-                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
-                                .andThen(SuperstructureFactory.stow()));
+                NamedCommands.registerCommand("scoreL3",
+                                Commands.print("scoring L3")
+                                                .alongWith(SuperstructureFactory.scoreL3Coral())
+                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
+                                                                .andThen(Commands.waitSeconds(0.25))
+                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                                .andThen(SuperstructureFactory.stow()));
 
-                NamedCommands.registerCommand("scoreL2", Commands.print("scoring L2")
-                                .alongWith(SuperstructureFactory.scoreL2Coral())
-                                .alongWith(Commands.waitSeconds(3.0)
-                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
-                                .andThen(SuperstructureFactory.stow()));
+                NamedCommands.registerCommand("scoreL2",
+                                Commands.print("scoring L2")
+                                                .alongWith(SuperstructureFactory.scoreL2Coral())
+                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
+                                                                .andThen(Commands.waitSeconds(0.25))
+                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                                .andThen(SuperstructureFactory.stow()));
 
-                NamedCommands.registerCommand("scoreL1", Commands.print("scoring L1")
-                                .alongWith(SuperstructureFactory.scoreL1Coral())
-                                .alongWith(Commands.waitSeconds(3.0)
-                                                .andThen(m_flywheels.scoreCoral()).withTimeout(1.5))
-                                .andThen(SuperstructureFactory.stow()));
+                NamedCommands.registerCommand("scoreL1",
+                                Commands.print("scoring L1")
+                                                .alongWith(SuperstructureFactory.scoreL1Coral())
+                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
+                                                                .andThen(Commands.waitSeconds(0.25))
+                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                                .andThen(SuperstructureFactory.stow()));
 
-                NamedCommands.registerCommand("intakeCoral", Commands.print("Intaking coral"));
+                NamedCommands.registerCommand("intakeCoral",
+                                Commands.print("Intaking coral")
+                                                .alongWith(SuperstructureFactory.intakeCoral())
+                                                .withDeadline(m_flywheels.intakeCoral())
+                                                .andThen(SuperstructureFactory.stow()));
 
         }
 

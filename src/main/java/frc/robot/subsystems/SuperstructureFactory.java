@@ -2,10 +2,10 @@ package frc.robot.subsystems;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -18,7 +18,7 @@ public class SuperstructureFactory {
     private static final Elevator elevator = RobotContainer.m_elevator;
     private static final Wrist wrist = RobotContainer.m_wrist;
 
-    private static Timer levelAdjustmentTimer;
+    private static Command pendingRumbleCommand = null;
     private static int level = 1;
     private static final Map<Integer, SuperstructureState> levelMap = new HashMap<>();
     static {
@@ -29,14 +29,21 @@ public class SuperstructureFactory {
     }
 
     public static Command runSuperstructureState(SuperstructureState state) {
-        return Commands.parallel(
-                elevator.runPositionCommand(state.getElevatorMetersSupplier()),
-                wrist.runPositionCommand(state.getWristDegreesSupplier()));
+        return runSuperstructureState(() -> state);
+    }
 
+    public static Command runSuperstructureState(Supplier<SuperstructureState> state) {
+        return Commands.parallel(
+                elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
+                wrist.runPositionCommand(state.get().getWristDegreesSupplier()));
+    }
+
+    public static Command waitUntilAtSetpoint() {
+        return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint());
     }
 
     public static Command scoreCoral() {
-        return runSuperstructureState(levelMap.get(level));
+        return runSuperstructureState(() -> levelMap.get(level));
     }
 
     public static Command scoreL1Coral() {
@@ -63,23 +70,39 @@ public class SuperstructureFactory {
         return runSuperstructureState(SuperstructureState.STOW);
     }
 
-    public static Command adjustLevel(int amount) {
-        level = (int) Util.clamp(level + amount, 1, 4);
-        levelAdjustmentTimer = new Timer();
-        levelAdjustmentTimer.reset();
-        levelAdjustmentTimer.start();
-        int hash = levelAdjustmentTimer.hashCode();
+    public static Command adjustLevelSimple(int amount) {
+        return Commands.runOnce(() -> {
+            // Update the level
+            level = (int) Util.clamp(level + amount, 1, 4);
+            System.out.println("Level adjusted to: " + level);
+        });
+    }
 
-        return Commands.waitUntil(() -> levelAdjustmentTimer.hasElapsed(0.75))
-                .andThen(
-                        RobotContainer.controllerRumbleCommand()
-                                .withTimeout(0.2)
-                                .andThen(Commands.waitSeconds(0.1))
-                                .repeatedly()
-                                .withTimeout(0.3 * level).unless(() -> hash != levelAdjustmentTimer.hashCode()))
-                .ignoringDisable(true);
-        // TODO: I'm not sure that this will buzz the correct number of times because of
-        // how the command is created
+    public static Command adjustLevel(int amount) {
+        return Commands.runOnce(() -> {
+            // Update the level
+            level = (int) Util.clamp(level + amount, 1, 4);
+            System.out.println("Level adjusted to: " + level);
+
+            // Cancel the previous rumble command if it exists
+            if (pendingRumbleCommand != null) {
+                pendingRumbleCommand.cancel();
+            }
+
+            // Create a new rumble command
+            Command rumbleCommand = Commands.waitSeconds(0.75) // Wait for 0.75 seconds
+                    .andThen(
+                            RobotContainer.controllerRumbleCommand()
+                                    .withTimeout(0.2) // Buzz for 0.2 seconds
+                                    .andThen(Commands.waitSeconds(0.1)) // Wait 0.1 seconds between buzzes
+                                    .repeatedly() // Repeat for `level` times
+                                    .withTimeout(0.3 * level))
+                    .ignoringDisable(true); // Ensure this works even when the robot is disabled
+
+            // Schedule the new rumble command
+            pendingRumbleCommand = rumbleCommand;
+            rumbleCommand.schedule();
+        });
     }
 
     @AutoLogOutput(key = "Superstrucutre/selectedScoringLevel")
