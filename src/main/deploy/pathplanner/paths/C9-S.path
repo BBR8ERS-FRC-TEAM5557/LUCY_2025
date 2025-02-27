@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5327118586195003,
-        "y": 5.377383409524067
+        "x": 3.6997577783842797,
+        "y": 5.036905107123363
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.781023103360761,
-        "y": 6.065310380180819
+        "x": 3.5109998493270127,
+        "y": 5.200827174637202
       },
       "isLocked": false,
       "linkedName": "C9"
@@ -20,8 +20,8 @@
         "y": 7.229208174126637
       },
       "prevControl": {
-        "x": 2.1018312413860265,
-        "y": 6.726041855216006
+        "x": 2.216005916430168,
+        "y": 6.603227042745468
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": -53.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "coral-source",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.99999999999999

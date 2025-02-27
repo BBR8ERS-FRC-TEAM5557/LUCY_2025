@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.045294053819443,
-        "y": 6.12263527199074
+        "x": 7.873311271834061,
+        "y": 1.5633678186408282
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.632991898148147,
-        "y": 5.94811378761574
+        "x": 6.980731987333003,
+        "y": 1.5764232953837138
       },
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.2820538516648465,
-        "y": 5.031416740584061
+        "x": 5.907627848662664,
+        "y": 1.5633678186408282
       },
       "prevControl": {
-        "x": 5.581718664710698,
-        "y": 5.469288601937773
+        "x": 6.964341550583462,
+        "y": 1.5491487652083558
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C12"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "coral-source",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.57869373218625
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
