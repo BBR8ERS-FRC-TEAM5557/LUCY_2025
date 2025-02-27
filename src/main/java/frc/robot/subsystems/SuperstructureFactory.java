@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -20,13 +19,6 @@ public class SuperstructureFactory {
 
     private static Command pendingRumbleCommand = null;
     private static int level = 1;
-    private static final Map<Integer, SuperstructureState> levelMap = new HashMap<>();
-    static {
-        levelMap.put(1, SuperstructureState.L1_CORAL);
-        levelMap.put(2, SuperstructureState.L2_CORAL);
-        levelMap.put(3, SuperstructureState.L3_CORAL);
-        levelMap.put(4, SuperstructureState.L4_CORAL);
-    }
 
     public static Command runSuperstructureState(SuperstructureState state) {
         return runSuperstructureState(() -> state);
@@ -43,7 +35,13 @@ public class SuperstructureFactory {
     }
 
     public static Command scoreCoral() {
-        return runSuperstructureState(() -> levelMap.get(level));
+        return Commands.select(
+                Map.of(
+                        1, scoreL1Coral(),
+                        2, scoreL2Coral(),
+                        3, scoreL3Coral(),
+                        4, scoreL4Coral()),
+                () -> getLevel());
     }
 
     public static Command scoreL1Coral() {
