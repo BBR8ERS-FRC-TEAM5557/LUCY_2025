@@ -340,15 +340,15 @@ public class RobotContainer {
         }
 
         public double getForwardInput() {
-                return -square(deadband(m_driver.getLeftY(), 0.05));
+                return -square(deadband(m_driver.getLeftY(), 0.15));
         }
 
         public double getStrafeInput() {
-                return -square(deadband(m_driver.getLeftX(), 0.05));
+                return -square(deadband(m_driver.getLeftX(), 0.15));
         }
 
         public double getRotationInput() {
-                return -square(deadband(m_driver.getRightX(), 0.05));
+                return -square(deadband(m_driver.getRightX(), 0.15));
         }
 
         public boolean getLeftIntakeInput() {
