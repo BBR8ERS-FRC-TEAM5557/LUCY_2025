@@ -1,6 +1,5 @@
 package frc.robot.subsystems.swerve.commands;
 
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -10,9 +9,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.state.RobotStateEstimator;
 import frc.robot.subsystems.swerve.Swerve;
@@ -47,8 +44,6 @@ public class TeleopDrive extends Command {
     private Swerve mDrivetrain;
     private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
     private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier;
-    private Optional<Rotation2d> mHeadingSetpoint = Optional.empty();
-    private double mJoystickLastTouched = -1;
 
     private SwerveRequest.FieldCentric driveNoHeading = new SwerveRequest.FieldCentric()
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
@@ -57,7 +52,6 @@ public class TeleopDrive extends Command {
 
     @Override
     public void initialize() {
-        mHeadingSetpoint = Optional.of(RobotStateEstimator.getInstance().getEstimatedPose().getRotation());
     }
 
     @Override
@@ -68,59 +62,38 @@ public class TeleopDrive extends Command {
         double throttleFieldFrame = AllianceFlipUtil.shouldFlip() ? -throttle : throttle;
         double strafeFieldFrame = AllianceFlipUtil.shouldFlip() ? -strafe : strafe;
 
-        if (Math.abs(turnFieldFrame) > 0.0) {
-            mJoystickLastTouched = Timer.getFPGATimestamp();
-        }
-
         boolean wantsLeftIntake = mLeftIntakeSupplier.getAsBoolean();
         boolean wantsRightIntake = mRightIntakeSupplier.getAsBoolean();
         boolean wantsSnap = mSnapSupplier.getAsBoolean();
 
         if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
-            double setpointDegrees = 0.0;
+            Rotation2d headingSetpoint = Rotation2d.kZero;
             if (wantsLeftIntake) {
-                setpointDegrees = -54.0;
-                mHeadingSetpoint = Optional.of(AllianceFlipUtil.apply(Rotation2d.fromDegrees(setpointDegrees)));
+                headingSetpoint = Rotation2d.fromDegrees(-54.0);
+                headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
             } else if (wantsRightIntake) {
-                setpointDegrees = 54.0;
-                mHeadingSetpoint = Optional.of(AllianceFlipUtil.apply(Rotation2d.fromDegrees(setpointDegrees)));
+                headingSetpoint = Rotation2d.fromDegrees(54.0);
+                headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
             } else if (wantsSnap) {
                 throttleFieldFrame *= 0.5; // slow down by 50% when snapping
                 strafeFieldFrame *= 0.5;
-                setpointDegrees = 60.0 * Math
-                        .round(RobotStateEstimator.getInstance().getEstimatedPose().getRotation().getDegrees() / 60.0);
-                mHeadingSetpoint = Optional.of(Rotation2d.fromDegrees(setpointDegrees));
+
+                double currentHeadingDegrees = RobotStateEstimator.getInstance().getEstimatedPose().getRotation()
+                        .getDegrees();
+                headingSetpoint = Rotation2d.fromDegrees(60.0 * Math.round(currentHeadingDegrees / 60.0));
             }
 
             mDrivetrain
                     .setControl(driveWithHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
-                            .withTargetDirection(mHeadingSetpoint.get()));
+                            .withTargetDirection(headingSetpoint));
             Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
-            Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", mHeadingSetpoint.get().getDegrees());
+            Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", headingSetpoint.getDegrees());
         } else {
-            // TODO: circumvent maintain heading to make driving a little smoother
-            if (true || Math.abs(turnFieldFrame) > 0.0
-                    || ((Timer.getFPGATimestamp() - mJoystickLastTouched < 0.25)
-                            && Math.abs(mDrivetrain.getCurrentRobotChassisSpeeds().omegaRadiansPerSecond) > Math
-                                    .toRadians(10))) {
-                turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
-                mDrivetrain
-                        .setControl(driveNoHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
-                                .withRotationalRate(turnFieldFrame));
-                mHeadingSetpoint = Optional.empty();
-                Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
-            } else {
-                if (mHeadingSetpoint.isEmpty()) {
-                    mHeadingSetpoint = Optional
-                            .of(RobotStateEstimator.getInstance().getEstimatedPose().getRotation());
-                }
-                mDrivetrain
-                        .setControl(
-                                driveWithHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
-                                        .withTargetDirection(mHeadingSetpoint.get()));
-                Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
-                Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", mHeadingSetpoint.get().getDegrees());
-            }
+            turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
+            mDrivetrain
+                    .setControl(driveNoHeading.withVelocityX(throttleFieldFrame).withVelocityY(strafeFieldFrame)
+                            .withRotationalRate(turnFieldFrame));
+            Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
         }
     }
 
