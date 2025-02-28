@@ -25,6 +25,31 @@ public class Superstructure {
                         "Superstructure/IntakeCoralWrist",
                         -50.0);
 
+        private static final LoggedTunableNumber l2_prep_pop_algae_elevator = new LoggedTunableNumber(
+                        "Superstructure/L2PrepPopAlgaeElevator",
+                        0.228);
+        private static final LoggedTunableNumber l2_prep_pop_algae_wrist = new LoggedTunableNumber(
+                        "Superstructure/L2PrepPopAlgaeWrist",
+                        150.0);
+        private static final LoggedTunableNumber l2_pop_algae_elevator = new LoggedTunableNumber(
+                        "Superstructure/L2PopAlgaeElevator",
+                        0.3);
+        private static final LoggedTunableNumber l2_pop_algae_wrist = new LoggedTunableNumber(
+                        "Superstructure/L2PopAlgaeWrist",
+                        120.0);
+        private static final LoggedTunableNumber l3_prep_pop_algae_elevator = new LoggedTunableNumber(
+                        "Superstructure/L3PrepPopAlgaeElevator",
+                        0.4);
+        private static final LoggedTunableNumber l3_prep_pop_algae_wrist = new LoggedTunableNumber(
+                        "Superstructure/L3PrepPopAlgaeWrist",
+                        150.0);
+        private static final LoggedTunableNumber l3_pop_algae_elevator = new LoggedTunableNumber(
+                        "Superstructure/L3PopAlgaeElevator",
+                        0.5);
+        private static final LoggedTunableNumber l3_pop_algae_wrist = new LoggedTunableNumber(
+                        "Superstructure/L3PopAlgaeWrist",
+                        120.0);
+
         private static final LoggedTunableNumber l1_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L1CoralElevator",
                         0.0);
@@ -60,7 +85,12 @@ public class Superstructure {
                 L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get()),
                 L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get()),
                 L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get()),
-                L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get());
+                L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get()),
+
+                L2_PREP_POP_ALGAE(() -> l2_prep_pop_algae_elevator.get(), () -> l2_prep_pop_algae_wrist.get()),
+                L2_POP_ALGAE(() -> l2_pop_algae_elevator.get(), () -> l2_pop_algae_wrist.get()),
+                L3_PREP_POP_ALGAE(() -> l3_prep_pop_algae_elevator.get(), () -> l3_prep_pop_algae_wrist.get()),
+                L3_POP_ALGAE(() -> l3_pop_algae_elevator.get(), () -> l3_pop_algae_wrist.get());
 
                 // TODO: Add the remaining states plz
 
