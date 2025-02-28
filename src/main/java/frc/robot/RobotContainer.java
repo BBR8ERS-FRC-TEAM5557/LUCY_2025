@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
 import frc.robot.state.vision.AprilTagVisionIO;
 //import frc.robot.state.vision.AprilTagVisionIOLimelight;
@@ -33,7 +34,6 @@ import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristIO;
 import frc.robot.subsystems.wrist.WristIOTalonFX;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.state.*;
 
 import static frc.robot.state.vision.VisionConstants.*;
@@ -202,8 +202,17 @@ public class RobotContainer {
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
                                                 }));
-                m_driver.x().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
+                m_driver.y().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
                                 SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
+
+                m_driver.x().and(m_driver.rightTrigger().negate())
+                                .whileTrue(SuperstructureFactory.prepPopAlgae().finallyDo(() -> {
+                                        SuperstructureFactory.stow().schedule();
+                                }));
+                m_driver.x().and(m_driver.rightTrigger())
+                                .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
+                                        SuperstructureFactory.stow().schedule();
+                                }));
 
                 /* OPERATOR CONTROLS */
                 m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
