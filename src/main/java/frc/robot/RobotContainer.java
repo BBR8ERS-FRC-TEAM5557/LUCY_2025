@@ -222,6 +222,7 @@ public class RobotContainer {
 
                 m_operator.povDown().whileTrue(SuperstructureFactory.scoreL3Coral());
                 m_operator.povDown().onFalse(SuperstructureFactory.stow());
+
                 m_operator.povLeft().whileTrue(SuperstructureFactory.scoreL4Coral());
                 m_operator.povLeft().onFalse(SuperstructureFactory.stow());
 
@@ -275,7 +276,13 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("Do Nothing", null);
 
-                m_autoChooser.addDefaultOption("Drive_Back", AutoBuilder.buildAuto("Drive_Back"));
+                m_autoChooser.addDefaultOption("drive_back_left", AutoBuilder.buildAuto("drive_back_left"));
+
+                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths")); //drive_back_right
+
+                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); //drive_back_right
+
+                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); //drive_back_right
 
                 // // Set up feedforward characterization
                 // m_autoChooser.addOption(

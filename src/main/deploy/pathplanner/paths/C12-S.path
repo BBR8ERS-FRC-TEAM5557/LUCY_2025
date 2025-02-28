@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.442961516203703,
-        "y": 5.358630642361111
+        "x": 5.2820538516648465,
+        "y": 5.031416740584061
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.0168385293246445,
-        "y": 6.131675799763033
+        "x": 4.855930864785788,
+        "y": 5.804461897985983
       },
       "isLocked": false,
       "linkedName": "C12"
@@ -45,7 +45,7 @@
     "rotation": -53.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "coral-source",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.99999999999999

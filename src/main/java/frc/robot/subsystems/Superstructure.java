@@ -74,7 +74,7 @@ public class Superstructure {
                         1.180);
         private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
-                        150.0);
+                        160.0);
 
         public enum SuperstructureState {
                 HOME(() -> home_elevator.get(), () -> home_wrist.get()),
