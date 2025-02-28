@@ -14,7 +14,7 @@ public class Constants {
     public static final int kFLDriveMotor = 22;
     public static final int kFLTurnMotor = 21;
     public static final int kFLEncoder = 11;
-    public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-79.62890625);
+    public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-81.826171875);
 
     public static final int kFRDriveMotor = 24;
     public static final int kFRTurnMotor = 23;

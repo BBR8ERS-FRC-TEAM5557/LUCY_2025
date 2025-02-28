@@ -269,11 +269,13 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_left", AutoBuilder.buildAuto("drive_back_left"));
 
-                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths")); //drive_back_right
+                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths")); 
 
-                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); //drive_back_right
+                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); 
 
-                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); //drive_back_right
+                m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths")); 
+
+                m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
 
                 // // Set up feedforward characterization
                 // m_autoChooser.addOption(
