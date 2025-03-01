@@ -91,7 +91,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                                                 SwerveConstants.PID.kRotationkP,
                                                                 SwerveConstants.PID.kRotationkI,
                                                                 SwerveConstants.PID.kRotationkD),
-                                                0.004),
+                                                0.004), // TODO: This might mess things up
                                 kRobotConfig,
                                 () -> AllianceFlipUtil.shouldFlip(),
                                 this); // Subsystem for requirements
