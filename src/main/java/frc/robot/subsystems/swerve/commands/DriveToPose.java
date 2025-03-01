@@ -78,6 +78,7 @@ public class DriveToPose extends Command {
         private double thetaErrorAbs = 0.0;
         @Getter
         private boolean running = false;
+        private boolean shouldEnd = true;
         private Supplier<Pose2d> robot = RobotStateEstimator.getInstance()::getEstimatedPose;
 
         private Supplier<Translation2d> linearFF = () -> Translation2d.kZero;
@@ -103,6 +104,15 @@ public class DriveToPose extends Command {
                 this(drive, target);
                 this.linearFF = linearFF;
                 this.omegaFF = omegaFF;
+        }
+
+        public DriveToPose(
+                        Swerve drive,
+                        Supplier<Pose2d> target,
+                        Supplier<Translation2d> linearFF,
+                        DoubleSupplier omegaFF, boolean shouldEnd) {
+                this(drive, target, linearFF, omegaFF);
+                this.shouldEnd = shouldEnd;
         }
 
         @Override
@@ -226,6 +236,11 @@ public class DriveToPose extends Command {
                                                                                 thetaController.getSetpoint().position))
                                 });
                 Logger.recordOutput("DriveToPose/Goal", new Pose2d[] { targetPose });
+        }
+
+        @Override
+        public boolean isFinished() {
+                return (shouldEnd && atGoal()) || target.get().equals(null);
         }
 
         @Override

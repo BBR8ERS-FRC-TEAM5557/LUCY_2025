@@ -30,10 +30,12 @@ import frc.robot.subsystems.flywheels.FlywheelsIO;
 import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.commands.AutoScore;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristIO;
 import frc.robot.subsystems.wrist.WristIOTalonFX;
+import frc.robot.util.FieldConstants.ReefLevel;
 import frc.robot.state.*;
 
 import static frc.robot.state.vision.VisionConstants.*;
@@ -139,58 +141,66 @@ public class RobotContainer {
                 System.out.println("[Init] Binding controls");
                 DriverStation.silenceJoystickConnectionWarning(true);
 
-                /* SWERVING */
+                /* DRIVING */
+                // TELEOP DRIVE
                 TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
                                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput,
                                 this::getSnapInput);
-                m_swerve.setDefaultCommand(teleop.withName("Teleop Drive"));
+                m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
+                // AUTO SCORE DRIVE
+                m_driver.a().and(() -> m_vision.getVisionEnabled()).whileTrue(
+                                AutoScore.getAutoDriveCommand(
+                                                m_swerve,
+                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
+                                                this::getForwardInput,
+                                                this::getStrafeInput,
+                                                false)
+                                                .withName("AutoDriveToNearest"));
+
+                /* UTIL */
                 // ZERO SWERVE
-                m_driver.start()
-                                .onTrue(
-                                                Commands.runOnce(
-                                                                () -> m_stateEstimator.setPose(
-                                                                                new Pose2d(
-                                                                                                m_stateEstimator.getEstimatedPose()
-                                                                                                                .getTranslation(),
-                                                                                                AllianceFlipUtil.apply(
-                                                                                                                new Rotation2d()))))
-                                                                .ignoringDisable(true)
-                                                                .withName("ResetHeading"));
+                m_driver.start().onTrue(Commands.runOnce(
+                                () -> m_stateEstimator.setPose(
+                                                new Pose2d(
+                                                                m_stateEstimator.getEstimatedPose().getTranslation(),
+                                                                AllianceFlipUtil.apply(new Rotation2d()))))
+                                .ignoringDisable(true)
+                                .withName("ResetHeading"));
 
                 // HOME SUPERSTRUCTURE
                 m_driver.back().whileTrue(Commands.parallel(m_elevator.homingSequence(), m_wrist.homingSequence())
                                 .withName("HomeSuperstructure"));
 
                 // COAST MODE
-                m_driver.back()
-                                .whileTrue(
-                                                Commands.startEnd(
-                                                                () -> {
-                                                                        m_swerve.setBrakeMode(false);
-                                                                        m_elevator.setBrakeMode(false);
-                                                                        m_wrist.setBrakeMode(false);
-                                                                        m_flywheels.setBrakeMode(false);
-                                                                },
-                                                                () -> {
-                                                                        m_swerve.setBrakeMode(true);
-                                                                        m_elevator.setBrakeMode(true);
-                                                                        m_wrist.setBrakeMode(true);
-                                                                        m_flywheels.setBrakeMode(true);
-                                                                },
-                                                                m_swerve, m_elevator, m_wrist, m_flywheels)
-                                                                .unless(() -> DriverStation.isEnabled())
-                                                                .ignoringDisable(true)
-                                                                .withName("RobotGoLimp"));
+                m_driver.back().whileTrue(
+                                Commands.startEnd(
+                                                () -> {
+                                                        m_swerve.setBrakeMode(false);
+                                                        m_elevator.setBrakeMode(false);
+                                                        m_wrist.setBrakeMode(false);
+                                                        m_flywheels.setBrakeMode(false);
+                                                },
+                                                () -> {
+                                                        m_swerve.setBrakeMode(true);
+                                                        m_elevator.setBrakeMode(true);
+                                                        m_wrist.setBrakeMode(true);
+                                                        m_flywheels.setBrakeMode(true);
+                                                },
+                                                m_swerve, m_elevator, m_wrist, m_flywheels)
+                                                .unless(() -> DriverStation.isEnabled())
+                                                .ignoringDisable(true)
+                                                .withName("RobotGoLimp"));
 
-                /* DRVIER CONTROLS */
+                // ADJUST SCORING LEVEL
+                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
+                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
 
+                /* DRIVER CONTROLS */
                 // SUPERSTRUCTURE SCORE
                 m_driver.leftTrigger().whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
                         SuperstructureFactory.stow().schedule();
                 }));
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
-                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
 
                 // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
@@ -205,6 +215,7 @@ public class RobotContainer {
                 m_driver.y().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
                                 SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
+                // POP ALGAE
                 m_driver.x().and(m_driver.rightTrigger().negate())
                                 .whileTrue(SuperstructureFactory.prepPopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
@@ -214,28 +225,7 @@ public class RobotContainer {
                                         SuperstructureFactory.stow().schedule();
                                 }));
 
-                /* OPERATOR CONTROLS */
-                m_operator.povUp().onTrue(SuperstructureFactory.scoreL1Coral());
-                m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral().finallyDo(() -> {
-                        SuperstructureFactory.stow();
-                }));
-
-                m_operator.povDown().whileTrue(SuperstructureFactory.scoreL3Coral());
-                m_operator.povDown().onFalse(SuperstructureFactory.stow());
-
-                m_operator.povLeft().whileTrue(SuperstructureFactory.scoreL4Coral());
-                m_operator.povLeft().onFalse(SuperstructureFactory.stow());
-
-                m_operator.leftBumper().onTrue(SuperstructureFactory.stow());
-
-                // m_operator.povUp().onTrue(SuperstructureFactory.scoreCoral().finallyDo(() ->
-                // {
-                // SuperstructureFactory.stow();
-                // }));
-
-                // m_operator.povRight().onTrue(SuperstructureFactory.scoreL2Coral());
-
-                // Endgame Alerts
+                /* ENDGAME ALERTS */
                 new Trigger(
                                 () -> DriverStation.isTeleopEnabled()
                                                 && DriverStation.getMatchTime() > 0
@@ -278,11 +268,11 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_left", AutoBuilder.buildAuto("drive_back_left"));
 
-                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths")); 
+                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths"));
 
-                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right")); 
+                m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
-                m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths")); 
+                m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
 
@@ -296,14 +286,15 @@ public class RobotContainer {
         }
 
         private void generateEventMap() {
-
                 NamedCommands.registerCommand("scoreL4",
                                 Commands.print("scoring L4")
                                                 .alongWith(SuperstructureFactory.scoreL4Coral())
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL3",
                                 Commands.print("scoring L3")
@@ -311,7 +302,9 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL2",
                                 Commands.print("scoring L2")
@@ -319,7 +312,9 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL1",
                                 Commands.print("scoring L1")
@@ -327,13 +322,17 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("intakeCoral",
                                 Commands.print("Intaking coral")
                                                 .alongWith(SuperstructureFactory.intakeCoral())
                                                 .withDeadline(m_flywheels.intakeCoral())
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
         }
 
@@ -351,15 +350,15 @@ public class RobotContainer {
         }
 
         public double getForwardInput() {
-                return -square(deadband(m_driver.getLeftY(), 0.15));
+                return -square(deadband(m_driver.getLeftY(), 0.1));
         }
 
         public double getStrafeInput() {
-                return -square(deadband(m_driver.getLeftX(), 0.15));
+                return -square(deadband(m_driver.getLeftX(), 0.1));
         }
 
         public double getRotationInput() {
-                return -square(deadband(m_driver.getRightX(), 0.15));
+                return -square(deadband(m_driver.getRightX(), 0.1));
         }
 
         public boolean getLeftIntakeInput() {
@@ -371,7 +370,7 @@ public class RobotContainer {
         }
 
         public boolean getSnapInput() {
-                return m_driver.a().getAsBoolean();
+                return m_driver.a().getAsBoolean() || m_driver.x().getAsBoolean();
         }
 
         private static double deadband(double value, double tolerance) {

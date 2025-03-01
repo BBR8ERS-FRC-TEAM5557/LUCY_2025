@@ -14,7 +14,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -23,14 +22,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-        //public static final double drumPitchDiameter = Units.inchesToMeters(2.4); 
+        // public static final double drumPitchDiameter = Units.inchesToMeters(2.4);
         public static final double reduction = 5.0 / (.005 * 24.0);
-
 
         // Hardware
         private final TalonFX talon;
@@ -57,7 +54,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         private final VoltageOut voltageRequest = new VoltageOut(0.0);
         // Closed loop requests
         private final MotionMagicVoltage motionMagicVoltageRequest = new MotionMagicVoltage(0.0);
-        private final MotionMagicTorqueCurrentFOC motionMagicTorqueCurrentFOC = new MotionMagicTorqueCurrentFOC(0.0);
 
         private final Debouncer connectedDebouncer = new Debouncer(0.5);
 

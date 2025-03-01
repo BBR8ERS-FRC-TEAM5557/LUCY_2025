@@ -1,26 +1,16 @@
 package frc.robot.subsystems;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.team6328.AllianceFlipUtil;
-import frc.lib.team6328.GeomUtil;
 import frc.robot.RobotContainer;
-import frc.robot.state.RobotStateEstimator;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.util.FieldConstants;
 import frc.robot.util.Util;
 
 public class SuperstructureFactory {
@@ -148,24 +138,4 @@ public class SuperstructureFactory {
         public static int getLevel() {
                 return level;
         }
-
-        // public static Pose2d getNearestCoralScoring() {
-        // Pose2d currentPose =
-        // AllianceFlipUtil.apply(RobotStateEstimator.getInstance().getEstimatedPose());
-        // double nearestDistance = Double.MAX_VALUE;
-        // int nearestFaceIdx = -1;
-        // Optional<Pose2d> nearestFace = Optional.empty();
-        // for (int i = 0; i < FieldConstants.Reef.centerFaces.length; i++) {
-        // if (nearestDistance > FieldConstants.Reef.centerFaces[i].getTranslation()
-        // .getDistance(currentPose.getTranslation())) {
-        // nearestFace = Optional.of(FieldConstants.Reef.centerFaces[i]);
-        // nearestFaceIdx = i;
-        // }
-        // }
-        // if (nearestFace.isEmpty()) {
-        // return currentPose;
-        // }
-
-        // return currentPose;
-        // }
 }
