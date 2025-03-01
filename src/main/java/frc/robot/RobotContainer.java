@@ -173,25 +173,24 @@ public class RobotContainer {
                                 .withName("HomeSuperstructure"));
 
                 // COAST MODE
-                m_driver.back()
-                                .whileTrue(
-                                                Commands.startEnd(
-                                                                () -> {
-                                                                        m_swerve.setBrakeMode(false);
-                                                                        m_elevator.setBrakeMode(false);
-                                                                        m_wrist.setBrakeMode(false);
-                                                                        m_flywheels.setBrakeMode(false);
-                                                                },
-                                                                () -> {
-                                                                        m_swerve.setBrakeMode(true);
-                                                                        m_elevator.setBrakeMode(true);
-                                                                        m_wrist.setBrakeMode(true);
-                                                                        m_flywheels.setBrakeMode(true);
-                                                                },
-                                                                m_swerve, m_elevator, m_wrist, m_flywheels)
-                                                                .unless(() -> DriverStation.isEnabled())
-                                                                .ignoringDisable(true)
-                                                                .withName("RobotGoLimp"));
+                m_driver.back().whileTrue(
+                                Commands.startEnd(
+                                                () -> {
+                                                        m_swerve.setBrakeMode(false);
+                                                        m_elevator.setBrakeMode(false);
+                                                        m_wrist.setBrakeMode(false);
+                                                        m_flywheels.setBrakeMode(false);
+                                                },
+                                                () -> {
+                                                        m_swerve.setBrakeMode(true);
+                                                        m_elevator.setBrakeMode(true);
+                                                        m_wrist.setBrakeMode(true);
+                                                        m_flywheels.setBrakeMode(true);
+                                                },
+                                                m_swerve, m_elevator, m_wrist, m_flywheels)
+                                                .unless(() -> DriverStation.isEnabled())
+                                                .ignoringDisable(true)
+                                                .withName("RobotGoLimp"));
 
                 // ADJUST SCORING LEVEL
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
