@@ -34,7 +34,7 @@ public class Wrist extends SubsystemBase {
     private static final LoggedTunableNumber maxVelocityDegreesPerSec = new LoggedTunableNumber(
             "Wrist/MaxVelocityDegreesPerSec", 720.0);
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
-            "Wrist/MaxAccelerationDegreesPerSec2", 3000.0);
+            "Wrist/MaxAccelerationDegreesPerSec2", 2000.0);
 
     private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Wrist/HomingVolts", -2.0);
     private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Wrist/HomingTimeSecs",

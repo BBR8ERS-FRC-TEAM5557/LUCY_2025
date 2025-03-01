@@ -20,10 +20,10 @@ public class Superstructure {
 
         private static final LoggedTunableNumber intake_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralElevator",
-                        0.228);
+                        0.24);
         private static final LoggedTunableNumber intake_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralWrist",
-                        -50.0);
+                        -45.0);
 
         private static final LoggedTunableNumber l2_prep_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L2PrepPopAlgaeElevator",
