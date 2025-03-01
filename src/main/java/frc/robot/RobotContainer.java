@@ -293,7 +293,9 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL3",
                                 Commands.print("scoring L3")
@@ -301,7 +303,9 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL2",
                                 Commands.print("scoring L2")
@@ -309,7 +313,9 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("scoreL1",
                                 Commands.print("scoring L1")
@@ -317,13 +323,17 @@ public class RobotContainer {
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
                                                                 .andThen(Commands.waitSeconds(0.25))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
                 NamedCommands.registerCommand("intakeCoral",
                                 Commands.print("Intaking coral")
                                                 .alongWith(SuperstructureFactory.intakeCoral())
                                                 .withDeadline(m_flywheels.intakeCoral())
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .finallyDo(() -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                }));
 
         }
 
