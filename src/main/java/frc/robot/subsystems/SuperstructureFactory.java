@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.elevator.Elevator;
@@ -16,6 +17,10 @@ import frc.robot.util.Util;
 public class SuperstructureFactory {
         private static final Elevator elevator = RobotContainer.m_elevator;
         private static final Wrist wrist = RobotContainer.m_wrist;
+
+        public static final LoggedTunableNumber elevator_tolerance_before_moving_wrist = new LoggedTunableNumber(
+                        "Superstructure/ElevatorToleranceBeforeWrist",
+                        0.5);
 
         private static Command pendingRumbleCommand = null;
         private static int level = 4;
@@ -27,7 +32,11 @@ public class SuperstructureFactory {
         public static Command runSuperstructureState(Supplier<SuperstructureState> state) {
                 return Commands.parallel(
                                 elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
-                                wrist.runPositionCommand(state.get().getWristDegreesSupplier()));
+                                elevator.waitUntilAboveCommand(
+                                                () -> state.get().getElevatorMeters()
+                                                                - elevator_tolerance_before_moving_wrist.get())
+                                                .andThen(wrist.runPositionCommand(state.get()
+                                                                .getWristDegreesSupplier())));
         }
 
         public static Command waitUntilAtSetpoint() {
@@ -104,7 +113,7 @@ public class SuperstructureFactory {
                 return runSuperstructureState(SuperstructureState.STOW);
         }
 
-        public static Command adjustLevel(int amount) {
+        public static Command adjustLevel(int amount, double rumbleWait) {
                 return Commands.runOnce(() -> {
                         // Update the level
                         level = (int) Util.clamp(level + amount, 1, 4);
@@ -116,7 +125,7 @@ public class SuperstructureFactory {
                         }
 
                         // Create a new rumble command
-                        Command rumbleCommand = Commands.waitSeconds(0.75) // Wait for 0.75 seconds
+                        Command rumbleCommand = Commands.waitSeconds(rumbleWait) // Wait for 0.75 seconds
                                         .andThen(
                                                         RobotContainer.controllerRumbleCommand()
                                                                         .withTimeout(0.2) // Buzz for 0.2 seconds

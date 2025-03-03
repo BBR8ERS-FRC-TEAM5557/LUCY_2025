@@ -19,8 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
 import frc.robot.state.vision.AprilTagVisionIO;
-//import frc.robot.state.vision.AprilTagVisionIOLimelight;
+// import frc.robot.state.vision.AprilTagVisionIOLimelight;
+// import static frc.robot.state.vision.VisionConstants.*;
 import frc.robot.state.vision.Vision;
+import frc.robot.subsystems.AutoScore;
 import frc.robot.subsystems.SuperstructureFactory;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -30,15 +32,12 @@ import frc.robot.subsystems.flywheels.FlywheelsIO;
 import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.commands.AutoScore;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristIO;
 import frc.robot.subsystems.wrist.WristIOTalonFX;
 import frc.robot.util.FieldConstants.ReefLevel;
 import frc.robot.state.*;
-
-import static frc.robot.state.vision.VisionConstants.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -145,18 +144,8 @@ public class RobotContainer {
                 // TELEOP DRIVE
                 TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
                                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput,
-                                this::getSnapInput);
+                                this::getSnapInput, this::getSlowDownInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
-
-                // AUTO SCORE DRIVE
-                m_driver.a().and(() -> m_vision.getVisionEnabled()).whileTrue(
-                                AutoScore.getAutoDriveCommand(
-                                                m_swerve,
-                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
-                                                this::getForwardInput,
-                                                this::getStrafeInput,
-                                                false)
-                                                .withName("AutoDriveToNearest"));
 
                 /* UTIL */
                 // ZERO SWERVE
@@ -193,14 +182,37 @@ public class RobotContainer {
                                                 .withName("RobotGoLimp"));
 
                 // ADJUST SCORING LEVEL
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
-                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
+                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
+                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1, 0.75));
+                m_driver.a().onTrue(SuperstructureFactory.adjustLevel(0, 0.0));
 
                 /* DRIVER CONTROLS */
-                // SUPERSTRUCTURE SCORE
-                m_driver.leftTrigger().whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
-                        SuperstructureFactory.stow().schedule();
-                }));
+                // AUTO DRIVE TO SCORING POSE
+                Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled());
+                m_driver.a().and(visionEnabled).whileTrue(
+                                AutoScore.getAutoDriveCommand(
+                                                m_swerve,
+                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
+                                                this::getForwardInput,
+                                                this::getStrafeInput,
+                                                false)
+                                                .withName("AutoDriveToNearest"));
+
+                // AUTO SCORE
+                m_driver.leftTrigger().and(visionEnabled).whileTrue(
+                                AutoScore.getAutoScoreCommand(
+                                                m_swerve,
+                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
+                                                this::getForwardInput,
+                                                this::getStrafeInput,
+                                                false)
+                                                .withName("AutoScoreToNearest"));
+
+                // SUPERSTRUCTURE SCORING
+                m_driver.leftTrigger().and(visionEnabled.negate())
+                                .whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
+                                        SuperstructureFactory.stow().schedule();
+                                }));
 
                 // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
@@ -275,14 +287,6 @@ public class RobotContainer {
                 m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
-
-                // // Set up feedforward characterization
-                // m_autoChooser.addOption(
-                // "Drive FF Characterization",
-                // new FeedForwardCharacterization(
-                // m_swerve, m_swerve::runCharacterizationVolts,
-                // m_swerve::getCharacterizationVelocity)
-                // .finallyDo(m_swerve::stop));
         }
 
         private void generateEventMap() {
@@ -371,6 +375,10 @@ public class RobotContainer {
 
         public boolean getSnapInput() {
                 return m_driver.a().getAsBoolean() || m_driver.x().getAsBoolean();
+        }
+
+        public boolean getSlowDownInput() {
+                return m_driver.leftTrigger().getAsBoolean();
         }
 
         private static double deadband(double value, double tolerance) {

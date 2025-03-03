@@ -105,6 +105,10 @@ public class Elevator extends SubsystemBase {
                                 () -> atSetpoint());
         }
 
+        public Command waitUntilAboveCommand(DoubleSupplier threshold) {
+                return new WaitUntilCommand(() -> getPositionMeters() > threshold.getAsDouble());
+        }
+
         public void setBrakeMode(boolean enabled) {
                 if (brakeModeEnabled == enabled)
                         return;

@@ -5,16 +5,17 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.subsystems.swerve.commands;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.lib.team6328.GeomUtil;
 import frc.lib.team6328.LoggedTunableNumber;
@@ -23,6 +24,7 @@ import frc.robot.leds.Leds;
 import frc.robot.state.RobotStateEstimator;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.commands.DriveToPose;
 import frc.robot.util.FieldConstants.CoralObjective;
 import frc.robot.util.FieldConstants.Reef;
 import frc.robot.util.FieldConstants.ReefLevel;
@@ -30,14 +32,24 @@ import frc.robot.util.FieldConstants.ReefLevel;
 import java.util.function.*;
 
 public class AutoScore {
-        // Radius of regular hexagon is side length
+        // This does something for the driveToTarget method...
         private static final LoggedTunableNumber maxDistanceReefLineup = new LoggedTunableNumber(
                         "AutoScore/MaxDistanceReefLineup", 1.5);
-        public static final LoggedTunableNumber minDistanceReefClearAlgae = new LoggedTunableNumber(
-                        "AutoScore/MinDistanceReefClearAlgae", Units.inchesToMeters(18.0));
-        public static final LoggedTunableNumber minDistanceReefClear = new LoggedTunableNumber(
-                        "AutoScore/MinDistanceReefClear", Units.inchesToMeters(12.0));
 
+        /* superstructure conditions */
+        private static final LoggedTunableNumber maxDistanceForExtend = new LoggedTunableNumber(
+                        "AutoScore/MaxDistanceForExtend", 1.0);
+        private static final LoggedTunableNumber maxThetaForExtend = new LoggedTunableNumber(
+                        "AutoScore/MaxDistanceForExtend", 5.0);
+        private static final LoggedTunableNumber maxVelocityForExtend = new LoggedTunableNumber(
+                        "AutoScore/MaxDistanceForExtend", 1.0);
+
+        /* ALIGNMENT OFFSETS */
+        // Y should be the side to side distance from center of target pose
+        // X should be the front to back distance from the wall of the reef (technically
+        // l1AlignOffsetDegrees could be used to get you a little tilted from the reef
+        // when scoring L1 may be useful
+        // actually distance from center of reef pipe)
         private static final LoggedTunableNumber l1AlignOffsetX = new LoggedTunableNumber("AutoScore/L1AlignOffsetX",
                         0.5);
         private static final LoggedTunableNumber l1AlignOffsetY = new LoggedTunableNumber("AutoScore/L1AlignOffsetY",
@@ -52,6 +64,65 @@ public class AutoScore {
         private static final LoggedTunableNumber l4AlignOffsetX = new LoggedTunableNumber(
                         "AutoScore/L4AlignOffsetX",
                         0.3);
+
+        public static Command getAutoScoreCommand(
+                        Swerve drive,
+                        Supplier<ReefLevel> reefLevel,
+                        DoubleSupplier driverThrottle,
+                        DoubleSupplier driverStrafe,
+                        boolean shouldEnd) {
+                DriveToPose driveCommand = new DriveToPose(
+                                drive,
+                                () -> {
+                                        CoralObjective objective = getNearestCoralObjective(reefLevel.get());
+                                        if (reefLevel.get() == ReefLevel.L1) {
+                                                return getDriveTarget(AllianceFlipUtil.apply(getL1Pose(objective)));
+                                        }
+                                        return getDriveTarget(AllianceFlipUtil.apply(getCoralScorePose(objective)));
+                                },
+                                () -> {
+                                        double scalar = SwerveConstants.Kinematics.kTeleopLimits.maxLinearSpeed();
+                                        Translation2d linearFF = new Translation2d(
+                                                        driverThrottle.getAsDouble() * scalar,
+                                                        driverStrafe.getAsDouble() * scalar)
+                                                        .times(AllianceFlipUtil.shouldFlip() ? -1.0 : 1.0);
+
+                                        return linearFF;
+                                },
+                                () -> 0.0,
+                                shouldEnd);
+                Trigger autoExtendTrigger = new Trigger(
+                                () -> {
+                                        if (reefLevel.get() == ReefLevel.L1 || reefLevel.get() == ReefLevel.L2) {
+                                                return true;
+                                        }
+
+                                        ChassisSpeeds currSpeed = drive.getCurrentFieldChassisSpeeds();
+                                        double driveSpeed = Math.hypot(currSpeed.vxMetersPerSecond,
+                                                        currSpeed.vyMetersPerSecond);
+                                        boolean withinTolerance = driveCommand.withinTolerance(
+                                                        maxDistanceForExtend.get(),
+                                                        Rotation2d.fromDegrees(maxThetaForExtend.get()));
+                                        boolean belowSpeed = driveSpeed < maxVelocityForExtend.get();
+
+                                        return (belowSpeed && withinTolerance);
+                                });
+
+                return Commands.runOnce(
+                                () -> {
+                                        // Start LEDs
+                                        Leds.getInstance().autoDrive = true;
+                                })
+                                .andThen(Commands.parallel(
+                                                driveCommand,
+                                                Commands.waitUntil(autoExtendTrigger)
+                                                                .andThen(SuperstructureFactory.scoreCoral())))
+                                .finallyDo(
+                                                interrupted -> {
+                                                        SuperstructureFactory.stow().schedule();
+                                                        Leds.getInstance().autoDrive = false;
+                                                });
+        }
 
         public static Command getAutoDriveCommand(
                         Swerve drive,
