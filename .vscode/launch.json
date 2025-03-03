@@ -9,7 +9,7 @@
       "name": "Main",
       "request": "launch",
       "mainClass": "frc.robot.Main",
-      "projectName": "TBD-C2025"
+      "projectName": "Molly-C2025"
     },
     {
       "type": "wpilib",

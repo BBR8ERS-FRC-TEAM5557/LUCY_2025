@@ -47,7 +47,7 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void robotInit() {
-		Logger.recordMetadata("ProjectName", "TBD-C2025"); // Set a metadata value
+		Logger.recordMetadata("ProjectName", "Molly-C2025"); // Set a metadata value
 
 		if (Constants.kIsReal) {
 			Logger.addDataReceiver(new WPILOGWriter()); // gotta plug a usb stick into rio 2 to have logging
