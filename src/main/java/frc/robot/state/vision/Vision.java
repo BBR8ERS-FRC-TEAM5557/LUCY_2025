@@ -35,7 +35,7 @@ public class Vision extends VirtualSubsystem {
 
         private final Map<Integer, Double> lastFrameTimes = new HashMap<>();
         private final Map<Integer, Double> lastTagDetectionTimes = new HashMap<>();
-        private final LoggedNetworkBoolean visionEnabled = new LoggedNetworkBoolean("Driver/visionEnabled", false);
+        private final LoggedNetworkBoolean visionEnabled = new LoggedNetworkBoolean("AprilTagVision/enabled", false);
 
         public Vision(AprilTagVisionIO... io) {
                 System.out.println("[Init] Creating Vision");
