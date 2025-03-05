@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase {
                         "Elevator/HomingVelocityThresh", 0.01);
 
         private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-                        "Elevator/setpointTolerance", Units.inchesToMeters(1.0));
+                        "Elevator/setpointTolerance", Units.inchesToMeters(2));
 
         private final ElevatorIO io;
         private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();

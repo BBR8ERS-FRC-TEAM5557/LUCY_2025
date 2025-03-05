@@ -43,7 +43,7 @@ public class Wrist extends SubsystemBase {
             "Wrist/HomingVelocityThresh", 0.1);
 
     private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-            "Wrist/setpointTolerance", 1.0);
+            "Wrist/setpointTolerance", 1.5);
 
     private final WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();

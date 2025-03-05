@@ -30,7 +30,6 @@ import frc.robot.subsystems.flywheels.FlywheelsIO;
 import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.commands.AutoScore;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristIO;
@@ -148,6 +147,7 @@ public class RobotContainer {
                                 this::getSnapInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
+                /**
                 // AUTO SCORE DRIVE
                 m_driver.a().and(() -> m_vision.getVisionEnabled()).whileTrue(
                                 AutoScore.getAutoDriveCommand(
@@ -156,7 +156,7 @@ public class RobotContainer {
                                                 this::getForwardInput,
                                                 this::getStrafeInput,
                                                 false)
-                                                .withName("AutoDriveToNearest"));
+                                                .withName("AutoDriveToNearest")); */
 
                 /* UTIL */
                 // ZERO SWERVE
@@ -276,6 +276,9 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
 
+                m_autoChooser.addDefaultOption("CA2_C12_9_10", AutoBuilder.buildAuto("CA2_C12_9_10"));
+
+                m_autoChooser.addDefaultOption("Copy of CA2_C12_9_10", AutoBuilder.buildAuto("Copy of CA2_C12_9_10"));
                 // // Set up feedforward characterization
                 // m_autoChooser.addOption(
                 // "Drive FF Characterization",
@@ -290,11 +293,22 @@ public class RobotContainer {
                                 Commands.print("scoring L4")
                                                 .alongWith(SuperstructureFactory.scoreL4Coral())
                                                 .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                .andThen(Commands.waitSeconds(0.25))
+                                                                .andThen(Commands.waitSeconds(1))
                                                                 .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
                                                 }));
+
+                NamedCommands.registerCommand("prepL4",
+                                                Commands.print("prep L4")
+                                                                .alongWith(SuperstructureFactory.scoreL4Coral()));
+
+                NamedCommands.registerCommand("shootCoral",
+                                                                Commands.print("scoring L4")
+                                                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))
+                                                                                .finallyDo(() -> {
+                                                                                        SuperstructureFactory.stow().schedule();
+                                                                                }));
 
                 NamedCommands.registerCommand("scoreL3",
                                 Commands.print("scoring L3")

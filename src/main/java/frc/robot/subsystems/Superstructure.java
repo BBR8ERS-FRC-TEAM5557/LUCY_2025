@@ -49,7 +49,6 @@ public class Superstructure {
         private static final LoggedTunableNumber l3_pop_algae_wrist = new LoggedTunableNumber(
                         "Superstructure/L3PopAlgaeWrist",
                         120.0);
-
         private static final LoggedTunableNumber l1_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L1CoralElevator",
                         0.0);
@@ -65,16 +64,16 @@ public class Superstructure {
 
         private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L3CoralElevator",
-                        0.5);
+                        0.3);
         private static final LoggedTunableNumber l3_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L3CoralWrist",
-                        138.0);
+                        150.0);
         private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L4CoralElevator",
                         1.180);
         private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
-                        160.0);
+                        170.0);
 
         public enum SuperstructureState {
                 HOME(() -> home_elevator.get(), () -> home_wrist.get()),
