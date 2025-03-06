@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.339961449235807,
-        "y": 1.8810943470251074
+        "y": 1.8810943470251076
       },
       "isLocked": false,
       "linkedName": "Cage5"
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 270.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
