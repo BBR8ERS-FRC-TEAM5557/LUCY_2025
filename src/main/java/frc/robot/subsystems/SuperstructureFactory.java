@@ -20,7 +20,7 @@ public class SuperstructureFactory {
 
         public static final LoggedTunableNumber elevator_tolerance_before_moving_wrist = new LoggedTunableNumber(
                         "Superstructure/ElevatorToleranceBeforeWrist",
-                        0.5);
+                        0.1);
 
         private static Command pendingRumbleCommand = null;
         private static int level = 4;
@@ -32,11 +32,15 @@ public class SuperstructureFactory {
         public static Command runSuperstructureState(Supplier<SuperstructureState> state) {
                 return Commands.parallel(
                                 elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
-                                elevator.waitUntilAboveCommand(
-                                                () -> state.get().getElevatorMeters()
-                                                                - elevator_tolerance_before_moving_wrist.get())
-                                                .andThen(wrist.runPositionCommand(state.get()
-                                                                .getWristDegreesSupplier())));
+                                wrist.runPositionCommand(state.get().getWristDegreesSupplier()));
+
+                // return Commands.parallel(
+                // elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
+                // elevator.waitUntilAboveCommand(
+                // () -> state.get().getElevatorMeters()
+                // - elevator_tolerance_before_moving_wrist.get())
+                // .andThen(wrist.runPositionCommand(state.get()
+                // .getWristDegreesSupplier())));
         }
 
         public static Command waitUntilAtSetpoint() {
@@ -86,7 +90,15 @@ public class SuperstructureFactory {
         }
 
         public static Command scoreL4Coral() {
-                return runSuperstructureState(SuperstructureState.L4_CORAL);
+                return Commands.sequence(
+                                runSuperstructureState(SuperstructureState.L4_CORAL_TRANSITION)
+                                                .withDeadline(elevator.waitUntilAboveCommand(
+                                                                () -> SuperstructureState.L4_CORAL.getElevatorMeters()
+                                                                                - elevator_tolerance_before_moving_wrist
+                                                                                                .get())),
+                                runSuperstructureState(SuperstructureState.L4_CORAL));
+
+                // return runSuperstructureState(SuperstructureState.L4_CORAL);
         }
 
         public static Command intakeCoral() {

@@ -188,7 +188,7 @@ public class RobotContainer {
 
                 /* DRIVER CONTROLS */
                 // AUTO DRIVE TO SCORING POSE
-                Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled());
+                Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() && false);
                 m_driver.a().and(visionEnabled).whileTrue(
                                 AutoScore.getAutoDriveCommand(
                                                 m_swerve,

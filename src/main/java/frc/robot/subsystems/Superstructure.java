@@ -72,6 +72,9 @@ public class Superstructure {
         private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L4CoralElevator",
                         1.180);
+        private static final LoggedTunableNumber l4_coral_wrist_transition = new LoggedTunableNumber(
+                        "Superstructure/L4CoralWristTransition",
+                        130.0);
         private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
                         167.0);
@@ -86,6 +89,7 @@ public class Superstructure {
                 L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get()),
                 L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get()),
                 L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get()),
+                L4_CORAL_TRANSITION(() -> l4_coral_elevator.get(), () -> l4_coral_wrist_transition.get()),
 
                 L2_PREP_POP_ALGAE(() -> l2_prep_pop_algae_elevator.get(), () -> l2_prep_pop_algae_wrist.get()),
                 L2_POP_ALGAE(() -> l2_pop_algae_elevator.get(), () -> l2_pop_algae_wrist.get()),
