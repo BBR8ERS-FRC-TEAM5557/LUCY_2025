@@ -19,8 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
 import frc.robot.state.vision.AprilTagVisionIO;
-// import frc.robot.state.vision.AprilTagVisionIOLimelight;
-// import static frc.robot.state.vision.VisionConstants.*;
+import frc.robot.state.vision.AprilTagVisionIOLimelight;
+import static frc.robot.state.vision.VisionConstants.*;
 import frc.robot.state.vision.Vision;
 import frc.robot.subsystems.AutoScore;
 import frc.robot.subsystems.SuperstructureFactory;
@@ -91,9 +91,7 @@ public class RobotContainer {
                 m_flywheels = new Flywheels(
                                 new FlywheelsIOTalonFX());
 
-                // m_vision = new Vision(
-                // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
-                // new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
+                m_vision = new Vision(new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]));
 
                 // Instantiate missing subsystems
                 if (m_elevator == null) {
