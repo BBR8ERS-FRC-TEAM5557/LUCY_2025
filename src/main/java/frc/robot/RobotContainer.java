@@ -147,9 +147,13 @@ public class RobotContainer {
 
                 /* DRIVING */
                 // TELEOP DRIVE
-                TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
+               // TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
+               //                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput,
+                //                this::getSnapInput, this::getSlowDownInput);
+
+                                TeleopDrive teleop = new TeleopDrive(this::getForwardInput, this::getStrafeInput,
                                 this::getRotationInput, this::getLeftIntakeInput, this::getRightIntakeInput,
-                                this::getSnapInput, this::getSlowDownInput);
+                                this::getSnapInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
                 /* UTIL */
@@ -193,7 +197,7 @@ public class RobotContainer {
 
                 /* DRIVER CONTROLS */
                 // AUTO DRIVE TO SCORING POSE
-                Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() && false);
+               // Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() && false);
             /**    m_driver.a().and(visionEnabled).whileTrue(
                                 AutoScore.getAutoDriveCommand(
                                                 m_swerve,
@@ -214,7 +218,7 @@ public class RobotContainer {
                                                 .withName("AutoScoreToNearest")); */
 
                 // SUPERSTRUCTURE SCORING
-                m_driver.leftTrigger().and(visionEnabled.negate())
+                m_driver.leftTrigger()
                                 .whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));
