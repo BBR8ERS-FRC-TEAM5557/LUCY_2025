@@ -18,8 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
-import frc.robot.state.vision.AprilTagVisionIO;
+//import frc.robot.state.vision.AprilTagVisionIO;
 //import frc.robot.state.vision.AprilTagVisionIOLimelight;
+import static frc.robot.state.vision.VisionConstants.*;
+import frc.robot.state.vision.AprilTagVisionIO;
+import frc.robot.state.vision.AprilTagVisionIOLimelight;
 import frc.robot.state.vision.Vision;
 import frc.robot.subsystems.SuperstructureFactory;
 import frc.robot.subsystems.elevator.Elevator;
@@ -28,6 +31,9 @@ import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.flywheels.Flywheels;
 import frc.robot.subsystems.flywheels.FlywheelsIO;
 import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
@@ -54,6 +60,7 @@ public class RobotContainer {
         public static Wrist m_wrist;
         public static Leds m_leds;
         public static Flywheels m_flywheels;
+        public static Climb m_climb;
 
         // create variables for virtual subsystems
         public static Vision m_vision;
@@ -90,8 +97,11 @@ public class RobotContainer {
 
                 m_flywheels = new Flywheels(
                                 new FlywheelsIOTalonFX());
+                
+                m_climb = new Climb(
+                                new ClimbIOTalonFX());
 
-                // m_vision = new Vision(
+            //    // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
                 // new AprilTagVisionIOLimelight(instanceNames[1], robotToCameraPoses[1]));
 
@@ -110,14 +120,14 @@ public class RobotContainer {
                         m_flywheels = new Flywheels(new FlywheelsIO() {
                         });
                 }
-
+/**
                 if (m_vision == null) {
                         m_vision = new Vision(
                                         new AprilTagVisionIO() {
                                         },
                                         new AprilTagVisionIO() {
                                         });
-                }
+                } */
 
                 m_stateEstimator = RobotStateEstimator.getInstance(); // get state estimator singleton
                 m_leds = Leds.getInstance(); // get leds singleton
@@ -193,8 +203,9 @@ public class RobotContainer {
                                                 .withName("RobotGoLimp"));
 
                 // ADJUST SCORING LEVEL
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1));
-                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1));
+                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
+                m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1, 0.75));
+                m_driver.a().onTrue(SuperstructureFactory.adjustLevel(0, 0.0));
 
                 /* DRIVER CONTROLS */
                 // SUPERSTRUCTURE SCORE
@@ -215,15 +226,30 @@ public class RobotContainer {
                 m_driver.y().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
                                 SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
+                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
+
                 // POP ALGAE
+               /** 
                 m_driver.x().and(m_driver.rightTrigger().negate())
                                 .whileTrue(SuperstructureFactory.prepPopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));
+
                 m_driver.x().and(m_driver.rightTrigger())
                                 .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
+                                }));*/
+
+                m_driver.x()
+                                .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
+                                        SuperstructureFactory.stow().schedule();
                                 }));
+                
+                m_driver.povLeft()
+                                .onTrue(SuperstructureFactory.prepDeepClimb());
+
+                m_driver.povRight()
+                                .onTrue(SuperstructureFactory.deepClimb());
 
                 /* ENDGAME ALERTS */
                 new Trigger(
@@ -275,17 +301,6 @@ public class RobotContainer {
                 m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
-
-                m_autoChooser.addDefaultOption("CA2_C12_9_10", AutoBuilder.buildAuto("CA2_C12_9_10"));
-
-                m_autoChooser.addDefaultOption("Copy of CA2_C12_9_10", AutoBuilder.buildAuto("Copy of CA2_C12_9_10"));
-                // // Set up feedforward characterization
-                // m_autoChooser.addOption(
-                // "Drive FF Characterization",
-                // new FeedForwardCharacterization(
-                // m_swerve, m_swerve::runCharacterizationVolts,
-                // m_swerve::getCharacterizationVelocity)
-                // .finallyDo(m_swerve::stop));
         }
 
         private void generateEventMap() {
