@@ -11,11 +11,18 @@ public class Superstructure {
         private static final LoggedTunableNumber home_wrist = new LoggedTunableNumber(
                         "Superstructure/HomeWrist",
                         -55.0);
+        private static final LoggedTunableNumber home_climb = new LoggedTunableNumber(
+                        "Superstructure/HomeClimb",
+                        -52.0);
+
         private static final LoggedTunableNumber stow_elevator = new LoggedTunableNumber(
                         "Superstructure/StartElevator",
                         0.0);
         private static final LoggedTunableNumber stow_wrist = new LoggedTunableNumber(
                         "Superstructure/StartWrist",
+                        -52.0);
+        private static final LoggedTunableNumber stow_climb = new LoggedTunableNumber(
+                        "Superstructure/StowClimb",
                         -52.0);
 
         private static final LoggedTunableNumber intake_coral_elevator = new LoggedTunableNumber(
@@ -24,7 +31,6 @@ public class Superstructure {
         private static final LoggedTunableNumber intake_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralWrist",
                         -45.0);
-
         private static final LoggedTunableNumber l2_prep_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L2PrepPopAlgaeElevator",
                         0.3);
@@ -36,7 +42,7 @@ public class Superstructure {
                         0.3);
         private static final LoggedTunableNumber l2_pop_algae_wrist = new LoggedTunableNumber(
                         "Superstructure/L2PopAlgaeWrist",
-                        120.0);
+                        147.0);
         private static final LoggedTunableNumber l3_prep_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L3PrepPopAlgaeElevator",
                         0.4);
@@ -48,7 +54,7 @@ public class Superstructure {
                         0.5);
         private static final LoggedTunableNumber l3_pop_algae_wrist = new LoggedTunableNumber(
                         "Superstructure/L3PopAlgaeWrist",
-                        120.0);
+                        147.0);
 
         private static final LoggedTunableNumber l1_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L1CoralElevator",
@@ -79,31 +85,44 @@ public class Superstructure {
                         "Superstructure/L4CoralWrist",
                         167.0);
 
+        private static final LoggedTunableNumber prep_climb_wrist = new LoggedTunableNumber(
+                        "Superstructure/PrepClimbWrist",
+                        200.0);
+        private static final LoggedTunableNumber prep_climb_climb = new LoggedTunableNumber(
+                        "Superstructure/PrepClimbClimb",
+                        147.0);
+        private static final LoggedTunableNumber deep_climb_climb = new LoggedTunableNumber(
+                        "Superstructure/ExecuteDeepClimbClimb",
+                        40.0);
+
         public enum SuperstructureState {
-                HOME(() -> home_elevator.get(), () -> home_wrist.get()),
-                STOW(() -> stow_elevator.get(), () -> stow_wrist.get()),
+                HOME(() -> home_elevator.get(), () -> home_wrist.get(), () -> home_climb.get()),
+                STOW(() -> stow_elevator.get(), () -> stow_wrist.get(), () -> stow_climb.get()),
 
-                INTAKE_CORAL(() -> intake_coral_elevator.get(), () -> intake_coral_wrist.get()),
+                INTAKE_CORAL(() -> intake_coral_elevator.get(), () -> intake_coral_wrist.get(), () -> stow_climb.get()),
 
-                L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get()),
-                L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get()),
-                L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get()),
-                L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get()),
-                L4_CORAL_TRANSITION(() -> l4_coral_elevator.get(), () -> l4_coral_wrist_transition.get()),
+                L1_CORAL(() -> l1_coral_elevator.get(), () -> l1_coral_wrist.get(), () -> stow_climb.get()),
+                L2_CORAL(() -> l2_coral_elevator.get(), () -> l2_coral_wrist.get(), () -> stow_climb.get()),
+                L3_CORAL(() -> l3_coral_elevator.get(), () -> l3_coral_wrist.get(), () -> stow_climb.get()),
+                L4_CORAL(() -> l4_coral_elevator.get(), () -> l4_coral_wrist.get(), () -> stow_climb.get()),
+                L4_CORAL_TRANSITION(() -> l4_coral_elevator.get(), () -> l4_coral_wrist_transition.get(), () -> stow_climb.get()),
 
-                L2_PREP_POP_ALGAE(() -> l2_prep_pop_algae_elevator.get(), () -> l2_prep_pop_algae_wrist.get()),
-                L2_POP_ALGAE(() -> l2_pop_algae_elevator.get(), () -> l2_pop_algae_wrist.get()),
-                L3_PREP_POP_ALGAE(() -> l3_prep_pop_algae_elevator.get(), () -> l3_prep_pop_algae_wrist.get()),
-                L3_POP_ALGAE(() -> l3_pop_algae_elevator.get(), () -> l3_pop_algae_wrist.get());
+                L2_PREP_POP_ALGAE(() -> l2_prep_pop_algae_elevator.get(), () -> l2_prep_pop_algae_wrist.get(), () -> stow_climb.get()),
+                L2_POP_ALGAE(() -> l2_pop_algae_elevator.get(), () -> l2_pop_algae_wrist.get(), () -> stow_climb.get()),
+                L3_PREP_POP_ALGAE(() -> l3_prep_pop_algae_elevator.get(), () -> l3_prep_pop_algae_wrist.get(), () -> stow_climb.get()),
+                L3_POP_ALGAE(() -> l3_pop_algae_elevator.get(), () -> l3_pop_algae_wrist.get(), () -> stow_climb.get()),
 
-                // TODO: Add the remaining states plz
+                PREP_DEEP_CLIMB(() -> stow_elevator.get(), () -> prep_climb_wrist.get(), () -> prep_climb_climb.get()),
+                DEEP_CLIMB(() -> stow_elevator.get(), () -> prep_climb_wrist.get(), () -> deep_climb_climb.get());
 
                 private final DoubleSupplier elevatorSetpoint;
                 private final DoubleSupplier wristSetpoint;
+                private final DoubleSupplier climbSetpoint;
 
-                private SuperstructureState(DoubleSupplier elevatorSetpoint, DoubleSupplier wristSetpoint) {
+                private SuperstructureState(DoubleSupplier elevatorSetpoint, DoubleSupplier wristSetpoint, DoubleSupplier climbSetpoint) {
                         this.elevatorSetpoint = elevatorSetpoint;
                         this.wristSetpoint = wristSetpoint;
+                        this.climbSetpoint = climbSetpoint;
                 }
 
                 public double getElevatorMeters() {
@@ -120,6 +139,14 @@ public class Superstructure {
 
                 public DoubleSupplier getWristDegreesSupplier() {
                         return wristSetpoint;
+                }
+
+                public double getClimbDegrees() {
+                        return climbSetpoint.getAsDouble();
+                }
+
+                public DoubleSupplier getClimbDegreesSupplier() {
+                        return climbSetpoint;
                 }
         }
 }

@@ -10,13 +10,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.util.Util;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SuperstructureFactory {
         private static final Elevator elevator = RobotContainer.m_elevator;
         private static final Wrist wrist = RobotContainer.m_wrist;
+        private static final Climb climb = RobotContainer.m_climb;
 
         public static final LoggedTunableNumber elevator_tolerance_before_moving_wrist = new LoggedTunableNumber(
                         "Superstructure/ElevatorToleranceBeforeWrist",
@@ -32,7 +35,8 @@ public class SuperstructureFactory {
         public static Command runSuperstructureState(Supplier<SuperstructureState> state) {
                 return Commands.parallel(
                                 elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
-                                wrist.runPositionCommand(state.get().getWristDegreesSupplier()));
+                                wrist.runPositionCommand(state.get().getWristDegreesSupplier()),
+                                climb.runPositionCommand(state.get().getClimbDegreesSupplier()));
 
                 // return Commands.parallel(
                 // elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
@@ -44,7 +48,7 @@ public class SuperstructureFactory {
         }
 
         public static Command waitUntilAtSetpoint() {
-                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint());
+                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint() && climb.atSetpoint());
         }
 
         public static Command scoreCoral() {
@@ -125,6 +129,14 @@ public class SuperstructureFactory {
                 return runSuperstructureState(SuperstructureState.STOW);
         }
 
+        public static Command prepDeepClimb() {
+                return runSuperstructureState(SuperstructureState.PREP_DEEP_CLIMB);
+        }
+
+        public static Command deepClimb() {
+                return runSuperstructureState(SuperstructureState.DEEP_CLIMB);
+        }
+
         public static Command adjustLevel(int amount, double rumbleWait) {
                 return Commands.runOnce(() -> {
                         // Update the level
@@ -152,10 +164,11 @@ public class SuperstructureFactory {
                         // Schedule the new rumble command
                         pendingRumbleCommand = rumbleCommand;
                         rumbleCommand.schedule();
+                        SmartDashboard.putNumber("Level", getLevel());
                 });
         }
 
-        @AutoLogOutput(key = "Superstrucutre/selectedScoringLevel")
+        @AutoLogOutput(key = "Superstructure/selectedScoringLevel")
         public static int getLevel() {
                 return level;
         }
