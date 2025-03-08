@@ -189,12 +189,12 @@ public class RobotContainer {
                 // ADJUST SCORING LEVEL
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1, 0.75));
-                m_driver.a().onTrue(SuperstructureFactory.adjustLevel(0, 0.0));
+               // m_driver.a().onTrue(SuperstructureFactory.adjustLevel(0, 0.0));
 
                 /* DRIVER CONTROLS */
                 // AUTO DRIVE TO SCORING POSE
                 Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() && false);
-                m_driver.a().and(visionEnabled).whileTrue(
+            /**    m_driver.a().and(visionEnabled).whileTrue(
                                 AutoScore.getAutoDriveCommand(
                                                 m_swerve,
                                                 () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
@@ -211,7 +211,7 @@ public class RobotContainer {
                                                 this::getForwardInput,
                                                 this::getStrafeInput,
                                                 false)
-                                                .withName("AutoScoreToNearest"));
+                                                .withName("AutoScoreToNearest")); */
 
                 // SUPERSTRUCTURE SCORING
                 m_driver.leftTrigger().and(visionEnabled.negate())

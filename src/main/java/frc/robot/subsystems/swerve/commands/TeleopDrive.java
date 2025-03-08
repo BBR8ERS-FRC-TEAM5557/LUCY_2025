@@ -21,8 +21,8 @@ import frc.robot.subsystems.swerve.SwerveConstants;
  */
 public class TeleopDrive extends Command {
         public TeleopDrive(DoubleSupplier throttle, DoubleSupplier strafe, DoubleSupplier turn,
-                        BooleanSupplier intakeLeft, BooleanSupplier intakeRight, BooleanSupplier snap,
-                        BooleanSupplier slowDown) {
+                        BooleanSupplier intakeLeft,
+                        BooleanSupplier intakeRight, BooleanSupplier snap) {
                 mDrivetrain = RobotContainer.m_swerve;
                 mThrottleSupplier = throttle;
                 mStrafeSupplier = strafe;
@@ -31,7 +31,6 @@ public class TeleopDrive extends Command {
                 mLeftIntakeSupplier = intakeLeft;
                 mRightIntakeSupplier = intakeRight;
                 mSnapSupplier = snap;
-                mSlowDownSupplier = slowDown;
 
                 driveWithHeading.HeadingController.setPID(
                                 SwerveConstants.PID.kRotationkP,
@@ -45,7 +44,7 @@ public class TeleopDrive extends Command {
 
         private Swerve mDrivetrain;
         private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
-        private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier, mSlowDownSupplier;
+        private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier;
 
         private SwerveRequest.FieldCentric driveNoHeading = new SwerveRequest.FieldCentric()
                         .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
@@ -70,12 +69,7 @@ public class TeleopDrive extends Command {
                 boolean wantsLeftIntake = mLeftIntakeSupplier.getAsBoolean();
                 boolean wantsRightIntake = mRightIntakeSupplier.getAsBoolean();
                 boolean wantsSnap = mSnapSupplier.getAsBoolean();
-                boolean wantsSlowDown = mSlowDownSupplier.getAsBoolean();
 
-                if (wantsSlowDown) {
-                        throttleFieldFrame *= 0.5; // slow down by 50% when snapping
-                        strafeFieldFrame *= 0.5;
-                }
                 if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
                         Rotation2d headingSetpoint = Rotation2d.kZero;
                         if (wantsLeftIntake) {
@@ -85,6 +79,9 @@ public class TeleopDrive extends Command {
                                 headingSetpoint = Rotation2d.fromDegrees(54.0);
                                 headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
                         } else if (wantsSnap) {
+                                throttleFieldFrame *= 0.5; // slow down by 50% when snapping
+                                strafeFieldFrame *= 0.5;
+
                                 double currentHeadingDegrees = RobotStateEstimator.getInstance().getEstimatedPose()
                                                 .getRotation()
                                                 .getDegrees();
