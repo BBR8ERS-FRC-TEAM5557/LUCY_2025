@@ -120,14 +120,14 @@ public class RobotContainer {
                         m_flywheels = new Flywheels(new FlywheelsIO() {
                         });
                 }
-/**
+
                 if (m_vision == null) {
                         m_vision = new Vision(
                                         new AprilTagVisionIO() {
                                         },
                                         new AprilTagVisionIO() {
                                         });
-                } */
+                } 
 
                 m_stateEstimator = RobotStateEstimator.getInstance(); // get state estimator singleton
                 m_leds = Leds.getInstance(); // get leds singleton
