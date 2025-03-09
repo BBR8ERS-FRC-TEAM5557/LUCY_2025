@@ -51,8 +51,8 @@ public class ClimbIOTalonFX implements ClimbIO {
                 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
                 config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
                 config.Feedback.SensorToMechanismRatio = reduction;
-                config.Voltage.PeakForwardVoltage = 5.0;
-                config.Voltage.PeakReverseVoltage = -2.0;
+                config.Voltage.PeakForwardVoltage = 12.0;
+                config.Voltage.PeakReverseVoltage = -12.0;
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 50.0;
                 config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 50.0;

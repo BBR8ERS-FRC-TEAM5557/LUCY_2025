@@ -46,11 +46,10 @@ public class TeleopDrive extends Command {
         private Swerve mDrivetrain;
         private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
         private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier, mSlowDownSupplier;
-
         private SwerveRequest.FieldCentric driveNoHeading = new SwerveRequest.FieldCentric()
                         .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
         private SwerveRequest.FieldCentricFacingAngle driveWithHeading = new SwerveRequest.FieldCentricFacingAngle()
-                        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
+                        .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
 
         @Override
         public void initialize() {
@@ -76,6 +75,7 @@ public class TeleopDrive extends Command {
                         throttleFieldFrame *= 0.5; // slow down by 50% when snapping
                         strafeFieldFrame *= 0.5;
                 }
+
                 if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
                         Rotation2d headingSetpoint = Rotation2d.kZero;
                         if (wantsLeftIntake) {
@@ -92,24 +92,18 @@ public class TeleopDrive extends Command {
                                                 .fromDegrees(60.0 * Math.round(currentHeadingDegrees / 60.0));
                         }
 
-                        mDrivetrain
-                                        .setControl(driveWithHeading.withVelocityX(throttleFieldFrame)
+                        mDrivetrain.setControl(
+                                        driveWithHeading.withVelocityX(throttleFieldFrame)
                                                         .withVelocityY(strafeFieldFrame)
                                                         .withTargetDirection(headingSetpoint));
                         Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
                         Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", headingSetpoint.getDegrees());
                 } else {
-                        turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
-                        mDrivetrain
-                                        .setControl(driveNoHeading.withVelocityX(throttleFieldFrame)
+                        mDrivetrain.setControl(
+                                        driveNoHeading.withVelocityX(throttleFieldFrame)
                                                         .withVelocityY(strafeFieldFrame)
                                                         .withRotationalRate(turnFieldFrame));
                         Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
                 }
-        }
-
-        @Override
-        public boolean isFinished() {
-                return false;
         }
 }

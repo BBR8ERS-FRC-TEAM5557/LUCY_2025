@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
-//import frc.robot.state.vision.AprilTagVisionIO;
-//import frc.robot.state.vision.AprilTagVisionIOLimelight;
+import frc.robot.state.vision.AprilTagVisionIO;
+import frc.robot.state.vision.AprilTagVisionIOLimelight;
 import static frc.robot.state.vision.VisionConstants.*;
 import frc.robot.state.vision.Vision;
 import frc.robot.subsystems.AutoScore;
@@ -49,7 +49,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer {
         // create controller instances
         public static final CommandXboxController m_driver = new CommandXboxController(0);
-        public static final CommandXboxController m_operator = new CommandXboxController(1);
 
         // create variables for physical subsystems
         public static Swerve m_swerve;
@@ -68,8 +67,6 @@ public class RobotContainer {
 
         // controller alerts
         private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).",
-                        AlertType.kWarning);
-        private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
                         AlertType.kWarning);
         private final Alert tuningMode = new Alert("Tuning mode enabled, expect slower network", AlertType.kInfo);
 
@@ -94,11 +91,12 @@ public class RobotContainer {
 
                 m_flywheels = new Flywheels(
                                 new FlywheelsIOTalonFX());
-                
+
                 m_climb = new Climb(
                                 new ClimbIOTalonFX());
 
-            //    m_vision = new Vision(new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]));
+                // m_vision = new Vision(new AprilTagVisionIOLimelight(instanceNames[0],
+                // robotToCameraPoses[0]));
 
                 // Instantiate missing subsystems
                 if (m_elevator == null) {
@@ -115,14 +113,14 @@ public class RobotContainer {
                         m_flywheels = new Flywheels(new FlywheelsIO() {
                         });
                 }
-/**
+
                 if (m_vision == null) {
                         m_vision = new Vision(
                                         new AprilTagVisionIO() {
                                         },
                                         new AprilTagVisionIO() {
                                         });
-                } */
+                }
 
                 m_stateEstimator = RobotStateEstimator.getInstance(); // get state estimator singleton
                 m_leds = Leds.getInstance(); // get leds singleton
@@ -193,28 +191,29 @@ public class RobotContainer {
 
                 /* DRIVER CONTROLS */
                 // AUTO DRIVE TO SCORING POSE
-                Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() && false);
-                m_driver.a().and(visionEnabled).whileTrue(
-                                AutoScore.getAutoDriveCommand(
-                                                m_swerve,
-                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
-                                                this::getForwardInput,
-                                                this::getStrafeInput,
-                                                false)
-                                                .withName("AutoDriveToNearest"));
+                // Trigger visionEnabled = new Trigger(() -> m_vision.getVisionEnabled() &&
+                // false);
+                // m_driver.a().and(visionEnabled).whileTrue(
+                // AutoScore.getAutoDriveCommand(
+                // m_swerve,
+                // () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
+                // this::getForwardInput,
+                // this::getStrafeInput,
+                // false)
+                // .withName("AutoDriveToNearest"));
 
-                // AUTO SCORE
-                m_driver.leftTrigger().and(visionEnabled).whileTrue(
-                                AutoScore.getAutoScoreCommand(
-                                                m_swerve,
-                                                () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
-                                                this::getForwardInput,
-                                                this::getStrafeInput,
-                                                false)
-                                                .withName("AutoScoreToNearest"));
+                // // AUTO SCORE
+                // m_driver.leftTrigger().and(visionEnabled).whileTrue(
+                // AutoScore.getAutoScoreCommand(
+                // m_swerve,
+                // () -> ReefLevel.fromLevel(SuperstructureFactory.getLevel()),
+                // this::getForwardInput,
+                // this::getStrafeInput,
+                // false)
+                // .withName("AutoScoreToNearest"));
 
                 // SUPERSTRUCTURE SCORING
-                m_driver.leftTrigger().and(visionEnabled.negate())
+                m_driver.leftTrigger()// .and(visionEnabled.negate())
                                 .whileTrue(SuperstructureFactory.scoreCoral().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));
@@ -232,25 +231,24 @@ public class RobotContainer {
                 m_driver.y().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
                                 SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
-
                 // POP ALGAE
-               /** 
-                m_driver.x().and(m_driver.rightTrigger().negate())
-                                .whileTrue(SuperstructureFactory.prepPopAlgae().finallyDo(() -> {
-                                        SuperstructureFactory.stow().schedule();
-                                }));
-
-                m_driver.x().and(m_driver.rightTrigger())
-                                .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
-                                        SuperstructureFactory.stow().schedule();
-                                }));*/
+                /**
+                 * m_driver.x().and(m_driver.rightTrigger().negate())
+                 * .whileTrue(SuperstructureFactory.prepPopAlgae().finallyDo(() -> {
+                 * SuperstructureFactory.stow().schedule();
+                 * }));
+                 * 
+                 * m_driver.x().and(m_driver.rightTrigger())
+                 * .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
+                 * SuperstructureFactory.stow().schedule();
+                 * }));
+                 */
 
                 m_driver.x()
                                 .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));
-                
+
                 m_driver.povLeft()
                                 .onTrue(SuperstructureFactory.prepDeepClimb());
 
@@ -288,9 +286,6 @@ public class RobotContainer {
                 driverDisconnected.set(
                                 !DriverStation.isJoystickConnected(m_driver.getHID().getPort())
                                                 || !DriverStation.getJoystickIsXbox(m_driver.getHID().getPort()));
-                operatorDisconnected.set(
-                                !DriverStation.isJoystickConnected(m_operator.getHID().getPort())
-                                                || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
         }
 
         private void generateAutoChoices() {
@@ -367,11 +362,9 @@ public class RobotContainer {
                 return Commands.startEnd(
                                 () -> {
                                         m_driver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-                                        m_operator.getHID().setRumble(RumbleType.kBothRumble, 1.0);
                                 },
                                 () -> {
                                         m_driver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-                                        m_operator.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                                 });
         }
 

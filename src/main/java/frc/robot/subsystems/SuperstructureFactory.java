@@ -37,18 +37,10 @@ public class SuperstructureFactory {
                                 elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
                                 wrist.runPositionCommand(state.get().getWristDegreesSupplier()),
                                 climb.runPositionCommand(state.get().getClimbDegreesSupplier()));
-
-                // return Commands.parallel(
-                // elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
-                // elevator.waitUntilAboveCommand(
-                // () -> state.get().getElevatorMeters()
-                // - elevator_tolerance_before_moving_wrist.get())
-                // .andThen(wrist.runPositionCommand(state.get()
-                // .getWristDegreesSupplier())));
         }
 
         public static Command waitUntilAtSetpoint() {
-                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint() && climb.atSetpoint());
+                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint());
         }
 
         public static Command scoreCoral() {
