@@ -56,10 +56,6 @@ public class Constants {
                                                                                                               // slab
         }
 
-        public class Joystick {
-                public static double kSteerJoystickDeadband = 0.05;
-        }
-
         public static boolean disableHAL = false;
 
         public static void disableHAL() {

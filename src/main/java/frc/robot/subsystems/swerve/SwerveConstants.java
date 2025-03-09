@@ -51,11 +51,7 @@ public class SwerveConstants {
                 public static final double kTranslationkI = 0.0;
                 public static final double kTranslationkD = 0.0;
 
-                public static final double kRotationkP = 3.5
-                
-                
-                
-                ;
+                public static final double kRotationkP = 3.5;
                 public static final double kRotationkI = 0.0;
                 public static final double kRotationkD = 0.0;
 
@@ -77,7 +73,7 @@ public class SwerveConstants {
                 public static final KinematicLimits kTeleopLimits = new KinematicLimits(
                                 kTrueMaxSpeed,
                                 kTrueMaxSpeed / 0.2,
-                                kTrueMaxOmega * 0.25,
+                                kTrueMaxOmega * 0.7,
                                 Double.MAX_VALUE);
 
                 public static final KinematicLimits kAutoLimits = new KinematicLimits(
