@@ -27,7 +27,6 @@ public class Superstructure {
 
         private static final LoggedTunableNumber intake_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralElevator",
-                        0.24);
         private static final LoggedTunableNumber intake_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/IntakeCoralWrist",
                         -45.0);
@@ -67,20 +66,16 @@ public class Superstructure {
                         0.0);
         private static final LoggedTunableNumber l2_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L2CoralWrist",
-                        138.0);
 
         private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L3CoralElevator",
-                        0.3);
         private static final LoggedTunableNumber l3_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L3CoralWrist",
-                        150.0);
         private static final LoggedTunableNumber l4_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L4CoralElevator",
                         1.180);
         private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
-                        170.0);
 
         private static final LoggedTunableNumber prep_climb_wrist = new LoggedTunableNumber(
                         "Superstructure/PrepClimbWrist",
