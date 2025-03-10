@@ -11,21 +11,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "scoreL4"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C12-S"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
           }
         },
         {
@@ -35,33 +23,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "scoreL4"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C9-S"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "S-C10"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "scoreL4"
           }
         }
       ]

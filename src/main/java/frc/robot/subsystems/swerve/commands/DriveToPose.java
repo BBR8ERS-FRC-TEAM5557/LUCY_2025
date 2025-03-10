@@ -216,12 +216,11 @@ public class DriveToPose extends Command {
                 thetaVelocity = MathUtil.interpolate(
                                 thetaVelocity, omegaFF.getAsDouble() * SwerveConstants.kTrueMaxOmega, thetaS);
 
-                /**
-                                // Command speeds
+                // Command speeds
                 drive.setControl(driveNoHeading
                                 .withVelocityX(driveVelocity.getX())
                                 .withVelocityY(driveVelocity.getY())
-                                .withRotationalRate(thetaVelocity)); */
+                                .withRotationalRate(thetaVelocity));
 
                 // Log data
                 Logger.recordOutput("DriveToPose/DistanceMeasured", currentDistance);
