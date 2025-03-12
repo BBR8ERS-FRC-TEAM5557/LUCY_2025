@@ -325,9 +325,27 @@ public class RobotContainer {
                                                         SuperstructureFactory.stow().schedule();
                                                 }));
 
+                                                NamedCommands.registerCommand("scoreL2",
+                                                Commands.print("scoring L2")
+                                                                .alongWith(SuperstructureFactory.scoreL2Coral())
+                                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
+                                                                                .andThen(Commands.waitSeconds(1))
+                                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                                                .finallyDo(() -> {
+                                                                        SuperstructureFactory.stow().schedule();
+                                                                }));
+
                 NamedCommands.registerCommand("prepL4",
                                 Commands.print("prep L4")
                                                 .alongWith(SuperstructureFactory.scoreL4Coral()));
+
+                NamedCommands.registerCommand("prepL2",
+                                Commands.print("prep L2")
+                                                .alongWith(SuperstructureFactory.scoreL2Coral()));
+
+                NamedCommands.registerCommand("stow",
+                                Commands.print("stowing!")
+                                                .alongWith(SuperstructureFactory.stow()));
 
                 NamedCommands.registerCommand("shootCoral",
                                 Commands.print("shooting L4")
