@@ -73,7 +73,7 @@ public class SwerveConstants {
                 public static final KinematicLimits kTeleopLimits = new KinematicLimits(
                                 kTrueMaxSpeed,
                                 kTrueMaxSpeed / 0.2,
-                                kTrueMaxOmega * 0.25,
+                                kTrueMaxOmega * 0.7,
                                 Double.MAX_VALUE);
 
                 public static final KinematicLimits kAutoLimits = new KinematicLimits(

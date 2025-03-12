@@ -22,7 +22,7 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 public class TeleopDrive extends Command {
         public TeleopDrive(DoubleSupplier throttle, DoubleSupplier strafe, DoubleSupplier turn,
                         BooleanSupplier intakeLeft,
-                        BooleanSupplier intakeRight, BooleanSupplier snap) {
+                        BooleanSupplier intakeRight, BooleanSupplier snap, BooleanSupplier slowDown) {
                 mDrivetrain = RobotContainer.m_swerve;
                 mThrottleSupplier = throttle;
                 mStrafeSupplier = strafe;
@@ -31,6 +31,7 @@ public class TeleopDrive extends Command {
                 mLeftIntakeSupplier = intakeLeft;
                 mRightIntakeSupplier = intakeRight;
                 mSnapSupplier = snap;
+                mSlowDownSupplier = slowDown;
 
                 driveWithHeading.HeadingController.setPID(
                                 SwerveConstants.PID.kRotationkP,
@@ -44,12 +45,12 @@ public class TeleopDrive extends Command {
 
         private Swerve mDrivetrain;
         private DoubleSupplier mThrottleSupplier, mStrafeSupplier, mTurnSupplier;
-        private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier;
+        private BooleanSupplier mLeftIntakeSupplier, mRightIntakeSupplier, mSnapSupplier, mSlowDownSupplier;
 
         private SwerveRequest.FieldCentric driveNoHeading = new SwerveRequest.FieldCentric()
                         .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
         private SwerveRequest.FieldCentricFacingAngle driveWithHeading = new SwerveRequest.FieldCentricFacingAngle()
-                        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
+                        .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
 
         @Override
         public void initialize() {
@@ -69,6 +70,12 @@ public class TeleopDrive extends Command {
                 boolean wantsLeftIntake = mLeftIntakeSupplier.getAsBoolean();
                 boolean wantsRightIntake = mRightIntakeSupplier.getAsBoolean();
                 boolean wantsSnap = mSnapSupplier.getAsBoolean();
+                boolean wantsSlowDown = mSlowDownSupplier.getAsBoolean();
+
+                if (wantsSlowDown) {
+                        throttleFieldFrame *= 0.5; // slow down by 50% when scoring
+                        strafeFieldFrame *= 0.5;
+                }
 
                 if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
                         Rotation2d headingSetpoint = Rotation2d.kZero;
@@ -79,34 +86,24 @@ public class TeleopDrive extends Command {
                                 headingSetpoint = Rotation2d.fromDegrees(54.0);
                                 headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
                         } else if (wantsSnap) {
-                                throttleFieldFrame *= 0.5; // slow down by 50% when snapping
-                                strafeFieldFrame *= 0.5;
-
                                 double currentHeadingDegrees = RobotStateEstimator.getInstance().getEstimatedPose()
                                                 .getRotation()
                                                 .getDegrees();
                                 headingSetpoint = Rotation2d
                                                 .fromDegrees(60.0 * Math.round(currentHeadingDegrees / 60.0));
                         }
-
-                        mDrivetrain
-                                        .setControl(driveWithHeading.withVelocityX(throttleFieldFrame)
-                                                        .withVelocityY(strafeFieldFrame)
-                                                        .withTargetDirection(headingSetpoint));
+                        mDrivetrain.setControl(driveWithHeading
+                                        .withVelocityX(throttleFieldFrame)
+                                        .withVelocityY(strafeFieldFrame)
+                                        .withTargetDirection(headingSetpoint));
                         Logger.recordOutput("DriveMaintainHeading/Mode", "Heading");
                         Logger.recordOutput("DriveMaintainHeading/HeadingSetpoint", headingSetpoint.getDegrees());
                 } else {
-                        turnFieldFrame = turnFieldFrame * SwerveConstants.Kinematics.kTeleopLimits.maxOmega();
-                        mDrivetrain
-                                        .setControl(driveNoHeading.withVelocityX(throttleFieldFrame)
-                                                        .withVelocityY(strafeFieldFrame)
-                                                        .withRotationalRate(turnFieldFrame));
+                        mDrivetrain.setControl(driveNoHeading
+                                        .withVelocityX(throttleFieldFrame)
+                                        .withVelocityY(strafeFieldFrame)
+                                        .withRotationalRate(turnFieldFrame));
                         Logger.recordOutput("DriveMaintainHeading/Mode", "NoHeading");
                 }
-        }
-
-        @Override
-        public boolean isFinished() {
-                return false;
         }
 }

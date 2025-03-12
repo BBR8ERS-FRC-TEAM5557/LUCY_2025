@@ -149,7 +149,8 @@ public class RobotContainer {
                                 this::getRotationInput,
                                 this::getLeftIntakeInput,
                                 this::getRightIntakeInput,
-                                this::getSnapInput);
+                                this::getSnapInput,
+                                this::getSlowDownInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
                 /* UTIL */
