@@ -234,25 +234,23 @@ public class RobotContainer {
                                 () -> DriverStation.isTeleopEnabled()
                                                 && DriverStation.getMatchTime() > 0
                                                 && DriverStation.getMatchTime() <= Math.round(30.0))
-                                .onTrue(
-                                                controllerRumbleCommand()
-                                                                .withTimeout(0.5)
-                                                                .beforeStarting(() -> m_leds.endgameAlert = true)
-                                                                .finallyDo(() -> m_leds.endgameAlert = false));
+                                .onTrue(controllerRumbleCommand()
+                                                .withTimeout(0.5)
+                                                .beforeStarting(() -> m_leds.endgameAlert = true)
+                                                .finallyDo(() -> m_leds.endgameAlert = false));
                 new Trigger(
                                 () -> DriverStation.isTeleopEnabled()
                                                 && DriverStation.getMatchTime() > 0
                                                 && DriverStation.getMatchTime() <= Math.round(15.0))
-                                .onTrue(
-                                                controllerRumbleCommand()
-                                                                .withTimeout(0.2)
-                                                                .andThen(Commands.waitSeconds(0.1))
-                                                                .repeatedly()
-                                                                .withTimeout(0.9)
-                                                                .beforeStarting(() -> m_leds.endgameAlert = true)
-                                                                .finallyDo(() -> m_leds.endgameAlert = false)); // Rumble
-                                                                                                                // three
-                                                                                                                // times
+                                .onTrue(controllerRumbleCommand()
+                                                .withTimeout(0.2)
+                                                .andThen(Commands.waitSeconds(0.1))
+                                                .repeatedly()
+                                                .withTimeout(0.9)
+                                                .beforeStarting(() -> m_leds.endgameAlert = true)
+                                                .finallyDo(() -> m_leds.endgameAlert = false)); // Rumble
+                                                                                                // three
+                                                                                                // times
         }
 
         /** Updates the alerts for disconnected controllers. */

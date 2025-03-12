@@ -77,10 +77,12 @@ public class Climb extends SubsystemBase {
         }
 
         public Command runVoltageCommand(DoubleSupplier voltage) {
-                return runEnd(() -> {
-                        io.runVolts(voltage.getAsDouble());
-                },
+                return runEnd(
                                 () -> {
+                                        io.runVolts(voltage.getAsDouble());
+                                },
+                                () -> {
+                                        io.runVolts(0.0);
                                 }).withName(getName() + " runVoltageCommand");
         }
 
