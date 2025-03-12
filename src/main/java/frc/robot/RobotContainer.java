@@ -271,6 +271,8 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
+                m_autoChooser.addDefaultOption("CA5-C3-C6-TRY THIS ONE!!", AutoBuilder.buildAuto("CA5-C3-C6"));
+
                 m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
@@ -278,11 +280,13 @@ public class RobotContainer {
 
         private void generateEventMap() {
                 NamedCommands.registerCommand("scoreL4",
-                                Commands.print("scoring L4")
-                                                .alongWith(SuperstructureFactory.scoreL4Coral())
-                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                .andThen(Commands.waitSeconds(1))
-                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
+                                Commands.print("scoring L4").alongWith(
+                                                SuperstructureFactory.scoreL4Coral()
+                                                                .withDeadline(SuperstructureFactory
+                                                                                .waitUntilAtSetpoint()
+                                                                                .andThen(Commands.waitSeconds(1))
+                                                                                .andThen(m_flywheels.scoreCoral()
+                                                                                                .withTimeout(1.5))))
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
                                                 }));
