@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "prepL4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CA2-C12"
@@ -26,12 +38,6 @@
           "type": "path",
           "data": {
             "pathName": "C9-S"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "S-C10"
           }
         }
       ]
