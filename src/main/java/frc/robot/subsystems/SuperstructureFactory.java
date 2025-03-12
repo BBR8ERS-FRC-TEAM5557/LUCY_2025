@@ -22,6 +22,7 @@ public class SuperstructureFactory {
 
         private static Command pendingRumbleCommand = null;
         private static int level = 4;
+        private static Supplier<SuperstructureState> currState = () -> SuperstructureState.HOME;
 
         public static Command runSuperstructureState(SuperstructureState state) {
                 return runSuperstructureState(() -> state);
@@ -29,21 +30,16 @@ public class SuperstructureFactory {
 
         public static Command runSuperstructureState(Supplier<SuperstructureState> state) {
                 return Commands.parallel(
+                                Commands.runOnce(() -> {
+                                        currState = state;
+                                }),
                                 elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
                                 wrist.runPositionCommand(state.get().getWristDegreesSupplier()),
                                 climb.runPositionCommand(state.get().getClimbDegreesSupplier()));
-
-                // return Commands.parallel(
-                // elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
-                // elevator.waitUntilAboveCommand(
-                // () -> state.get().getElevatorMeters()
-                // - elevator_tolerance_before_moving_wrist.get())
-                // .andThen(wrist.runPositionCommand(state.get()
-                // .getWristDegreesSupplier())));
         }
 
         public static Command waitUntilAtSetpoint() {
-                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint() && climb.atSetpoint());
+                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint());
         }
 
         public static Command scoreCoral() {
@@ -59,10 +55,10 @@ public class SuperstructureFactory {
         public static Command prepPopAlgae() {
                 return Commands.select(
                                 Map.of(
-                                                1, stow(),
+                                                1, l2PrepPopAlgae(),
                                                 2, l2PrepPopAlgae(),
                                                 3, l3PrepPopAlgae(),
-                                                4, stow()),
+                                                4, l3PrepPopAlgae()),
                                 () -> getLevel());
         }
 
@@ -114,6 +110,13 @@ public class SuperstructureFactory {
 
         public static Command stow() {
                 return runSuperstructureState(SuperstructureState.STOW);
+        }
+
+        public static Command toggleClimb() {
+                return Commands.either(
+                                deepClimb(),
+                                prepDeepClimb(),
+                                () -> currState.get() == SuperstructureState.PREP_DEEP_CLIMB);
         }
 
         public static Command prepDeepClimb() {

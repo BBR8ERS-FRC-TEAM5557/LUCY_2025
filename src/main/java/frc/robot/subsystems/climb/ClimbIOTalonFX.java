@@ -6,7 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -16,11 +16,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.climb.ClimbIO.ClimbIOInputs;
 
 public class ClimbIOTalonFX implements ClimbIO {
-        public static final double reduction = (5.0 * 5.0) * (28.0 / 18.0) / 360.0;
-
         // Hardware
         private final TalonFX talon;
 
@@ -40,7 +37,7 @@ public class ClimbIOTalonFX implements ClimbIO {
         private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0.0);
         private final VoltageOut voltageRequest = new VoltageOut(0.0);
         // Closed loop requests
-        private final MotionMagicVoltage motionMagicVoltageRequest = new MotionMagicVoltage(0.0);
+        private final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
 
         private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
@@ -50,9 +47,8 @@ public class ClimbIOTalonFX implements ClimbIO {
                 // Configure motor
                 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
                 config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
-                config.Feedback.SensorToMechanismRatio = reduction;
-                config.Voltage.PeakForwardVoltage = 5.0;
-                config.Voltage.PeakReverseVoltage = -2.0;
+                config.Voltage.PeakForwardVoltage = 12.0;
+                config.Voltage.PeakReverseVoltage = -12.0;
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 50.0;
                 config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 50.0;
@@ -115,7 +111,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
         @Override
         public void runPosition(double positionDegrees, double feedforward) {
-                talon.setControl(motionMagicVoltageRequest.withPosition(positionDegrees).withFeedForward(feedforward));
+                talon.setControl(positionVoltageRequest.withPosition(positionDegrees).withFeedForward(feedforward));
         }
 
         @Override
