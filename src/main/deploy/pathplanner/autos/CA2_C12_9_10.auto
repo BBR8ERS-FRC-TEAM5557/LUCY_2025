@@ -4,24 +4,27 @@
     "type": "sequential",
     "data": {
       "commands": [
-        {
+        {         
           "type": "path",
           "data": {
             "pathName": "CA2-C12"
           }
         },
+        
         {
           "type": "path",
           "data": {
             "pathName": "C12-S"
           }
         },
+        
         {
           "type": "path",
           "data": {
             "pathName": "S-C9"
           }
         },
+        
         {
           "type": "path",
           "data": {
@@ -36,7 +39,7 @@
         }
       ]
     }
-  },
+},
   "resetOdom": true,
   "folder": null,
   "choreoAuto": false
