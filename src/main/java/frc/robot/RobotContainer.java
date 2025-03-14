@@ -347,7 +347,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("shootCoral",
                                 Commands.print("shooooooting coral")
                                                 .alongWith(m_flywheels.scoreCoral().withTimeout(1))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .andThen(SuperstructureFactory.stow().withTimeout(1.5)));
                
                 //take off finally do
                 NamedCommands.registerCommand("intakeCoral",
