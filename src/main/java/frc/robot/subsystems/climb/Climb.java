@@ -36,7 +36,7 @@ public class Climb extends SubsystemBase {
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
             "Climb/MaxAccelerationDegreesPerSec2", 2000.0);
 
-    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Climb/HomingVolts", -2.0);
+    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Climb/HomingVolts", -1.0);
     private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Climb/HomingTimeSecs",
             0.25);
     private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
