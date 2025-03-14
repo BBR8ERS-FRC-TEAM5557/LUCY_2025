@@ -52,7 +52,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer {
         // create controller instances
         public static final CommandXboxController m_driver = new CommandXboxController(0);
-        public static final CommandXboxController m_operator = new CommandXboxController(1);
 
         // create variables for physical subsystems
         public static Swerve m_swerve;
@@ -72,8 +71,7 @@ public class RobotContainer {
         // controller alerts
         private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).",
                         AlertType.kWarning);
-        private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
-                        AlertType.kWarning);
+        
         private final Alert tuningMode = new Alert("Tuning mode enabled, expect slower network", AlertType.kInfo);
 
         public RobotContainer() {
@@ -195,14 +193,16 @@ public class RobotContainer {
                                                         m_elevator.setBrakeMode(false);
                                                         m_wrist.setBrakeMode(false);
                                                         m_flywheels.setBrakeMode(false);
+                                                        m_climb.setBrakeMode(false);
                                                 },
                                                 () -> {
                                                         m_swerve.setBrakeMode(true);
                                                         m_elevator.setBrakeMode(true);
                                                         m_wrist.setBrakeMode(true);
                                                         m_flywheels.setBrakeMode(true);
+                                                        m_climb.setBrakeMode(true);
                                                 },
-                                                m_swerve, m_elevator, m_wrist, m_flywheels)
+                                                m_swerve, m_elevator, m_wrist, m_flywheels, m_climb)
                                                 .unless(() -> DriverStation.isEnabled())
                                                 .ignoringDisable(true)
                                                 .withName("RobotGoLimp"));
@@ -244,11 +244,14 @@ public class RobotContainer {
                                 .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));*/
-
+                                               
+                //JUST POP ALGAE (NO PREP)
                 m_driver.x()
                                 .whileTrue(SuperstructureFactory.executePopAlgae().finallyDo(() -> {
                                         SuperstructureFactory.stow().schedule();
                                 }));
+
+                
                 
                 m_driver.povLeft()
                                 .onTrue(SuperstructureFactory.prepDeepClimb());
@@ -287,9 +290,7 @@ public class RobotContainer {
                 driverDisconnected.set(
                                 !DriverStation.isJoystickConnected(m_driver.getHID().getPort())
                                                 || !DriverStation.getJoystickIsXbox(m_driver.getHID().getPort()));
-                operatorDisconnected.set(
-                                !DriverStation.isJoystickConnected(m_operator.getHID().getPort())
-                                                || !DriverStation.getJoystickIsXbox(m_operator.getHID().getPort()));
+                
         }
 
         private void generateAutoChoices() {
@@ -299,102 +300,63 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_left", AutoBuilder.buildAuto("drive_back_left"));
 
-                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths"));
-
                 m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
-                m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
+                m_autoChooser.addDefaultOption("CA5_C3_C6-YES", AutoBuilder.buildAuto("CA5_C3_C6-YES"));
+                
+                m_autoChooser.addDefaultOption("CA2_C12_C9_C10-YES", AutoBuilder.buildAuto("CA2_C12_C9_C10-YES"));
 
-                m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
+                m_autoChooser.addDefaultOption("Midline_C1", AutoBuilder.buildAuto("Midline_C1"));
 
                 m_autoChooser.addDefaultOption("Copy of CA2_C12_9_10", AutoBuilder.buildAuto("Copy of CA2_C12_9_10"));
 
-                m_autoChooser.addDefaultOption("Copy khghjof CA2_12_9_10", AutoBuilder.buildAuto("Copy khghjof CA2_12_9_10"));
-
                 m_autoChooser.addDefaultOption("DEBUGGING-AUTO", AutoBuilder.buildAuto("DEBUGGING-AUTO"));
+
         }
 
         private void generateEventMap() {
-                NamedCommands.registerCommand("scoreL4",
-                                Commands.print("scoring L4")
-                                                .alongWith(SuperstructureFactory.scoreL4Coral())
-                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                .andThen(Commands.waitSeconds(1))
-                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                .finallyDo(() -> {
-                                                        SuperstructureFactory.stow().schedule();
-                                                }));
 
-                                                NamedCommands.registerCommand("scoreL2",
-                                                Commands.print("scoring L2")
-                                                                .alongWith(SuperstructureFactory.scoreL2Coral())
-                                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                                .andThen(Commands.waitSeconds(1))
-                                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                                .finallyDo(() -> {
-                                                                        SuperstructureFactory.stow().schedule();
-                                                                }));
-
+                //PREP COMMANDS
                 NamedCommands.registerCommand("prepL4",
                                 Commands.print("prep L4")
                                                 .alongWith(SuperstructureFactory.scoreL4Coral()));
 
+                NamedCommands.registerCommand("prepL3",
+                                Commands.print("prep L3")
+                                                .alongWith(SuperstructureFactory.scoreL3Coral()));
                 NamedCommands.registerCommand("prepL2",
                                 Commands.print("prep L2")
                                                 .alongWith(SuperstructureFactory.scoreL2Coral()));
 
+                NamedCommands.registerCommand("prepL1",
+                                Commands.print("prep L1")
+                                                .alongWith(SuperstructureFactory.scoreL1Coral()));
+                
+
                 NamedCommands.registerCommand("stow",
                                 Commands.print("stowing!")
                                                 .alongWith(SuperstructureFactory.stow()));
-
+/**
                 NamedCommands.registerCommand("shootCoral",
-                                Commands.print("shooting L4")
+                                Commands.print("shooting!!!!")
                                                 .alongWith(m_flywheels.scoreCoral().withTimeout(1))
                                                                 .finallyDo(() -> {
-                                                                SuperstructureFactory.stow().schedule();
-                                                                        }));
-
+                                                                SuperstructureFactory.stow();
+                                                                        })); */
+                //try this shoot (doesn't have finally do)
+                NamedCommands.registerCommand("shootCoral",
+                                Commands.print("shooooooting coral")
+                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))
+                                                .andThen(SuperstructureFactory.stow()));
                
-
+                //take off finally do
                 NamedCommands.registerCommand("intakeCoral",
                                 Commands.print("Intaking coral")
                                                 .alongWith(SuperstructureFactory.intakeCoral())
                                                 .withDeadline(m_flywheels.intakeCoral())
                                                 .finallyDo(() -> {
-                                                        SuperstructureFactory.stow().schedule();
+                                                        SuperstructureFactory.stow();
                                                 }));
-
-                        ////////////////                             
-                                                NamedCommands.registerCommand("scoreL3",
-                                                Commands.print("scoring L3")
-                                                                .alongWith(SuperstructureFactory.scoreL3Coral())
-                                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                                .andThen(Commands.waitSeconds(0.25))
-                                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                                .finallyDo(() -> {
-                                                                        SuperstructureFactory.stow().schedule();
-                                                                }));
-                
-                                NamedCommands.registerCommand("scoreL2",
-                                                Commands.print("scoring L2")
-                                                                .alongWith(SuperstructureFactory.scoreL2Coral())
-                                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                                .andThen(Commands.waitSeconds(0.25))
-                                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                                .finallyDo(() -> {
-                                                                        SuperstructureFactory.stow().schedule();
-                                                                }));
-                
-                                NamedCommands.registerCommand("scoreL1",
-                                                Commands.print("scoring L1")
-                                                                .alongWith(SuperstructureFactory.scoreL1Coral())
-                                                                .withDeadline(SuperstructureFactory.waitUntilAtSetpoint()
-                                                                                .andThen(Commands.waitSeconds(0.25))
-                                                                                .andThen(m_flywheels.scoreCoral().withTimeout(1.5)))
-                                                                .finallyDo(() -> {
-                                                                        SuperstructureFactory.stow().schedule();
-                                                                }));
-                                ////////////////   
         }
 
         // Creates controller rumble command
@@ -402,11 +364,9 @@ public class RobotContainer {
                 return Commands.startEnd(
                                 () -> {
                                         m_driver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-                                        m_operator.getHID().setRumble(RumbleType.kBothRumble, 1.0);
                                 },
                                 () -> {
                                         m_driver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-                                        m_operator.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                                 });
         }
 

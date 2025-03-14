@@ -79,8 +79,8 @@ public class TeleopDrive extends Command {
                                 headingSetpoint = Rotation2d.fromDegrees(54.0);
                                 headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
                         } else if (wantsSnap) {
-                                throttleFieldFrame *= 0.5; // slow down by 50% when snapping
-                                strafeFieldFrame *= 0.5;
+                                throttleFieldFrame *= 0.45; // slow down by 50% when snapping
+                                strafeFieldFrame *= 0.45;
 
                                 double currentHeadingDegrees = RobotStateEstimator.getInstance().getEstimatedPose()
                                                 .getRotation()
