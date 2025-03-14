@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CA5-C3"
+                  "pathName": "Mid-C1"
                 }
               },
               {
@@ -21,13 +21,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.2
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "prepL2"
+                        "name": "prepL4"
                       }
                     }
                   ]
@@ -37,27 +37,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "C3-S2"
+            "waitTime": 0.5
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "S2-C6"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C6-S2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "S2-C5"
+            "name": "shootCoral"
           }
         }
       ]
