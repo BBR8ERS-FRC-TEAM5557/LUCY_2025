@@ -39,10 +39,10 @@ public class Superstructure {
                         116.0);
         private static final LoggedTunableNumber l2_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L2PopAlgaeElevator",
-                        0.3);
+                        0.0);
         private static final LoggedTunableNumber l2_pop_algae_wrist = new LoggedTunableNumber(
                         "Superstructure/L2PopAlgaeWrist",
-                        113.0);
+                        165.0);
         private static final LoggedTunableNumber l3_prep_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L3PrepPopAlgaeElevator",
                         0.4);
@@ -51,10 +51,10 @@ public class Superstructure {
                         116.0);
         private static final LoggedTunableNumber l3_pop_algae_elevator = new LoggedTunableNumber(
                         "Superstructure/L3PopAlgaeElevator",
-                        0.5);
+                        0.45);
         private static final LoggedTunableNumber l3_pop_algae_wrist = new LoggedTunableNumber(
                         "Superstructure/L3PopAlgaeWrist",
-                        86.0);
+                        167.0);
 
         private static final LoggedTunableNumber l1_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L1CoralElevator",
@@ -67,7 +67,7 @@ public class Superstructure {
                         0.0);
         private static final LoggedTunableNumber l2_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L2CoralWrist",
-                        116.0);
+                        118.0);
 
         private static final LoggedTunableNumber l3_coral_elevator = new LoggedTunableNumber(
                         "Superstructure/L3CoralElevator",
@@ -80,7 +80,7 @@ public class Superstructure {
                         1.180);
         private static final LoggedTunableNumber l4_coral_wrist = new LoggedTunableNumber(
                         "Superstructure/L4CoralWrist",
-                        129.0);
+                        133.0);
 
         private static final LoggedTunableNumber prep_climb_wrist = new LoggedTunableNumber(
                         "Superstructure/PrepClimbWrist",

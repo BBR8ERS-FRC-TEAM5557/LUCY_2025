@@ -207,6 +207,8 @@ public class RobotContainer {
                                                 .ignoringDisable(true)
                                                 .withName("RobotGoLimp"));
 
+              //  m_driver.rightStick().onTrue.start(() -> m_elevator.resetPosition());
+
                 // ADJUST SCORING LEVEL
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1, 0.75));
@@ -347,7 +349,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("shootCoral",
                                 Commands.print("shooooooting coral")
                                                 .alongWith(m_flywheels.scoreCoral().withTimeout(1))
-                                                .andThen(SuperstructureFactory.stow()));
+                                                .andThen(SuperstructureFactory.stow().withTimeout(1.5)));
                
                 //take off finally do
                 NamedCommands.registerCommand("intakeCoral",
