@@ -154,4 +154,8 @@ public class Elevator extends SubsystemBase {
                                                         io.runPosition(SuperstructureState.STOW.getElevatorMeters());
                                                 });
         }
+
+        public void resetPosition(){
+                io.setPosition(0);
+        }
 }

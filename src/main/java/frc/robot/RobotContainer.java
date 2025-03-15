@@ -207,6 +207,8 @@ public class RobotContainer {
                                                 .ignoringDisable(true)
                                                 .withName("RobotGoLimp"));
 
+              //  m_driver.rightStick().onTrue.start(() -> m_elevator.resetPosition());
+
                 // ADJUST SCORING LEVEL
                 m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
                 m_driver.povDown().onTrue(SuperstructureFactory.adjustLevel(-1, 0.75));
