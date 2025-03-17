@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CA2-C12"
+                  "pathName": "CA5-C3"
                 }
               },
               {
@@ -21,13 +21,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.2
+                        "waitTime": 0.25
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "prepL4"
+                        "name": "prepL2"
                       }
                     }
                   ]
@@ -39,7 +39,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.3
+            "waitTime": 0.5
           }
         },
         {
@@ -55,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C12-S"
+                  "pathName": "C3-S2"
                 }
               },
               {
@@ -65,7 +65,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.2
+                        "waitTime": 0.25
                       }
                     },
                     {
@@ -87,7 +87,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "S-C9"
+                  "pathName": "S2-C6"
                 }
               },
               {
@@ -97,13 +97,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.2
+                        "waitTime": 0.25
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "prepL4"
+                        "name": "prepL2"
                       }
                     }
                   ]
@@ -115,7 +115,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.3
+            "waitTime": 0.5
           }
         },
         {
@@ -131,7 +131,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C9-S"
+                  "pathName": "C6-S2"
                 }
               },
               {
@@ -141,7 +141,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.2
+                        "waitTime": 0.25
                       }
                     },
                     {
@@ -163,7 +163,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "S-C10"
+                  "pathName": "S2-C5"
                 }
               },
               {
@@ -173,13 +173,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.2
+                        "waitTime": 0.25
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "prepL4"
+                        "name": "prepL2"
                       }
                     }
                   ]
@@ -191,7 +191,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.3
+            "waitTime": 0.5
           }
         },
         {

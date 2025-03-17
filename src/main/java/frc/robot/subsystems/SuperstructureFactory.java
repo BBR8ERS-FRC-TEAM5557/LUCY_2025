@@ -43,7 +43,7 @@ public class SuperstructureFactory {
         }
 
         public static Command waitUntilAtSetpoint() {
-                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint() && climb.atSetpoint());
+                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint());
         }
 
         public static Command scoreCoral() {

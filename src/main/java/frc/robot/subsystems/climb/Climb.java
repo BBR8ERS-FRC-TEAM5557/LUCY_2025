@@ -34,7 +34,7 @@ public class Climb extends SubsystemBase {
     private static final LoggedTunableNumber maxVelocityDegreesPerSec = new LoggedTunableNumber(
             "Climb/MaxVelocityDegreesPerSec", 720.0);
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
-            "Climb/MaxAccelerationDegreesPerSec2", 2000.0);
+            "Climb/MaxAccelerationDegreesPerSec2", 5000.0);
 
     private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Climb/HomingVolts", -1.0);
     private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Climb/HomingTimeSecs",
@@ -64,6 +64,7 @@ public class Climb extends SubsystemBase {
         super.setName("Climb");
         this.io = io;
         io.setPID(kP.get(), 0.0, kD.get());
+        //
         io.setSGVA(kS.get(), 0.0, kV.get(), kA.get());
         io.setKinematicConstraints(maxVelocityDegreesPerSec.get(), maxAccelerationDegreesPerSec2.get());
     }
@@ -97,6 +98,16 @@ public class Climb extends SubsystemBase {
         }, () -> {
         }).withName(getName() + " runPositionCommand");
     }
+
+    public Command runVoltageCommand(DoubleSupplier voltage) {
+        return runEnd(
+                        () -> {
+                                io.runVolts(voltage.getAsDouble());
+                        },
+                        () -> {
+                                io.runVolts(0.0);
+                        }).withName(getName() + " runVoltageCommand");
+}
 
     public Command waitUntilAtSetpointCommand() {
         return new WaitUntilCommand(() -> atSetpoint());

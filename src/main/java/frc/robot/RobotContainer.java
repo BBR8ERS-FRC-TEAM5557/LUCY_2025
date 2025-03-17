@@ -87,8 +87,8 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
 
-                m_elevator = new Elevator(
-                                new ElevatorIOTalonFX());
+               // m_elevator = new Elevator(
+               //                 new ElevatorIOTalonFX());
 
                 m_wrist = new Wrist(
                                 new WristIOTalonFX());
@@ -96,8 +96,8 @@ public class RobotContainer {
                 m_flywheels = new Flywheels(
                                 new FlywheelsIOTalonFX());
                 
-            //    m_climb = new Climb(
-              //                  new ClimbIOTalonFX());
+                m_climb = new Climb(
+                                new ClimbIOTalonFX());
 
             //    // m_vision = new Vision(
                 // new AprilTagVisionIOLimelight(instanceNames[0], robotToCameraPoses[0]),
@@ -233,8 +233,6 @@ public class RobotContainer {
                 m_driver.y().whileTrue( // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
                                 SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
-                m_driver.povUp().onTrue(SuperstructureFactory.adjustLevel(1, 0.75));
-
                 // POP ALGAE
                /** 
                 m_driver.x().and(m_driver.rightTrigger().negate())
@@ -254,12 +252,20 @@ public class RobotContainer {
                                 }));
 
                 
-                
+                /**
                 m_driver.povLeft()
                                 .onTrue(SuperstructureFactory.prepDeepClimb());
 
                 m_driver.povRight()
-                                .onTrue(SuperstructureFactory.deepClimb());
+                                .onTrue(SuperstructureFactory.deepClimb()); */
+
+                //m_driver.povLeft().whileTrue(teleop)
+
+                m_driver.povLeft().whileTrue(m_climb.runVoltageCommand(() -> -12.0));
+                m_driver.povRight().whileTrue(m_climb.runVoltageCommand(() -> 12.0));
+
+                //m_driver.povLeft().whileTrue(Commands.parallel(m_climb.runVoltageCommand(() -> -12.0), SuperstructureFactory.l2PopAlgae()));
+                //m_driver.povLeft().whileTrue(Commands.parallel(m_climb.runVoltageCommand(() -> -12.0), SuperstructureFactory.l2PopAlgae()));
 
                 /* ENDGAME ALERTS */
                 new Trigger(
@@ -304,15 +310,16 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
-                m_autoChooser.addDefaultOption("CA5_C3_C6-YES", AutoBuilder.buildAuto("CA5_C3_C6-YES"));
-                
-                m_autoChooser.addDefaultOption("CA2_C12_C9_C10-YES", AutoBuilder.buildAuto("CA2_C12_C9_C10-YES"));
+                m_autoChooser.addDefaultOption("L4 CA5_C3_C6-YES", AutoBuilder.buildAuto("L4 CA5_C3_C6-YES"));
 
-                m_autoChooser.addDefaultOption("Midline_C1", AutoBuilder.buildAuto("Midline_C1"));
+                m_autoChooser.addDefaultOption("L2 CA5_C3_C6-YES", AutoBuilder.buildAuto("L2 CA5_C3_C6-YES"));
+              
+                m_autoChooser.addDefaultOption("L4 CA2_C12_C9_C10-YES", AutoBuilder.buildAuto("L4 CA2_C12_C9_C10-YES"));
 
-                m_autoChooser.addDefaultOption("Copy of CA2_C12_9_10", AutoBuilder.buildAuto("Copy of CA2_C12_9_10"));
+                m_autoChooser.addDefaultOption("L4 Midline_C1", AutoBuilder.buildAuto("L4 Midline_C1"));
 
-                m_autoChooser.addDefaultOption("DEBUGGING-AUTO", AutoBuilder.buildAuto("DEBUGGING-AUTO"));
+                m_autoChooser.addDefaultOption("L2 CA2_C12_C8_C10", AutoBuilder.buildAuto("L2 CA2_C12_C8_C10"));
+
 
         }
 
