@@ -26,7 +26,6 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-        // public static final double drumPitchDiameter = Units.inchesToMeters(2.4);
         public static final double reduction = 5.0 / (.005 * 24.0);
 
         // Hardware
@@ -78,8 +77,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
                 config.Audio.BeepOnBoot = false;
-                config.Audio.AllowMusicDurDisable = false;
-                config.Audio.BeepOnConfig = false;
+                config.Audio.AllowMusicDurDisable = true;
+                config.Audio.BeepOnConfig = true;
 
                 config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));

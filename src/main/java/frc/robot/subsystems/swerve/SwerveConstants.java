@@ -141,7 +141,7 @@ public class SwerveConstants {
                         initialDriveConfigs.CurrentLimits.SupplyCurrentLimit = 80;
                         initialDriveConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
                         initialDriveConfigs.Audio.BeepOnBoot = false;
-                        initialDriveConfigs.Audio.BeepOnConfig = false;
+                        initialDriveConfigs.Audio.BeepOnConfig = true;
                         initialDriveConfigs.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
                         initialDriveConfigs.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                         initialDriveConfigs.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
@@ -149,7 +149,7 @@ public class SwerveConstants {
                 private static final TalonFXConfiguration initialSteerConfigs = new TalonFXConfiguration();
                 static {
                         initialSteerConfigs.Audio.BeepOnBoot = false;
-                        initialSteerConfigs.Audio.BeepOnConfig = false;
+                        initialSteerConfigs.Audio.BeepOnConfig = true;
                         initialSteerConfigs.CurrentLimits.StatorCurrentLimit = 50.0;
                         initialSteerConfigs.CurrentLimits.StatorCurrentLimitEnable = false;
                 }

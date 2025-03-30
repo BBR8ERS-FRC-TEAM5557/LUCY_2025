@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.subsystems.wrist;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Alert;
@@ -21,49 +21,49 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Wrist extends SubsystemBase {
+public class Intake extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Wrist/kP", 1);
-    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Wrist/kI", 0.0);
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 0.7);
+    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Intake/kI", 0.7);
+    
+    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0.0);
 
-    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Wrist/kD", 0.0);
-
-    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Wrist/kS", 0.2);
-    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Wrist/kG", 0.4);
-    private static final LoggedTunableNumber kV = new LoggedTunableNumber("Wrist/kV", 0.0);
-    private static final LoggedTunableNumber kA = new LoggedTunableNumber("Wrist/kA", 0.0);
+    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Intake/kS", 0.4);
+    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Intake/kG", 0.6);
+    private static final LoggedTunableNumber kV = new LoggedTunableNumber("Intake/kV", 0.0);
+    private static final LoggedTunableNumber kA = new LoggedTunableNumber("Intake/kA", 0.0);
 
     private static final LoggedTunableNumber maxVelocityDegreesPerSec = new LoggedTunableNumber(
-            "Wrist/MaxVelocityDegreesPerSec", 720.0);
+            "Intake/MaxVelocityDegreesPerSec", 720.0);
     private static final LoggedTunableNumber maxAccelerationDegreesPerSec2 = new LoggedTunableNumber(
-            "Wrist/MaxAccelerationDegreesPerSec2", 2000.0);
+            "Intake/MaxAccelerationDegreesPerSec2", 2000.0);
 
-    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Wrist/HomingVolts", -2.0);
-    private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Wrist/HomingTimeSecs",
+    private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Intake/HomingVolts", -2.0);
+    private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Intake/HomingTimeSecs",
             0.25);
     private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
-            "Wrist/HomingVelocityThresh", 0.1);
+            "Intake/HomingVelocityThresh", 0.1);
 
     private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-            "Wrist/setpointTolerance", 1.5);
+            "Intake/setpointTolerance", 1.5);
 
-    private final WristIO io;
-    private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+    private final IntakeIO io;
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-    private final Alert motorDisconnectedAlert = new Alert("Wrist motor disconnected!",
+    private final Alert motorDisconnectedAlert = new Alert("Intake motor disconnected!",
             Alert.AlertType.kWarning);
 
-    @AutoLogOutput(key = "Wrist/isBrakeMode")
+    @AutoLogOutput(key = "Intake/isBrakeMode")
     private boolean brakeModeEnabled = true;
     private boolean homed = false;
     private Debouncer homingDebouncer = new Debouncer(homingTimeSecs.get());
 
     private DoubleSupplier setpointDegrees = () -> 0.0;
 
-    public Wrist(WristIO io) {
-        System.out.println("[Init] Instantiating Wrist");
+    public Intake(IntakeIO io) {
+        System.out.println("[Init] Instantiating Intake");
 
-        super.setName("Wrist");
+        super.setName("Intake");
         this.io = io;
         io.setPID(kP.get(), kI.get(), kD.get());
         io.setSGVA(kS.get(), 0.0, kV.get(), kA.get());
@@ -78,7 +78,7 @@ public class Wrist extends SubsystemBase {
         motorDisconnectedAlert.set(!inputs.motorConnected);
 
         // Update tunable numbers
-        if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode()) || kI.hasChanged(hashCode()) ) {
+        if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
             io.setPID(kP.get(), kI.get(), kD.get());
         }
         if (kS.hasChanged(hashCode()) || kG.hasChanged(hashCode()) || kV.hasChanged(hashCode())
@@ -115,18 +115,18 @@ public class Wrist extends SubsystemBase {
         return inputs.positionDegrees;
     }
 
-    @AutoLogOutput(key = "Wrist/SetpointDegrees")
+    @AutoLogOutput(key = "Intake/SetpointDegrees")
     public double getSetpointDegrees() {
         return setpointDegrees.getAsDouble();
     }
 
-    @AutoLogOutput(key = "Wrist/atSetpoint")
+    @AutoLogOutput(key = "Intake/atSetpoint")
     public boolean atSetpoint() {
         return Util.epsilonEquals(getPositionDegrees(), getSetpointDegrees(),
                 setpointTolerance.get());
     }
 
-    @AutoLogOutput(key = "Wrist/homed")
+    @AutoLogOutput(key = "Intake/homed")
     public boolean isHomed() {
         return homed;
     }
@@ -149,8 +149,8 @@ public class Wrist extends SubsystemBase {
                 .until(() -> homed)
                 .andThen(
                         () -> {
-                            io.setPosition(SuperstructureState.HOME.getWristDegrees());
-                            runPositionCommand(() -> SuperstructureState.STOW.getWristDegrees()).schedule();
+                            io.setPosition(SuperstructureState.HOME.getIntakeDegrees());
+                            runPositionCommand(() -> SuperstructureState.STOW.getIntakeDegrees()).schedule();
                         });
     }
 }

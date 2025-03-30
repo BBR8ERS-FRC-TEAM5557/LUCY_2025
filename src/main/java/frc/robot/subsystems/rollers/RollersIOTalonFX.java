@@ -1,4 +1,4 @@
-package frc.robot.subsystems.flywheels;
+package frc.robot.subsystems.rollers;
 
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
@@ -7,6 +7,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -14,9 +15,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 
-public class FlywheelsIOTalonFX implements FlywheelsIO {
+public class RollersIOTalonFX implements RollersIO {
     // Hardware
     private final TalonFX talon;
+    private final TalonFX followerTalon;
 
     // Config
     private final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -29,14 +31,22 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     private final StatusSignal<Current> supplyCurrent;
     private final StatusSignal<Temperature> temp;
 
+    private final StatusSignal<Voltage> followerAppliedVolts;
+    private final StatusSignal<Current> followerTorqueCurrent;
+    private final StatusSignal<Current> followerSupplyCurrent;
+    private final StatusSignal<Temperature> followerTemp;
+
     // Open loop requests
     private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0.0);
     private final VoltageOut voltageRequest = new VoltageOut(0.0);
 
     private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-    public FlywheelsIOTalonFX() {
-        talon = new TalonFX(30);
+    public RollersIOTalonFX() {
+        talon = new TalonFX(40);
+        followerTalon = new TalonFX(41);
+
+        followerTalon.setControl(new Follower(talon.getDeviceID(), false));
 
         // Configure motor
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -51,7 +61,7 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         config.Audio.BeepOnConfig = true;
         
 
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
 
         position = talon.getPosition();
@@ -61,6 +71,11 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         supplyCurrent = talon.getSupplyCurrent();
         temp = talon.getDeviceTemp();
 
+        followerAppliedVolts = followerTalon.getMotorVoltage();
+        followerTorqueCurrent = followerTalon.getTorqueCurrent();
+        followerSupplyCurrent = followerTalon.getSupplyCurrent();
+        followerTemp = followerTalon.getDeviceTemp();
+
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50.0, velocity, position,
                 appliedVolts, torqueCurrent, supplyCurrent, temp);
@@ -68,18 +83,26 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     }
 
     // @Override
-    public void updateInputs(FlywheelsIOInputs inputs) {
+    public void updateInputs(RollersIOInputs inputs) {
         boolean connected = BaseStatusSignal.refreshAll(
                 velocity, position,
                 appliedVolts, torqueCurrent, supplyCurrent, temp)
                 .isOK();
+        boolean followerConnected = BaseStatusSignal.refreshAll(
+                followerAppliedVolts, followerTorqueCurrent, followerSupplyCurrent, followerTemp)
+                .isOK();
 
         inputs.motorConnected = connectedDebouncer.calculate(connected);
+        inputs.followerConnected = connectedDebouncer.calculate(followerConnected);
         inputs.velocityRPM = velocity.getValueAsDouble();
-        inputs.appliedVolts = new double[] { appliedVolts.getValueAsDouble() };
-        inputs.torqueCurrentAmps = new double[] { torqueCurrent.getValueAsDouble() };
-        inputs.supplyCurrentAmps = new double[] { supplyCurrent.getValueAsDouble() };
-        inputs.tempCelsius = new double[] { temp.getValueAsDouble() };
+        inputs.appliedVolts = new double[] { appliedVolts.getValueAsDouble(),
+            followerAppliedVolts.getValueAsDouble() };
+        inputs.torqueCurrentAmps = new double[] { torqueCurrent.getValueAsDouble(),
+            followerTorqueCurrent.getValueAsDouble() };
+        inputs.supplyCurrentAmps = new double[] { supplyCurrent.getValueAsDouble(),
+            followerSupplyCurrent.getValueAsDouble() };
+        inputs.tempCelsius = new double[] { temp.getValueAsDouble(), 
+            followerTemp.getValueAsDouble() };
     }
 
     @Override

@@ -60,7 +60,7 @@ public class WristIOTalonFX implements WristIO {
                 config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
                 config.Audio.BeepOnBoot = false;
-                config.Audio.BeepOnConfig = false;
+                config.Audio.BeepOnConfig = true;
 
                 config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));

@@ -48,7 +48,7 @@ public class Robot extends LoggedRobot {
 
         @Override
         public void robotInit() {
-                Logger.recordMetadata("ProjectName", "TBD-C2025"); // Set a metadata value
+                Logger.recordMetadata("ProjectName", "LUCY-2025"); // Set a metadata value
 
                 if (Constants.kIsReal) {
                         Logger.addDataReceiver(new WPILOGWriter()); // gotta plug a usb stick into rio 2 to have logging
@@ -196,11 +196,12 @@ public class Robot extends LoggedRobot {
                         RobotContainer.m_elevator.homingSequence().schedule();
                 }
                 if (!RobotContainer.m_wrist.isHomed()) {
-                        // RobotContainer.m_wrist.homingSequence().schedule();
+                        RobotContainer.m_wrist.homingSequence().schedule();
                 }
                 if (!RobotContainer.m_climb.isHomed()) {
                         RobotContainer.m_climb.homingSequence().schedule();
                 }
+                
         }
 
         @Override

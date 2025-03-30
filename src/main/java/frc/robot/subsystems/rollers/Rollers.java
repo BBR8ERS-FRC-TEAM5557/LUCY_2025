@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.subsystems.flywheels;
+package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Alert;
@@ -17,40 +17,40 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Flywheels extends SubsystemBase {
+public class Rollers extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleVolts", 1.0);
+    private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Roller/IdleVolts", 0.0);
 
-    private static final LoggedTunableNumber mIntakingCoralRpm = new LoggedTunableNumber("Flywheels/IntakingCoralVolts",
-            12.0);
-    private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Flywheels/HoldingCoralVolts",
+    private static final LoggedTunableNumber mIntakingCoralRpm = new LoggedTunableNumber("Rollers/IntakingCoralVolts",
+            5.0);
+    private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Rollers/HoldingCoralVolts",
             1.0);
-    private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
-            -12.0);
+    private static final LoggedTunableNumber mHandoffCoralRpm = new LoggedTunableNumber("Rollers/EjectingCoralVolts",
+            -5.0);
 
     private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
-            "Flywheels/StallVelocityThresholdRPM",
+            "Rollers/StallVelocityThresholdRPM",
             50);
     private static final LoggedTunableNumber mStallCurrentThreshold = new LoggedTunableNumber(
-            "Flywheels/StallCurrentThresholdAmps",
+            "Rollers/StallCurrentThresholdAmps",
             30.0);
     private static final LoggedTunableNumber mStallTime = new LoggedTunableNumber(
-            "Flywheels/StallTimeSecs",
+            "Rollers/StallTimeSecs",
             0.25);
 
-    private final FlywheelsIO io;
-    private final FlywheelsIOInputsAutoLogged inputs = new FlywheelsIOInputsAutoLogged();
+    private final RollersIO io;
+    private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
 
     private State mState = State.IDLE;
     private Debouncer stallDebouncer = new Debouncer(mStallTime.get());
 
-    @AutoLogOutput(key = "Flywheels/stalled")
+    @AutoLogOutput(key = "Rollers/stalled")
     private boolean stalled = false;
 
-    @AutoLogOutput(key = "Flywheels/isBrakeMode")
+    @AutoLogOutput(key = "Rollers/isBrakeMode")
     private boolean brakeModeEnabled = true;
 
-    private final Alert motorDisconnectedAlert = new Alert("Flywheels motor disconnected!",
+    private final Alert motorDisconnectedAlert = new Alert("Rollers motor disconnected!",
             Alert.AlertType.kWarning);
 
     public enum State {
@@ -59,11 +59,16 @@ public class Flywheels extends SubsystemBase {
 
         INTAKE_CORAL(mIntakingCoralRpm),
         HOLD_CORAL(mHoldingCoralRpm),
-        SCORE_CORAL(mScoringCoralRpm);
+        HANDOFF_CORAL(mHandoffCoralRpm);
 
         private State(DoubleSupplier voltageSupplier) {
             volts = voltageSupplier;
         }
+
+        /**
+        private State(DoubleSupplier intakeVoltageSupplier, DoubleSupplier flywheelDoubleSupplier) {
+
+        } */
 
         private final DoubleSupplier volts;
 
@@ -72,10 +77,10 @@ public class Flywheels extends SubsystemBase {
         }
     }
 
-    public Flywheels(FlywheelsIO io) {
-        System.out.println("[Init] Instantiating Flywheels");
+    public Rollers(RollersIO io) {
+        System.out.println("[Init] Instantiating Rollers");
 
-        super.setName("Flywheels");
+        super.setName("Rollers");
         this.io = io;
     }
 
@@ -88,8 +93,8 @@ public class Flywheels extends SubsystemBase {
 
         io.runVolts(mState.getVolts());
 
-        Logger.recordOutput("Flywheels/State", mState);
-        Logger.recordOutput("Flywheels/SetpointVolts", mState.getVolts());
+        Logger.recordOutput("Rollers/State", mState);
+        Logger.recordOutput("Rollers/SetpointVolts", mState.getVolts());
     }
 
     private void setState(State state) {
@@ -103,7 +108,7 @@ public class Flywheels extends SubsystemBase {
         io.setBrakeMode(brakeModeEnabled);
     }
 
-    public Command handoffCoral() {
+    public Command intakeCoral() {
         return startRun(
                 () -> {
                     setState(State.INTAKE_CORAL);
@@ -123,17 +128,22 @@ public class Flywheels extends SubsystemBase {
                         setState(State.IDLE);
                     }
                 })
-                .withName("FlywheelsIntakeCoral");
+                .withName("RollersIntakeCoral");
     }
 
     public Command intakeCoralManual() {
         return startEnd(() -> setState(State.INTAKE_CORAL), () -> setState(State.IDLE))
-                .withName("FlywheelsIntakeCoralManually");
+                .withName("RollersIntakeCoralManually");
     }
 
     public Command scoreCoral() {
-        return startEnd(() -> setState(State.SCORE_CORAL), () -> setState(State.IDLE))
-                .withName("FlywheelsScoreCoral");
+        return startEnd(() -> setState(State.HANDOFF_CORAL), () -> setState(State.IDLE))
+                .withName("RollersScoreCoral");
+    }
+
+    public Command handoffCoral() {
+        return startEnd(() -> setState(State.HANDOFF_CORAL), () -> setState(State.IDLE))
+                .withName("RollersHandoffCoral");
     }
 
     public Command stop() {

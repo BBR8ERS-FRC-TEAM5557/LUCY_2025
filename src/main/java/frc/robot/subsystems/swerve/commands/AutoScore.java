@@ -79,7 +79,7 @@ public class AutoScore {
                                 },
                                 () -> 0.0,
                                 shouldEnd);
-
+                
                 return Commands.runOnce(
                                 () -> {
                                         // Start LEDs

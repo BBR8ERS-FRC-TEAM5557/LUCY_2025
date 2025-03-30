@@ -1,4 +1,4 @@
-package frc.robot.subsystems.climb;
+package frc.robot.subsystems.intake;
 
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
@@ -6,7 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -16,8 +16,12 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
+import frc.robot.subsystems.intake.IntakeIO.IntakeIOInputs;
 
-public class ClimbIOTalonFX implements ClimbIO {
+public class IntakeIOTalonFX implements IntakeIO {
+        public static final double reduction =  0.0457; //(70.0 / 14.0) * (44.0 / 16.0) / 360.0; 
+        
+
         // Hardware
         private final TalonFX talon;
 
@@ -37,18 +41,19 @@ public class ClimbIOTalonFX implements ClimbIO {
         private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0.0);
         private final VoltageOut voltageRequest = new VoltageOut(0.0);
         // Closed loop requests
-        private final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
+        private final MotionMagicVoltage motionMagicVoltageRequest = new MotionMagicVoltage(0.0);
 
         private final Debouncer connectedDebouncer = new Debouncer(0.5);
 
-        public ClimbIOTalonFX() {
-                talon = new TalonFX(34);
+        public IntakeIOTalonFX() {
+                talon = new TalonFX(43);
 
                 // Configure motor
                 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
                 config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
-                config.Voltage.PeakForwardVoltage = 12.0;
-                config.Voltage.PeakReverseVoltage = -12.0;
+                config.Feedback.SensorToMechanismRatio = reduction;
+                config.Voltage.PeakForwardVoltage = 10.0;
+                config.Voltage.PeakReverseVoltage = -10.0;
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 50.0;
                 config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 50.0;
@@ -61,7 +66,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
                 config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
-                tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getClimbDegrees(), 0.25));
+                tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getIntakeDegrees(), 0.25));
 
                 position = talon.getPosition();
                 velocity = talon.getVelocity();
@@ -78,7 +83,7 @@ public class ClimbIOTalonFX implements ClimbIO {
         }
 
         @Override
-        public void updateInputs(ClimbIOInputs inputs) {
+        public void updateInputs(IntakeIOInputs inputs) {
                 boolean connected = BaseStatusSignal.refreshAll(
                                 position, velocity,
                                 positionError, appliedVolts, torqueCurrent, supplyCurrent, temp)
@@ -111,7 +116,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
         @Override
         public void runPosition(double positionDegrees, double feedforward) {
-                talon.setControl(positionVoltageRequest.withPosition(positionDegrees).withFeedForward(feedforward));
+                talon.setControl(motionMagicVoltageRequest.withPosition(positionDegrees).withFeedForward(feedforward));
         }
 
         @Override

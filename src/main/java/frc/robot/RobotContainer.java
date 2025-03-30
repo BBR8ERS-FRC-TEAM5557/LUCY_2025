@@ -27,6 +27,7 @@ import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.flywheels.Flywheels;
 import frc.robot.subsystems.flywheels.FlywheelsIO;
 import frc.robot.subsystems.flywheels.FlywheelsIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOTalonFX;
@@ -36,6 +37,12 @@ import frc.robot.subsystems.swerve.commands.TeleopDrive;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristIO;
 import frc.robot.subsystems.wrist.WristIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.subsystems.rollers.RollersIOTalonFX;
 import frc.robot.state.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -52,6 +59,8 @@ public class RobotContainer {
         public static Wrist m_wrist;
         public static Flywheels m_flywheels;
         public static Climb m_climb;
+        public static Intake m_intake;
+        public static Rollers m_rollers;
 
         // create variables for virtual subsystems
         public static Vision m_vision;
@@ -78,18 +87,26 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.FrontRight,
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
-
+/**
                 m_elevator = new Elevator(
-                                new ElevatorIOTalonFX());
+                                new ElevatorIOTalonFX()); */
 
-                m_wrist = new Wrist(
+                /**m_wrist = new Wrist(
                                 new WristIOTalonFX());
 
                 m_flywheels = new Flywheels(
-                                new FlywheelsIOTalonFX());
+                                new FlywheelsIOTalonFX());  */
+                
+                                
+                m_rollers = new Rollers(
+                                new RollersIOTalonFX());                
+                
+                m_intake = new Intake(
+                                new IntakeIOTalonFX()); 
 
+                                /**
                 m_climb = new Climb(
-                                new ClimbIOTalonFX());
+                                new ClimbIOTalonFX()); */
 
                 // Instantiate missing subsystems
                 if (m_elevator == null) {
@@ -107,8 +124,18 @@ public class RobotContainer {
                         });
                 }
 
+                if (m_rollers == null) {
+                        m_rollers = new Rollers(new RollersIO() {
+                        });
+                }
+
                 if (m_climb == null) {
                         m_climb = new Climb(new ClimbIO() {
+                        });
+                }
+
+                if (m_intake == null) {
+                        m_intake = new Intake(new IntakeIO() {
                         });
                 }
 
@@ -167,7 +194,8 @@ public class RobotContainer {
                 m_driver.back().whileTrue(Commands
                                 .parallel(
                                                 m_elevator.homingSequence(),
-                                                m_wrist.homingSequence(),
+                                                m_wrist.homingSequence(), //TODO: DELETE??
+                                                //m_intake.homingSequence(),
                                                 m_climb.homingSequence())
                                 .withName("HomeSuperstructure"));
 
@@ -179,7 +207,9 @@ public class RobotContainer {
                                                         m_elevator.setBrakeMode(false);
                                                         m_wrist.setBrakeMode(false);
                                                         m_flywheels.setBrakeMode(false);
+                                                        m_intake.setBrakeMode(false);
                                                         m_climb.setBrakeMode(false);
+                                                        m_rollers.setBrakeMode(false);
                                                 },
                                                 () -> {
                                                         m_swerve.setBrakeMode(true);
@@ -187,8 +217,9 @@ public class RobotContainer {
                                                         m_wrist.setBrakeMode(true);
                                                         m_flywheels.setBrakeMode(true);
                                                         m_climb.setBrakeMode(true);
+                                                        m_rollers.setBrakeMode(true);
                                                 },
-                                                m_swerve, m_elevator, m_wrist, m_flywheels, m_climb)
+                                                m_swerve, m_elevator, m_wrist, m_flywheels, m_intake, m_climb, m_rollers)
                                                 .unless(() -> DriverStation.isEnabled())
                                                 .ignoringDisable(true)
                                                 .withName("RobotGoLimp"));
@@ -207,16 +238,44 @@ public class RobotContainer {
                 // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
+                /** 
                 // INTAKE
                 Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
                 intakeTrigger.whileTrue(
                                 SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
-                                                }));
+                                                })); */
 
-                // for testing when you don't want swerve snap to rotation (HAS AUTO RETRACT)
-                m_driver.y().whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
+                // INTAKE       
+                /**m_driver.leftBumper().or(m_driver.rightBumper())
+                        .whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_rollers.intakeCoral())
+                                .finallyDo(() -> SuperstructureFactory.handoffCoral()
+                                        .andThen(Commands.parallel(
+                                            m_flywheels.handoffCoral(),
+                                            m_rollers.intakeCoral()    
+                                        )))
+                        
+                        ); //TODO IF NOT TRY THE MANUAL intake coral */
+
+                m_driver.leftBumper().or(m_driver.rightBumper())
+                        .whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_rollers.intakeCoral() //)
+                                //.finallyDo(() -> SuperstructureFactory.stow().schedule()
+                                       
+                                /**() -> SuperstructureFactory.handoffCoral()
+                                        .andThen(Commands.parallel(
+                                            m_flywheels.handoffCoral(),
+                                            m_rollers.intakeCoral()  ))  */
+                                        )
+                        
+                        ); //TODO IF NOT TRY THE MANUAL intake coral
+
+                m_driver.leftBumper().or(m_driver.rightBumper())
+                .onFalse(SuperstructureFactory.handoffCoral()
+                        .andThen(Commands.parallel(
+                                m_flywheels.handoffCoral(),
+                                m_rollers.intakeCoral()      
+                        )));
 
                 // POP ALGAE
                 m_driver.x().whileTrue(SuperstructureFactory.executePopAlgae()
@@ -335,7 +394,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("intakeCoral",
                                 Commands.print("Intaking coral")
                                                 .alongWith(SuperstructureFactory.intakeCoral())
-                                                .withDeadline(m_flywheels.intakeCoral())
+                                                .withDeadline(m_flywheels.handoffCoral())
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
                                                 }));
