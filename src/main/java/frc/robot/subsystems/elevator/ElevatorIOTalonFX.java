@@ -58,8 +58,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
         public ElevatorIOTalonFX() {
 
-                talon = new TalonFX(31, "canivore");
-                followerTalon = new TalonFX(32, "canivore");
+                talon = new TalonFX(31);
+                followerTalon = new TalonFX(32);
 
                 followerTalon.setControl(new Follower(talon.getDeviceID(), true));
 
@@ -68,9 +68,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
                 config.Feedback.SensorToMechanismRatio = reduction;
                 config.Voltage.PeakForwardVoltage = 12.0;
-                config.Voltage.PeakReverseVoltage = -12.0;
+                config.Voltage.PeakReverseVoltage = -5.0;
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;
-                config.TorqueCurrent.PeakReverseTorqueCurrent = -70.0;
+                config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 70.0;
                 config.CurrentLimits.StatorCurrentLimitEnable = true;
                 config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
@@ -80,7 +80,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.Audio.AllowMusicDurDisable = true;
                 config.Audio.BeepOnConfig = true;
 
-                config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+                config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
                 tryUntilOk(5, () -> talon.setPosition(SuperstructureState.HOME.getElevatorMeters(), 0.25));
 

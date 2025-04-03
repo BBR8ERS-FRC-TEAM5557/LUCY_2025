@@ -77,10 +77,15 @@ public class TeleopDrive extends Command {
                         strafeFieldFrame *= 0.5;
                 }
 
-                if (wantsSnap) {
+                if (wantsLeftIntake || wantsRightIntake || wantsSnap) {
                         Rotation2d headingSetpoint = Rotation2d.kZero;
-                        
-                        if (wantsSnap) {
+                        if (wantsLeftIntake) {
+                                headingSetpoint = Rotation2d.fromDegrees(126.0);
+                                headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
+                        } else if (wantsRightIntake) {
+                                headingSetpoint = Rotation2d.fromDegrees(-126.0);
+                                headingSetpoint = AllianceFlipUtil.apply(headingSetpoint);
+                        } else if (wantsSnap) {
                                 double currentHeadingDegrees = RobotStateEstimator.getInstance().getEstimatedPose()
                                                 .getRotation()
                                                 .getDegrees();

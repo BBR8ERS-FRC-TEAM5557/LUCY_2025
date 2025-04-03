@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -47,6 +48,10 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         public IntakeIOTalonFX() {
                 talon = new TalonFX(43);
+                
+                //Orchestra orchestra = new Orchestra();
+                //orchestra.addInstrument(talon);
+                
 
                 // Configure motor
                 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -63,6 +68,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
                 config.Audio.BeepOnBoot = false;
                 config.Audio.BeepOnConfig = true;
+                config.Audio.withAllowMusicDurDisable(true);
+                
+                //orchestra.loadMusic("spin up.chrp");
 
                 config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
                 tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));

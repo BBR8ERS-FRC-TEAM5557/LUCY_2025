@@ -51,7 +51,7 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
         config.Audio.BeepOnConfig = true;
         
 
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
 
         position = talon.getPosition();

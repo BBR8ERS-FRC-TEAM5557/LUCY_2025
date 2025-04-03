@@ -48,7 +48,7 @@ public class Constants {
                 public static final double kKrakenFreeSpeed = 6000;
                 public static final double kKrakenFreeSpeedFOC = 5800;
 
-                public static final double kMass = Units.lbsToKilograms(101.0);
+                public static final double kMass = Units.lbsToKilograms(107.0);
                 public static final double kMOI = (kMass / 12.0) * Math.hypot(kChassisLength, kChassisWidth); // estimate
                                                                                                               // using
                                                                                                               // formula

@@ -11,16 +11,12 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.util.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SuperstructureFactory {
         private static final Elevator elevator = RobotContainer.m_elevator;
-        private static final Wrist wrist = RobotContainer.m_wrist;
         private static final Climb climb = RobotContainer.m_climb;
-        private static final Intake intake = RobotContainer.m_intake;
 
         private static Command pendingRumbleCommand = null;
         private static int level = 4;
@@ -35,14 +31,12 @@ public class SuperstructureFactory {
                                 Commands.runOnce(() -> {
                                         currState = state;
                                 }),
-                                elevator.runPositionCommand(state.get().getElevatorMetersSupplier()). //TODO: ANDTHEN MAY SCREW THINGS UP. CONSIDER ADDING A WAIT OR WAITUNTILATSETPOINT
-                                        andThen(wrist.runPositionCommand(state.get().getWristDegreesSupplier())),
-                                climb.runPositionCommand(state.get().getClimbDegreesSupplier()),
-                                intake.runPositionCommand(state.get().getIntakeDegreesSupplier()));
+                                elevator.runPositionCommand(state.get().getElevatorMetersSupplier()),
+                                climb.runPositionCommand(state.get().getClimbDegreesSupplier()));
         }
 
         public static Command waitUntilAtSetpoint() {
-                return Commands.waitUntil(() -> elevator.atSetpoint() && wrist.atSetpoint() && intake.atSetpoint());
+                return Commands.waitUntil(() -> elevator.atSetpoint());
         }
 
         public static Command scoreCoral() {

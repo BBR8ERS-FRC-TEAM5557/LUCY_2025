@@ -23,13 +23,13 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
     // Tunable numbers
-    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 0.7);
-    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Intake/kI", 0.7);
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 0.2);
+    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Intake/kI", 0.002);
     
-    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0.0);
+    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0.00002);
 
-    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Intake/kS", 0.4);
-    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Intake/kG", 0.6);
+    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Intake/kS", 0.01);
+    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Intake/kG", -.45);
     private static final LoggedTunableNumber kV = new LoggedTunableNumber("Intake/kV", 0.0);
     private static final LoggedTunableNumber kA = new LoggedTunableNumber("Intake/kA", 0.0);
 

@@ -34,9 +34,6 @@ import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
-import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristIO;
-import frc.robot.subsystems.wrist.WristIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -46,6 +43,8 @@ import frc.robot.subsystems.rollers.RollersIOTalonFX;
 import frc.robot.state.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -56,16 +55,15 @@ public class RobotContainer {
         // create variables for physical subsystems
         public static Swerve m_swerve;
         public static Elevator m_elevator;
-        public static Wrist m_wrist;
         public static Flywheels m_flywheels;
         public static Climb m_climb;
-        public static Intake m_intake;
-        public static Rollers m_rollers;
+        public static Orchestra m_orchestra;
 
         // create variables for virtual subsystems
         public static Vision m_vision;
         public static RobotStateEstimator m_stateEstimator;
         public static Leds m_leds;
+        
 
         // instantiate dashboard choosers / switches
         public static LoggedDashboardChooser<Command> m_autoChooser;
@@ -87,22 +85,16 @@ public class RobotContainer {
                                 SwerveConstants.TunerConstants.FrontRight,
                                 SwerveConstants.TunerConstants.BackLeft,
                                 SwerveConstants.TunerConstants.BackRight);
-/**
-                m_elevator = new Elevator(
-                                new ElevatorIOTalonFX()); */
 
-                /**m_wrist = new Wrist(
-                                new WristIOTalonFX());
+                
+                m_elevator = new Elevator(
+                                new ElevatorIOTalonFX());  
+
 
                 m_flywheels = new Flywheels(
-                                new FlywheelsIOTalonFX());  */
+                                new FlywheelsIOTalonFX());   
                 
-                                
-                m_rollers = new Rollers(
-                                new RollersIOTalonFX());                
-                
-                m_intake = new Intake(
-                                new IntakeIOTalonFX()); 
+              
 
                                 /**
                 m_climb = new Climb(
@@ -114,30 +106,20 @@ public class RobotContainer {
                         });
                 }
 
-                if (m_wrist == null) {
-                        m_wrist = new Wrist(new WristIO() {
-                        });
-                }
+                
 
                 if (m_flywheels == null) {
                         m_flywheels = new Flywheels(new FlywheelsIO() {
                         });
                 }
 
-                if (m_rollers == null) {
-                        m_rollers = new Rollers(new RollersIO() {
-                        });
-                }
 
                 if (m_climb == null) {
                         m_climb = new Climb(new ClimbIO() {
                         });
                 }
 
-                if (m_intake == null) {
-                        m_intake = new Intake(new IntakeIO() {
-                        });
-                }
+               
 
                 if (m_vision == null) {
                         m_vision = new Vision(
@@ -152,7 +134,7 @@ public class RobotContainer {
                 m_autoChooser = new LoggedDashboardChooser<Command>("Driver/AutonomousChooser");
 
                 // Alerts for constants
-                tuningMode.set(false);
+                tuningMode.set(true);
                 if (Constants.kTuningMode) {
                         SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
                         tuningMode.set(true);
@@ -180,6 +162,8 @@ public class RobotContainer {
                                 this::getSlowDownInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
+               // m_orchestra.addInstrument(m_intake);
+
                 /* UTIL */
                 // ZERO SWERVE
                 m_driver.start().onTrue(Commands.runOnce(
@@ -191,13 +175,12 @@ public class RobotContainer {
                                 .withName("ResetHeading"));
 
                 // HOME SUPERSTRUCTURE
+
+                /**
                 m_driver.back().whileTrue(Commands
                                 .parallel(
-                                                m_elevator.homingSequence(),
-                                                m_wrist.homingSequence(), //TODO: DELETE??
-                                                //m_intake.homingSequence(),
-                                                m_climb.homingSequence())
-                                .withName("HomeSuperstructure"));
+                                                m_elevator.homingSequence())
+                                .withName("HomeSuperstructure")); */
 
                 // COAST MODE
                 m_driver.back().whileTrue(
@@ -205,21 +188,16 @@ public class RobotContainer {
                                                 () -> {
                                                         m_swerve.setBrakeMode(false);
                                                         m_elevator.setBrakeMode(false);
-                                                        m_wrist.setBrakeMode(false);
                                                         m_flywheels.setBrakeMode(false);
-                                                        m_intake.setBrakeMode(false);
                                                         m_climb.setBrakeMode(false);
-                                                        m_rollers.setBrakeMode(false);
                                                 },
                                                 () -> {
                                                         m_swerve.setBrakeMode(true);
                                                         m_elevator.setBrakeMode(true);
-                                                        m_wrist.setBrakeMode(true);
                                                         m_flywheels.setBrakeMode(true);
                                                         m_climb.setBrakeMode(true);
-                                                        m_rollers.setBrakeMode(true);
                                                 },
-                                                m_swerve, m_elevator, m_wrist, m_flywheels, m_intake, m_climb, m_rollers)
+                                                m_swerve, m_elevator, m_flywheels, m_climb)
                                                 .unless(() -> DriverStation.isEnabled())
                                                 .ignoringDisable(true)
                                                 .withName("RobotGoLimp"));
@@ -235,47 +213,20 @@ public class RobotContainer {
                         SuperstructureFactory.stow().schedule();
                 }));
 
+        
+                m_driver.b().onTrue(m_elevator.zeroPosition());
+
                 // FLYWHEELS SCORE
                 m_driver.rightTrigger().whileTrue(m_flywheels.scoreCoral());
 
-                /** 
+                 
                 // INTAKE
                 Trigger intakeTrigger = m_driver.leftBumper().or(m_driver.rightBumper());
                 intakeTrigger.whileTrue(
-                                SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoralManual())
+                                SuperstructureFactory.intakeCoral().withDeadline(m_flywheels.intakeCoral())
                                                 .finallyDo(() -> {
                                                         SuperstructureFactory.stow().schedule();
-                                                })); */
-
-                // INTAKE       
-                /**m_driver.leftBumper().or(m_driver.rightBumper())
-                        .whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_rollers.intakeCoral())
-                                .finallyDo(() -> SuperstructureFactory.handoffCoral()
-                                        .andThen(Commands.parallel(
-                                            m_flywheels.handoffCoral(),
-                                            m_rollers.intakeCoral()    
-                                        )))
-                        
-                        ); //TODO IF NOT TRY THE MANUAL intake coral */
-
-                m_driver.leftBumper().or(m_driver.rightBumper())
-                        .whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_rollers.intakeCoral() //)
-                                //.finallyDo(() -> SuperstructureFactory.stow().schedule()
-                                       
-                                /**() -> SuperstructureFactory.handoffCoral()
-                                        .andThen(Commands.parallel(
-                                            m_flywheels.handoffCoral(),
-                                            m_rollers.intakeCoral()  ))  */
-                                        )
-                        
-                        ); //TODO IF NOT TRY THE MANUAL intake coral
-
-                m_driver.leftBumper().or(m_driver.rightBumper())
-                .onFalse(SuperstructureFactory.handoffCoral()
-                        .andThen(Commands.parallel(
-                                m_flywheels.handoffCoral(),
-                                m_rollers.intakeCoral()      
-                        )));
+                                                })); 
 
                 // POP ALGAE
                 m_driver.x().whileTrue(SuperstructureFactory.executePopAlgae()
@@ -283,8 +234,10 @@ public class RobotContainer {
                                         SuperstructureFactory.stow().schedule();
                                 }));
 
+                m_driver.y().whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
+
                 // CLIMB
-                m_driver.b().onTrue(SuperstructureFactory.toggleClimb());
+               // m_driver.b().onTrue(SuperstructureFactory.toggleClimb());
                 m_driver.povLeft().whileTrue(m_climb.runVoltageCommand(() -> -12.0));
                 m_driver.povRight().whileTrue(m_climb.runVoltageCommand(() -> 12.0));
 
@@ -330,11 +283,13 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
-                m_autoChooser.addDefaultOption("CA5-C3-C6-TRY THIS ONE!!", AutoBuilder.buildAuto("CA5-C3-C6"));
+                m_autoChooser.addDefaultOption("CA5-C3-C6-TRY THIS ONE!!", AutoBuilder.buildAuto("CA5-C3-C6-C5"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
 
                 m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
+
+                m_autoChooser.addDefaultOption("CA2-C12-C9-C10", AutoBuilder.buildAuto("CA2-C12-C9-C10"));
         }
 
         private void generateEventMap() {
@@ -354,12 +309,7 @@ public class RobotContainer {
                                 Commands.print("prep L4")
                                                 .alongWith(SuperstructureFactory.scoreL4Coral()));
 
-                NamedCommands.registerCommand("shootCoral",
-                                Commands.print("scoring L4")
-                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))
-                                                .finallyDo(() -> {
-                                                        SuperstructureFactory.stow().schedule();
-                                                }));
+             
 
                 NamedCommands.registerCommand("scoreL3",
                                 Commands.print("scoring L3")
@@ -394,11 +344,17 @@ public class RobotContainer {
                 NamedCommands.registerCommand("intakeCoral",
                                 Commands.print("Intaking coral")
                                                 .alongWith(SuperstructureFactory.intakeCoral())
-                                                .withDeadline(m_flywheels.handoffCoral())
+                                                .withDeadline(m_flywheels.intakeCoral())
                                                 .finallyDo(() -> {
-                                                        SuperstructureFactory.stow().schedule();
+                                                        SuperstructureFactory.stow();
                                                 }));
 
+                NamedCommands.registerCommand("shootCoral",
+                                                Commands.print("shooooooting coral")
+                                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))
+                                                                
+                                                                .andThen(SuperstructureFactory.stow().withTimeout(1.5)));
+                
         }
 
         // Creates controller rumble command

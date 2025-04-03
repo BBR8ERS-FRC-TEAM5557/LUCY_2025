@@ -26,14 +26,14 @@ public class Rollers extends SubsystemBase {
     private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Rollers/HoldingCoralVolts",
             1.0);
     private static final LoggedTunableNumber mHandoffCoralRpm = new LoggedTunableNumber("Rollers/EjectingCoralVolts",
-            -5.0);
+            -3.0);
 
     private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
             "Rollers/StallVelocityThresholdRPM",
-            50);
+            40);
     private static final LoggedTunableNumber mStallCurrentThreshold = new LoggedTunableNumber(
             "Rollers/StallCurrentThresholdAmps",
-            30.0);
+            25.0);
     private static final LoggedTunableNumber mStallTime = new LoggedTunableNumber(
             "Rollers/StallTimeSecs",
             0.25);

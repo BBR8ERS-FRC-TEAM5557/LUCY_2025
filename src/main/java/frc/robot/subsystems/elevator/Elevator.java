@@ -11,6 +11,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.team6328.LoggedTunableNumber;
@@ -25,7 +26,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
         // Tunable numbers
-        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 100);
+        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 90);
         
         private static final LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0);
 
@@ -40,7 +41,7 @@ public class Elevator extends SubsystemBase {
         private static final LoggedTunableNumber maxAccelerationMetersPerSec2 = new LoggedTunableNumber(
                         "Elevator/MaxAccelerationMetersPerSec2", 10.0);
 
-        private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", -2.0);
+        private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", -1.5);
         private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Elevator/HomingTimeSecs",
                         0.25);
         private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
@@ -155,4 +156,24 @@ public class Elevator extends SubsystemBase {
                                                         io.runPosition(SuperstructureState.STOW.getElevatorMeters());
                                                 });
         }
+
+
+        public Command zeroPosition(){
+                
+                return runOnce( 
+                        () -> {
+                                if (!brakeModeEnabled) // implies limp mode
+                                        return;
+                                
+                                if(!homed){
+                                        io.setPosition(0);
+                                }
+                        });
+
+        }; 
+
 }
+                                                
+                                        
+                
+        

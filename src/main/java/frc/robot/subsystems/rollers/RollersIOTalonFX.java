@@ -3,6 +3,8 @@ package frc.robot.subsystems.rollers;
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -46,6 +48,10 @@ public class RollersIOTalonFX implements RollersIO {
         talon = new TalonFX(40);
         followerTalon = new TalonFX(41);
 
+        Orchestra orchestra = new Orchestra();
+        orchestra.addInstrument(talon);
+        orchestra.addInstrument(followerTalon);
+
         followerTalon.setControl(new Follower(talon.getDeviceID(), false));
 
         // Configure motor
@@ -60,7 +66,8 @@ public class RollersIOTalonFX implements RollersIO {
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = true;
         
-
+        StatusCode loaded = orchestra.loadMusic("spin up.chrp");
+            
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         tryUntilOk(5, () -> talon.getConfigurator().apply(config, 0.25));
 
@@ -80,6 +87,7 @@ public class RollersIOTalonFX implements RollersIO {
                 50.0, velocity, position,
                 appliedVolts, torqueCurrent, supplyCurrent, temp);
         ParentDevice.optimizeBusUtilizationForAll(talon);
+
     }
 
     // @Override
