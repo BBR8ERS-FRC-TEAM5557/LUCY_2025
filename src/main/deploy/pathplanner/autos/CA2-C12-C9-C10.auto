@@ -53,9 +53,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "C12-S"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C12-S"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -116,9 +129,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "C9-S"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C9-S"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -179,9 +205,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "C10-S"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C10-S"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
                 }
               },
               {
