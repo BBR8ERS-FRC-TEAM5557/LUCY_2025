@@ -229,12 +229,14 @@ public class RobotContainer {
                                         SuperstructureFactory.stow().schedule();
                                 }));
 
+                m_driver.povLeft().whileTrue(m_flywheels.popAlgae());
+
                 m_driver.y().whileTrue(SuperstructureFactory.intakeCoral().alongWith(m_flywheels.intakeCoral()));
 
                 // CLIMB
                // m_driver.b().onTrue(SuperstructureFactory.toggleClimb());
-                m_driver.povLeft().whileTrue(m_climb.runVoltageCommand(() -> -12.0));
-                m_driver.povRight().whileTrue(m_climb.runVoltageCommand(() -> 12.0));
+                //m_driver.povLeft().whileTrue(m_climb.runVoltageCommand(() -> -12.0));
+                //m_driver.povRight().whileTrue(m_climb.runVoltageCommand(() -> 12.0));
 
                 /* ENDGAME ALERTS */
                 new Trigger(

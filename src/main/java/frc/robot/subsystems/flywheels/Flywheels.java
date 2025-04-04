@@ -30,6 +30,9 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
             -6.0);
 
+    private static final LoggedTunableNumber mAlgaeRemover = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
+            6.0);
+
             private static final LoggedTunableNumber mScoringL1CoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
             -3.0);
 
@@ -65,7 +68,8 @@ public class Flywheels extends SubsystemBase {
         INTAKE_CORAL(mIntakingCoralRpm),
         HOLD_CORAL(mHoldingCoralRpm),
         SCORE_CORAL(mScoringCoralRpm),
-        SCOREL1_CORAL(mScoringL1CoralRpm);
+        SCOREL1_CORAL(mScoringL1CoralRpm),
+        ALGAE_REMOVE(mAlgaeRemover);
 
         private State(DoubleSupplier voltageSupplier) {
             volts = voltageSupplier;
@@ -152,6 +156,11 @@ public class Flywheels extends SubsystemBase {
     public Command scoreL1Coral() {
         return startEnd(() -> setState(State.SCOREL1_CORAL), () -> setState(State.IDLE))
                 .withName("FlywheelsScoreCoral");
+    }
+
+    public Command popAlgae() {
+        return startEnd(() -> setState(State.ALGAE_REMOVE), () -> setState(State.IDLE))
+                .withName("PopAlgae");
     }
 
     public Command stop() {
