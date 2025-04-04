@@ -279,17 +279,11 @@ public class RobotContainer {
 
                 m_autoChooser.addDefaultOption("drive_back_left", AutoBuilder.buildAuto("drive_back_left"));
 
-                m_autoChooser.addDefaultOption("just_paths", AutoBuilder.buildAuto("just_paths"));
-
                 m_autoChooser.addDefaultOption("drive_back_right", AutoBuilder.buildAuto("drive_back_right"));
 
-                m_autoChooser.addDefaultOption("CA5-C3-C6-TRY THIS ONE!!", AutoBuilder.buildAuto("CA5-C3-C6-C5"));
+                m_autoChooser.addDefaultOption("CA5-C3-C6-C5 THIS ONE!!", AutoBuilder.buildAuto("CA5-C3-C6-C5"));
 
-                m_autoChooser.addDefaultOption("CA5_C3_C6-paths", AutoBuilder.buildAuto("CA5_C3_C6-paths"));
-
-                m_autoChooser.addDefaultOption("CA5_C3_C6-real", AutoBuilder.buildAuto("CA5_C3_C6-real"));
-
-                m_autoChooser.addDefaultOption("CA2-C12-C9-C10", AutoBuilder.buildAuto("CA2-C12-C9-C10"));
+                m_autoChooser.addDefaultOption("CA2-C12-C9-C10 THIS ONE!!", AutoBuilder.buildAuto("CA2-C12-C9-C10"));
         }
 
         private void generateEventMap() {
@@ -352,7 +346,6 @@ public class RobotContainer {
                 NamedCommands.registerCommand("shootCoral",
                                                 Commands.print("shooooooting coral")
                                                                 .alongWith(m_flywheels.scoreCoral().withTimeout(1))
-                                                                
                                                                 .andThen(SuperstructureFactory.stow().withTimeout(1.5)));
                 
         }

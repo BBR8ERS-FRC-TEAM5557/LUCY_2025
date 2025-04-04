@@ -68,7 +68,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
                 config.Feedback.SensorToMechanismRatio = reduction;
                 config.Voltage.PeakForwardVoltage = 12.0;
-                config.Voltage.PeakReverseVoltage = -5.0;
+                config.Voltage.PeakReverseVoltage = -5.5;   //CHANGE ELEVATOR MAX SPEED DOWN HERE (prev 5.0)
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;
                 config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 70.0;

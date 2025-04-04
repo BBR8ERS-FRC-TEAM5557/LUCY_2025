@@ -35,7 +35,7 @@ public class Flywheels extends SubsystemBase {
 
     private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
             "Flywheels/StallVelocityThresholdRPM",
-            50);
+            50.0);
     private static final LoggedTunableNumber mStallCurrentThreshold = new LoggedTunableNumber(
             "Flywheels/StallCurrentThresholdAmps",
             30.0);
