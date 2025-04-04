@@ -24,9 +24,9 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber mIdleRpm = new LoggedTunableNumber("Flywheels/IdleVolts", 0.0);
 
     private static final LoggedTunableNumber mIntakingCoralRpm = new LoggedTunableNumber("Flywheels/IntakingCoralVolts",
-            -5.0);
+            -4.0);
     private static final LoggedTunableNumber mHoldingCoralRpm = new LoggedTunableNumber("Flywheels/HoldingCoralVolts",
-            1.0);
+            0.0);
     private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
             -6.0);
 
@@ -35,10 +35,10 @@ public class Flywheels extends SubsystemBase {
 
     private static final LoggedTunableNumber mStallVelocityThreshold = new LoggedTunableNumber(
             "Flywheels/StallVelocityThresholdRPM",
-            50.0);
+            50.0);   // **IMPORTANT** 
     private static final LoggedTunableNumber mStallCurrentThreshold = new LoggedTunableNumber(
             "Flywheels/StallCurrentThresholdAmps",
-            30.0);
+            30.0);  // **IMPORTANT**
     private static final LoggedTunableNumber mStallTime = new LoggedTunableNumber(
             "Flywheels/StallTimeSecs",
             0.25);

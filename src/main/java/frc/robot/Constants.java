@@ -31,7 +31,6 @@ public class Constants {
                 public static final int kBREncoder = 13;
                 public static final Rotation2d kBROffset = Rotation2d.fromDegrees(-163.5644);
         }
-
         public class Physical {
                 // Physical Constants
                 public static final double kChassisLength = Units.inchesToMeters(26.0);

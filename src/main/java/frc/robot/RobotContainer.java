@@ -34,12 +34,7 @@ import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.commands.TeleopDrive;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOTalonFX;
-import frc.robot.subsystems.rollers.Rollers;
-import frc.robot.subsystems.rollers.RollersIO;
-import frc.robot.subsystems.rollers.RollersIOTalonFX;
+
 import frc.robot.state.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -88,7 +83,7 @@ public class RobotContainer {
 
                 
                 m_elevator = new Elevator(
-                                new ElevatorIOTalonFX());  
+                                new ElevatorIOTalonFX());   
 
 
                 m_flywheels = new Flywheels(
@@ -213,7 +208,7 @@ public class RobotContainer {
                         SuperstructureFactory.stow().schedule();
                 }));
 
-        
+                //ZEROS ELEVATOR
                 m_driver.b().onTrue(m_elevator.zeroPosition());
 
                 // FLYWHEELS SCORE
@@ -345,7 +340,7 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("shootCoral",
                                                 Commands.print("shooooooting coral")
-                                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))
+                                                                .alongWith(m_flywheels.scoreCoral().withTimeout(1))   //**IMPORTANT**
                                                                 .andThen(SuperstructureFactory.stow().withTimeout(1.5)));
                 
         }
