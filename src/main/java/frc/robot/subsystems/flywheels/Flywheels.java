@@ -30,7 +30,7 @@ public class Flywheels extends SubsystemBase {
     private static final LoggedTunableNumber mScoringCoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
             -6.0);
 
-    private static final LoggedTunableNumber mAlgaeRemover = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
+    private static final LoggedTunableNumber mAlgaeRemover = new LoggedTunableNumber("Flywheels/PoppingAlgaeVolts",
             6.0);
 
             private static final LoggedTunableNumber mScoringL1CoralRpm = new LoggedTunableNumber("Flywheels/EjectingCoralVolts",
