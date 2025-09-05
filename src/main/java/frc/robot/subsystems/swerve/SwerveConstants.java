@@ -133,8 +133,8 @@ public class SwerveConstants {
 
                 public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
                                 .withPigeon2Id(kPigeon)
-                                .withPigeon2Configs(Pigeon2)
-                                .withCANBusName(kCANbusName);
+                                .withPigeon2Configs(Pigeon2);
+                                //.withCANBusName(kCANbusName);
 
                 private static final TalonFXConfiguration initialDriveConfigs = new TalonFXConfiguration();
                 static {
