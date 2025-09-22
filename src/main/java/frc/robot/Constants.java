@@ -11,30 +11,30 @@ public class Constants {
         public class RobotMap {
                 public static final int kPigeon = 5;
 
-                public static final int kFLDriveMotor = 22;
+                public static final int kFLDriveMotor = 12;
                 public static final int kFLTurnMotor = 21;
                 public static final int kFLEncoder = 11;
-                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-237.1289);
+                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(0);
 
-                public static final int kFRDriveMotor = 24;
-                public static final int kFRTurnMotor = 23;
+                public static final int kFRDriveMotor = 14;
+                public static final int kFRTurnMotor = 22;
                 public static final int kFREncoder = 12;
-                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(-340.3125);
+                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(0);
 
-                public static final int kBLDriveMotor = 28;
-                public static final int kBLTurnMotor = 27;
+                public static final int kBLDriveMotor = 13;
+                public static final int kBLTurnMotor = 23;
                 public static final int kBLEncoder = 14;
-                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(-325.546875);
+                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(0);
 
-                public static final int kBRDriveMotor = 26;
-                public static final int kBRTurnMotor = 25;
+                public static final int kBRDriveMotor = 15;
+                public static final int kBRTurnMotor = 24;
                 public static final int kBREncoder = 13;
-                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(-163.5644);
+                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(0);
         }
         public class Physical {
                 // Physical Constants
-                public static final double kChassisLength = Units.inchesToMeters(26.0);
-                public static final double kChassisWidth = Units.inchesToMeters(26.0);
+                public static final double kChassisLength = Units.inchesToMeters(22.0);
+                public static final double kChassisWidth = Units.inchesToMeters(22.0);
                 public static final double kBumperThickness = Units.inchesToMeters(0.75 + 2.5);
                 public static final double kRobotLength = kChassisLength + 2 * kBumperThickness;
                 public static final double kRobotWidth = kChassisWidth + 2 * kBumperThickness;
