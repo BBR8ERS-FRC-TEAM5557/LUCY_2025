@@ -1,11 +1,6 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.1"
-
-    id "com.peterabeles.gversion" version "1.10"
-    id "com.diffplug.spotless" version "6.24.0"
-    id "io.freefair.lombok" version "8.4"
-    id "com.google.protobuf" version "0.9.4"
 }
 
 java {
@@ -91,6 +86,9 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 }
 
 test {
@@ -118,6 +116,6 @@ wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
-tasks.withType(JavaCompile) {
-    options.compilerArgs.add '-XDstringConcat=inline'
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ["-Xlint:all,-options,-processing"]
 }
