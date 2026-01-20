@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.team6328.VirtualSubsystem;
 import frc.robot.RobotContainer;
-import frc.robot.state.vision.Vision.VisionObservation;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotStateEstimator extends VirtualSubsystem {
         private static RobotStateEstimator mInstance = null;
@@ -41,15 +41,15 @@ public class RobotStateEstimator extends VirtualSubsystem {
                 updateFieldWidget();
         }
 
-        public void addVisionObservation(VisionObservation update) {
-                RobotContainer.m_swerve.addVisionMeasurement(update.visionPose(), update.timestamp(), update.stdDevs());
-        }
+        // public void addVisionObservation(VisionObservation update) {
+        //         RobotContainer.m_swerve.addVisionMeasurement(update.visionPose(), update.timestamp(), update.stdDevs());
+        // }
 
-        public void addVisionObservation(List<VisionObservation> visionData) {
-                for (var update : visionData) {
-                        addVisionObservation(update);
-                }
-        }
+        // public void addVisionObservation(List<VisionObservation> visionData) {
+        //         for (var update : visionData) {
+        //                 addVisionObservation(update);
+        //         }
+        // }
 
         @AutoLogOutput(key = "RobotState/EstimatedPose")
         public Pose2d getEstimatedPose() {

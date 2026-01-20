@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team6328.AllianceFlipUtil;
 import frc.robot.leds.Leds;
-import frc.robot.state.vision.AprilTagVisionIO;
-import frc.robot.state.vision.Vision;
+// import frc.robot.state.vision.AprilTagVisionIO;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.SuperstructureFactory;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -55,7 +55,7 @@ public class RobotContainer {
         public static Orchestra m_orchestra;
 
         // create variables for virtual subsystems
-        public static Vision m_vision;
+        public static VisionSubsystem m_vision;
         public static RobotStateEstimator m_stateEstimator;
         public static Leds m_leds;
         
@@ -120,13 +120,13 @@ public class RobotContainer {
 
                
 
-                if (m_vision == null) {
-                        m_vision = new Vision(
-                                        new AprilTagVisionIO() {
-                                        },
-                                        new AprilTagVisionIO() {
-                                        });
-                }
+                // if (m_vision == null) {
+                //         m_vision = new Vision(
+                //                         new AprilTagVisionIO() {
+                //                         },
+                //                         new AprilTagVisionIO() {
+                //                         });
+                // }
 
                 m_stateEstimator = RobotStateEstimator.getInstance(); // get state estimator singleton
                 m_leds = Leds.getInstance(); // get leds singleton
