@@ -46,10 +46,8 @@ public class Elevator extends SubsystemBase {
                         0.25);
         private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(
                         "Elevator/HomingVelocityThresh", 0.01);
-
         private static final LoggedTunableNumber setpointTolerance = new LoggedTunableNumber(
-                        "Elevator/setpointTolerance", Units.inchesToMeters(2));
-
+                        "Elevator/SetpointTolerance", 0.05);
         private final ElevatorIO io;
         private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -126,7 +124,8 @@ public class Elevator extends SubsystemBase {
         @AutoLogOutput(key = "Elevator/atSetpoint")
         public boolean atSetpoint() {
                 return Util.epsilonEquals(getPositionMeters(), getSetpointMeters(),
-                                setpointTolerance.get());
+                                
+                setpointTolerance.get());
         }
 
         @AutoLogOutput(key = "Elevator/homed")

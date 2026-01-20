@@ -101,6 +101,10 @@ public class RobotContainer {
                         });
                 }
 
+                if (m_vision == null) {
+                        m_vision = new VisionSubsystem();
+                }
+
                 
 
                 if (m_flywheels == null) {

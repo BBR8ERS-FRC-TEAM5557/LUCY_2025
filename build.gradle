@@ -16,6 +16,7 @@ java {
 repositories {
     maven {
         url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release")
+        url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release")
     }
 }
 
@@ -91,6 +92,9 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 }
 
 test {
@@ -118,6 +122,6 @@ wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
-tasks.withType(JavaCompile) {
-    options.compilerArgs.add '-XDstringConcat=inline'
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ["-Xlint:all,-options,-processing"]
 }

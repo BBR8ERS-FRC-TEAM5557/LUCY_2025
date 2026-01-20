@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -11,30 +12,30 @@ public class Constants {
         public class RobotMap {
                 public static final int kPigeon = 5;
 
-                public static final int kFLDriveMotor = 22;
-                public static final int kFLTurnMotor = 21;
+                public static final int kFLDriveMotor = 26;
+                public static final int kFLTurnMotor = 25;
                 public static final int kFLEncoder = 11;
-                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-237.1289);
+                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(0);
 
-                public static final int kFRDriveMotor = 24;
-                public static final int kFRTurnMotor = 23;
-                public static final int kFREncoder = 12;
-                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(-340.3125);
+                public static final int kFRDriveMotor = 28;
+                public static final int kFRTurnMotor = 27;
+                public static final int kFREncoder = 12; 
+                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(0);
 
-                public static final int kBLDriveMotor = 28;
-                public static final int kBLTurnMotor = 27;
+                public static final int kBLDriveMotor = 24;
+                public static final int kBLTurnMotor = 23;
                 public static final int kBLEncoder = 14;
-                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(-325.546875);
+                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(0);
 
-                public static final int kBRDriveMotor = 26;
-                public static final int kBRTurnMotor = 25;
+                public static final int kBRDriveMotor = 22;
+                public static final int kBRTurnMotor = 21;
                 public static final int kBREncoder = 13;
-                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(-163.5644);
+                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(0);
         }
         public class Physical {
                 // Physical Constants
-                public static final double kChassisLength = Units.inchesToMeters(26.0);
-                public static final double kChassisWidth = Units.inchesToMeters(26.0);
+                public static final double kChassisLength = Units.inchesToMeters(22.0);
+                public static final double kChassisWidth = Units.inchesToMeters(22.0);
                 public static final double kBumperThickness = Units.inchesToMeters(0.75 + 2.5);
                 public static final double kRobotLength = kChassisLength + 2 * kBumperThickness;
                 public static final double kRobotWidth = kChassisWidth + 2 * kBumperThickness;
@@ -54,6 +55,31 @@ public class Constants {
                                                                                                               // for a
                                                                                                               // slab
         }
+
+        public static final class VisionConstants {
+                public static final String kLimelightName = "limelight";
+                public static final double kLimelightMountAngleDegrees = 15.0; // Angle from horizontal
+                public static final double kLimelightLensHeightMeters = Units.inchesToMeters(24.0);
+                public static final double kLimelightMountOffsetX = 0.0; // Forward offset from robot center
+                public static final double kLimelightMountOffsetY = 0.0; // Left/right offset from robot center
+        
+                // AprilTag field layout
+                public static final AprilTagFields kAprilTagField = AprilTagFields.kDefaultField;
+        
+                // Vision measurement standard deviations
+                public static final double kVisionTranslationStdDev = 0.5; // meters
+                public static final double kVisionRotationStdDev = 0.5; // radians
+        
+                // Target alignment constants
+                public static final double kMaxAlignAngularVelocity = Math.PI; // rad/s
+                public static final double kAlignPositionTolerance = Units.degreesToRadians(2.0); // radians
+                public static final double kAlignVelocityTolerance = Units.degreesToRadians(5.0); // rad/s
+        
+                // PID constants for rotation alignment
+                public static final double kAlignP = 2.0;
+                public static final double kAlignI = 0.0;
+                public static final double kAlignD = 0.1;
+            }
 
         public class Joystick {
                 public static double kSteerJoystickDeadband = 0.05;
