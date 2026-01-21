@@ -15,22 +15,22 @@ public class Constants {
                 public static final int kFLDriveMotor = 26;
                 public static final int kFLTurnMotor = 25;
                 public static final int kFLEncoder = 11;
-                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(0);
+                public static final Rotation2d kFLOffset = Rotation2d.fromDegrees(-343.916015625);
 
                 public static final int kFRDriveMotor = 28;
                 public static final int kFRTurnMotor = 27;
                 public static final int kFREncoder = 12; 
-                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(0);
+                public static final Rotation2d kFROffset = Rotation2d.fromDegrees(-83.68359375);
 
                 public static final int kBLDriveMotor = 24;
                 public static final int kBLTurnMotor = 23;
                 public static final int kBLEncoder = 14;
-                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(0);
+                public static final Rotation2d kBLOffset = Rotation2d.fromDegrees(-160.400390625);
 
                 public static final int kBRDriveMotor = 22;
                 public static final int kBRTurnMotor = 21;
                 public static final int kBREncoder = 13;
-                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(0);
+                public static final Rotation2d kBROffset = Rotation2d.fromDegrees(-54.5921875);
         }
         public class Physical {
                 // Physical Constants
