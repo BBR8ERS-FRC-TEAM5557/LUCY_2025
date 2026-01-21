@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -37,7 +37,8 @@ public class AlignToAprilTag extends Command {
         // Enable continuous input for angles (-180 to 180 degrees)
         m_rotationController.enableContinuousInput(-180.0, 180.0);
 
-        // addRequirements(driveSubsystem);
+        // Require the swerve subsystem so this command can take control of driving
+        addRequirements(m_swerve);
     }
 
     @Override

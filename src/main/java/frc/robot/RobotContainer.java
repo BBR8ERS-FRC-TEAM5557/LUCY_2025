@@ -157,6 +157,13 @@ public class RobotContainer {
                                 this::getSlowDownInput);
                 m_swerve.setDefaultCommand(teleop.withName("TeleopDrive"));
 
+                // Automatically align to an AprilTag when it first appears
+                // Schedules AlignToAprilTag on the rising edge of vision detection
+                new Trigger(() -> m_vision.hasTargets())
+                        .onTrue(Commands.runOnce(() -> {
+                                new frc.robot.commands.AlignToAprilTag(m_swerve, m_vision).schedule();
+                        }));
+
                // m_orchestra.addInstrument(m_intake);
 
                 /* UTIL */
