@@ -188,6 +188,15 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
                                 getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
         }
 
+        /**
+         * Convenience method for legacy code: directly drive with ChassisSpeeds.
+         * Forwards the speeds into the Phoenix Swerve control request used elsewhere.
+         */
+        public void drive(ChassisSpeeds speeds) {
+                // use the pre-created autoRequest apply type to set speeds
+                this.setControl(autoRequest.withSpeeds(speeds));
+        }
+
         private double placeRotationIn360Scope(Rotation2d rot) {
                 double result = rot.getDegrees() % 360.0;
                 if (result < 0) {

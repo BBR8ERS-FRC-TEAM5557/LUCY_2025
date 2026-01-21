@@ -24,12 +24,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
         // Tunable numbers
-        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 90);
+        private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 850);
         
-        private static final LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0);
+        private static final LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 7);
 
-        private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.25);
-        private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.45);
+        private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", .2);
+        private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.2);
         private static final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
         private static final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.0);
 
@@ -39,7 +39,7 @@ public class Elevator extends SubsystemBase {
         private static final LoggedTunableNumber maxAccelerationMetersPerSec2 = new LoggedTunableNumber(
                         "Elevator/MaxAccelerationMetersPerSec2", 10.0);
 
-        private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", -1.5);
+        private static final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", -1.0);
         private static final LoggedTunableNumber homingTimeSecs = new LoggedTunableNumber("Elevator/HomingTimeSecs",
                         0.25);
         private static final LoggedTunableNumber homingVelocityThresh = new LoggedTunableNumber(

@@ -65,10 +65,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
                 // Configure motor
                 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-                config.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
+                config.Slot0 = new Slot0Configs().withKP(6).withKI(0).withKD(0);
                 config.Feedback.SensorToMechanismRatio = reduction;
-                config.Voltage.PeakForwardVoltage = 12.0;
-                config.Voltage.PeakReverseVoltage = -5.5;   //CHANGE ELEVATOR MAX SPEED DOWN HERE (prev 5.0) **IMPORTANT**
+                config.Voltage.PeakForwardVoltage = 7;
+                config.Voltage.PeakReverseVoltage = -4;   //CHANGE ELEVATOR MAX SPEED DOWN HERE (prev 5.0) **IMPORTANT**
                 config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;
                 config.TorqueCurrent.PeakReverseTorqueCurrent = -50.0;
                 config.CurrentLimits.StatorCurrentLimit = 70.0;
@@ -76,7 +76,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.01;
                 config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
-                config.Audio.BeepOnBoot = false;
+                config.Audio.BeepOnBoot = true;
                 config.Audio.AllowMusicDurDisable = true;
                 config.Audio.BeepOnConfig = true;
 
