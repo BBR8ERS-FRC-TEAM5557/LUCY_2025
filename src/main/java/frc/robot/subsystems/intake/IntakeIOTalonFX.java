@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake;
 import static frc.lib.team6328.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,7 +16,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.intake.IntakeIO.IntakeIOInputs;
 
 public class IntakeIOTalonFX implements IntakeIO {
         public static final double reduction =  0.0457; //(70.0 / 14.0) * (44.0 / 16.0) / 360.0; 

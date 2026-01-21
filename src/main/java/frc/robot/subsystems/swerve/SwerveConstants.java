@@ -84,7 +84,8 @@ public class SwerveConstants {
         }
 
         public class TunerConstants {
-                private static final String kCANbusName = "canivore";
+                // Unused
+                // private static final String kCANbusName = "canivore";
 
                 // The closed-loop output type to use for the steer motors;
                 // This affects the PID/FF gains for the steer motors
