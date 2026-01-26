@@ -43,7 +43,7 @@ public class VisionSubsystem extends VirtualSubsystem {
         // Create pose estimator
         m_poseEstimator = new PhotonPoseEstimator(
             m_fieldLayout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            PoseStrategy.MULTI_TAG_PNP_ON_RIO,
             new Transform3d(
                 new Translation3d(
                     VisionConstants.kLimelightMountOffsetX,
